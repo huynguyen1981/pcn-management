@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Task Manager</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        input { padding: 8px; width: 200px; }
+        button { padding: 8px; cursor: pointer; }
+        ul { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <h2>Task Manager (Sheet DB)</h2>
+    <input type="text" id="taskInput" placeholder="Nhập task mới...">
+    <button onclick="addTask()">Thêm Task</button>
+    <ul id="taskList"></ul>
+
+    <script>
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCD1QdEY78sHZPh30PS3J0D9tXTIcq22M-oO_umsUOtpbx3BtXBpLSbKOednT7gdY2kQ/exec"; // Dán link Apps Script vào đây
+
+        // Hàm lấy danh sách task
+        async function loadTasks() {
+            const res = await fetch(SCRIPT_URL);
+            const data = await res.json();
+            const list = document.getElementById('taskList');
+            list.innerHTML = data.map(item => `<li>${item[1]} - <b>${item[2]}</b></li>`).join('');
+        }
+
+        // Hàm thêm task mới
+        async function addTask() {
+            const task = document.getElementById('taskInput').value;
+            if (!task) return;
+            
+            await fetch(SCRIPT_URL, {
+                method: "POST",
+                body: JSON.stringify({ task: task })
+            });
+            
+            document.getElementById('taskInput').value = '';
+            loadTasks(); // Load lại danh sách
+        }
+
+        loadTasks(); // Gọi khi vừa mở trang
+    </script>
+</body>
+</html>
