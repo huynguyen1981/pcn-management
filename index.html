@@ -1,46 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="vi">
 <head>
-    <title>My Task Manager</title>
-    <style>
-        body { font-family: sans-serif; padding: 20px; }
-        input { padding: 8px; width: 200px; }
-        button { padding: 8px; cursor: pointer; }
-        ul { margin-top: 20px; }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pro Task Manager</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h2>Task Manager (Sheet DB)</h2>
-    <input type="text" id="taskInput" placeholder="Nhập task mới...">
-    <button onclick="addTask()">Thêm Task</button>
-    <ul id="taskList"></ul>
+<body class="bg-gray-50 min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <h1 class="text-3xl font-bold text-gray-800 mb-8 text-center">🚀 Task Management System</h1>
+        
+        <div class="bg-white p-6 rounded-xl shadow-md mb-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <input type="text" id="taskInput" placeholder="Tên công việc..." class="border p-2 rounded-lg focus:ring-2 focus:ring-blue-400 outline-none">
+                <select id="pcnInput" class="border p-2 rounded-lg">
+                    <option value="Mandatory">Mandatory</option>
+                    <option value="Immediately">Immediately</option>
+                    <option value="Schedule">Schedule</option>
+                </select>
+                <select id="statusInput" class="border p-2 rounded-lg">
+                    <option value="IN PROGRESS">IN PROGRESS</option>
+                    <option value="ON HOLD">ON HOLD</option>
+                    <option value="RELEASE">RELEASE</option>
+                </select>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">Start:</span>
+                    <input type="date" id="startInput" class="border p-2 rounded-lg flex-1">
+                </div>
+                <div class="flex items-center space-x-2">
+                    <span class="text-sm text-gray-500">End:</span>
+                    <input type="date" id="endInput" class="border p-2 rounded-lg flex-1">
+                </div>
+                <button onclick="addTask()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition">Thêm Task</button>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+            <table class="min-w-full leading-normal">
+                <thead>
+                    <tr class="bg-gray-100 text-gray-600 uppercase text-sm leading-normal">
+                        <th class="py-3 px-6 text-left">Công việc</th>
+                        <th class="py-3 px-6 text-center">Loại PCN</th>
+                        <th class="py-3 px-6 text-center">Trạng thái</th>
+                        <th class="py-3 px-6 text-center">Bắt đầu</th>
+                        <th class="py-3 px-6 text-center">Kết thúc</th>
+                    </tr>
+                </thead>
+                <tbody id="taskTableBody" class="text-gray-700 text-sm">
+                    </tbody>
+            </table>
+            <div id="loading" class="text-center py-4 hidden text-blue-500 font-bold">Đang cập nhật dữ liệu...</div>
+        </div>
+    </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyCD1QdEY78sHZPh30PS3J0D9tXTIcq22M-oO_umsUOtpbx3BtXBpLSbKOednT7gdY2kQ/exec"; // Dán link Apps Script vào đây
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbz9Pd0b4j-ihXUr3-a7g_UkitVtNVHz7uepH-__rXFvQajDCK6qcR3mcJXDqB0gkyUrhQ/exec";
 
-        // Hàm lấy danh sách task
         async function loadTasks() {
-            const res = await fetch(SCRIPT_URL);
-            const data = await res.json();
-            const list = document.getElementById('taskList');
-            list.innerHTML = data.map(item => `<li>${item[1]} - <b>${item[2]}</b></li>`).join('');
+            document.getElementById('loading').classList.remove('hidden');
+            try {
+                const res = await fetch(SCRIPT_URL);
+                const data = await res.json();
+                renderTable(data);
+            } catch (e) { console.error("Lỗi load data"); }
+            document.getElementById('loading').classList.add('hidden');
         }
 
-        // Hàm thêm task mới
+        function renderTable(data) {
+            const body = document.getElementById('taskTableBody');
+            body.innerHTML = data.map(row => `
+                <tr class="border-b border-gray-200 hover:bg-gray-50 transition">
+                    <td class="py-3 px-6 text-left font-medium">${row[1]}</td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs ${row[2] === 'Mandatory' ? 'bg-red-100 text-red-600' : 'bg-orange-100 text-orange-600'}">${row[2]}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center">
+                        <span class="px-3 py-1 rounded-full text-xs ${row[3] === 'RELEASE' ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600'} font-bold">${row[3]}</span>
+                    </td>
+                    <td class="py-3 px-6 text-center text-gray-500">${new Date(row[4]).toLocaleDateString('vi-VN')}</td>
+                    <td class="py-3 px-6 text-center text-gray-500">${new Date(row[5]).toLocaleDateString('vi-VN')}</td>
+                </tr>
+            `).join('');
+        }
+
         async function addTask() {
-            const task = document.getElementById('taskInput').value;
-            if (!task) return;
-            
-            await fetch(SCRIPT_URL, {
+            const taskData = {
+                task: document.getElementById('taskInput').value,
+                pcn: document.getElementById('pcnInput').value,
+                status: document.getElementById('statusInput').value,
+                start: document.getElementById('startInput').value,
+                end: document.getElementById('endInput').value
+            };
+
+            if (!taskData.task) return alert("Điền tên task bồ ơi!");
+
+            // OPTIMISTIC UI: Hiện lên bảng ngay lập tức cho máu
+            const body = document.getElementById('taskTableBody');
+            const tempRow = `
+                <tr class="border-b border-gray-200 opacity-50 bg-blue-50">
+                    <td class="py-3 px-6">${taskData.task} (Đang lưu...)</td>
+                    <td class="py-3 px-6 text-center">${taskData.pcn}</td>
+                    <td class="py-3 px-6 text-center">${taskData.status}</td>
+                    <td class="py-3 px-6 text-center">${taskData.start}</td>
+                    <td class="py-3 px-6 text-center">${taskData.end}</td>
+                </tr>
+            `;
+            body.innerHTML = tempRow + body.innerHTML;
+
+            // Gửi dữ liệu ngầm
+            fetch(SCRIPT_URL, {
                 method: "POST",
-                body: JSON.stringify({ task: task })
+                body: JSON.stringify(taskData)
+            }).then(() => {
+                loadTasks(); // Load lại bản chuẩn từ Server
             });
-            
+
+            // Reset form
             document.getElementById('taskInput').value = '';
-            loadTasks(); // Load lại danh sách
         }
 
-        loadTasks(); // Gọi khi vừa mở trang
+        loadTasks();
     </script>
 </body>
 </html>
