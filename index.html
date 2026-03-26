@@ -2,129 +2,179 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>Enterprise Task Manager</title>
+    <title>Enterprise PCN Manager</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
 </head>
-<body class="bg-slate-100 min-h-screen p-4">
-    <div class="max-w-6xl mx-auto">
-        <div class="flex justify-between items-center mb-6">
-            <h1 class="text-2xl font-bold text-slate-800">📊 Task Report System</h1>
-            <button onclick="exportPDF()" class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg font-bold shadow">
-                📄 Export PDF Report
+<body class="bg-slate-50 min-h-screen p-4">
+    <div class="max-w-[95%] mx-auto">
+        <div class="flex justify-between items-center mb-8 pb-4 border-b">
+            <h1 class="text-3xl font-extrabold text-slate-900 tracking-tight">🛠️ PCN Tracking System</h1>
+            <button onclick="exportPDF()" class="bg-rose-600 hover:bg-rose-700 text-white px-6 py-2.5 rounded-xl font-bold shadow-lg transition-all flex items-center gap-2">
+                📄 Export Approval Report
             </button>
         </div>
 
-        <div class="bg-white p-6 rounded-xl shadow-sm mb-6 border border-slate-200">
+        <div class="bg-white p-7 rounded-2xl shadow-sm mb-8 border border-slate-100">
             <input type="hidden" id="editId">
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <input type="text" id="taskInput" placeholder="Task name..." class="border p-2 rounded-md outline-blue-500">
-                <select id="pcnInput" class="border p-2 rounded-md text-sm">
-                    <option value="Mandatory">Mandatory</option>
-                    <option value="Immediately">Immediately</option>
-                    <option value="Schedule">Schedule</option>
-                </select>
-                <select id="statusInput" class="border p-2 rounded-md text-sm font-bold">
-                    <option value="IN PROGRESS">IN PROGRESS</option>
-                    <option value="ON HOLD">ON HOLD</option>
-                    <option value="RELEASE">RELEASE</option>
-                </select>
-                <input type="date" id="startInput" class="border p-2 rounded-md">
-                <input type="date" id="endInput" class="border p-2 rounded-md">
-                <button id="btnSubmit" onclick="saveTask()" class="bg-indigo-600 text-white font-bold py-2 rounded-md hover:bg-indigo-700 transition">Save Task</button>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div class="md:col-span-2 grid grid-cols-2 gap-4 border-r pr-6">
+                    <input type="text" id="pcnInput" placeholder="PCN #" class="border p-2.5 rounded-xl outline-blue-500 text-sm">
+                    <select id="pcnTypeInput" class="border p-2.5 rounded-xl text-sm">
+                        <option value="Mandatory">Mandatory</option>
+                        <option value="Immediately">Immediately</option>
+                        <option value="Schedule">Schedule</option>
+                    </select>
+                    <select id="statusInput" class="border p-2.5 rounded-xl text-sm font-bold md:col-span-2">
+                        <option value="IN PROGRESS">IN PROGRESS</option>
+                        <option value="ON HOLD">ON HOLD</option>
+                        <option value="RELEASE">RELEASE</option>
+                    </select>
+                </div>
+
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="engrTechInput" placeholder="Engr. Tech" class="border p-2.5 rounded-xl text-sm">
+                    <input type="text" id="apprEngrInput" placeholder="Appr Engr." class="border p-2.5 rounded-xl text-sm">
+                    <input type="date" id="startInput" title="Start Date" class="border p-2.5 rounded-xl text-sm">
+                    <input type="date" id="apprDateInput" title="Appr Date" class="border p-2.5 rounded-xl text-sm">
+                </div>
+
+                <div class="flex flex-col gap-4">
+                    <input type="date" id="releaseDateInput" title="Release Date" class="border p-2.5 rounded-xl text-sm">
+                    <button id="btnSubmit" onclick="saveTask()" class="flex-1 bg-indigo-600 text-white font-bold py-3 rounded-xl hover:bg-indigo-700 transition shadow-md">Save PCN</button>
+                </div>
             </div>
+            <textarea id="descInput" placeholder="Description..." class="border p-3 rounded-xl outline-blue-500 text-sm w-full mt-5 h-20" rows="2"></textarea>
         </div>
 
-        <div class="bg-white rounded-xl shadow-sm overflow-hidden">
-            <table id="taskTable" class="w-full text-left border-collapse">
-                <thead class="bg-slate-800 text-white">
-                    <tr>
-                        <th class="p-4">Task</th>
-                        <th class="p-4 text-center">PCN</th>
-                        <th class="p-4 text-center">Status</th>
-                        <th class="p-4 text-center">Dates</th>
-                        <th class="p-4 text-center">Action</th>
+        <div class="bg-white rounded-2xl shadow-sm overflow-x-auto border border-slate-100">
+            <table id="taskTable" class="w-full text-left border-collapse min-w-[1200px]">
+                <thead class="bg-slate-900 text-white">
+                    <tr class="text-xs uppercase tracking-wider">
+                        <th class="p-4 whitespace-nowrap">PCN # / Type</th>
+                        <th class="p-4 text-center whitespace-nowrap">Status</th>
+                        <th class="p-4">Description</th>
+                        <th class="p-4 text-center whitespace-nowrap">Engr Tech</th>
+                        <th class="p-4 text-center whitespace-nowrap">Appr Engr / Date</th>
+                        <th class="p-4 text-center whitespace-nowrap">Timeline</th>
+                        <th class="p-4 text-center whitespace-nowrap">Action</th>
                     </tr>
                 </thead>
-                <tbody id="taskTableBody"></tbody>
+                <tbody id="taskTableBody" class="text-sm"></tbody>
             </table>
         </div>
     </div>
 
     <script>
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyhe09ADEYM0lDZurvMrhmXV32Zvwn4d9I6M8d9hZRyVMYZhI32x5oJv4yKzItOl4IHNQ/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzNdyx_kd5dE4nC6CMV8CdBKm__0_pGbGnjr2gytlJzTUsmZm65qGuzoNpFWzxZO99ZnQ/exec";
         let allTasks = [];
 
         async function loadTasks() {
             const res = await fetch(SCRIPT_URL);
             allTasks = await res.json();
-            renderTable();
+            renderTable(allTasks);
         }
 
-        function renderTable() {
+        function formatDate(dateStr) {
+            return dateStr ? dateStr.split('T')[0] : '';
+        }
+
+        function renderTable(data) {
             const body = document.getElementById('taskTableBody');
-            body.innerHTML = allTasks.map((row, index) => `
-                <tr class="border-b hover:bg-slate-50">
-                    <td class="p-4 font-medium">${row[1]}</td>
-                    <td class="p-4 text-center text-xs font-bold uppercase text-slate-500">${row[2]}</td>
-                    <td class="p-4 text-center">
-                        <span class="px-2 py-1 rounded text-[10px] font-bold ${row[3] === 'RELEASE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${row[3]}</span>
+            body.innerHTML = data.map((row) => `
+                <tr class="border-b hover:bg-slate-50 transition ${row[0] === 'temp-id' ? 'opacity-60 bg-indigo-50 animate-pulse' : ''}">
+                    <td class="p-4 font-bold text-slate-950 whitespace-nowrap">
+                        ${row[1]}<br><span class="text-xs font-medium text-slate-500 uppercase">${row[2]}</span>
                     </td>
-                    <td class="p-4 text-center text-xs text-slate-400">
-                        ${row[4].split('T')[0]} ➡️ ${row[5].split('T')[0]}
+                    <td class="p-4 text-center whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-md text-[11px] font-bold ${row[3] === 'RELEASE' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}">${row[3]}</span>
                     </td>
-                    <td class="p-4 text-center">
-                        <button onclick='editTask(${JSON.stringify(index)})' class="text-blue-600 hover:underline font-bold">Edit</button>
+                    <td class="p-4 text-slate-600 text-xs max-w-sm">${row[4]}</td>
+                    <td class="p-4 text-center whitespace-nowrap">${row[6]}</td>
+                    <td class="p-4 text-center whitespace-nowrap text-xs text-slate-500">
+                        <b>${row[8]}</b><br>${formatDate(row[7])}
+                    </td>
+                    <td class="p-4 text-center whitespace-nowrap text-[11px] text-slate-400">
+                        S: ${formatDate(row[5])}<br>R: ${formatDate(row[9])}
+                    </td>
+                    <td class="p-4 text-center whitespace-nowrap">
+                        ${row[0] !== 'temp-id' ? `<button onclick="prepareEdit('${row[0]}')" class="text-indigo-600 hover:text-indigo-800 font-bold text-xs bg-indigo-50 px-3 py-1 rounded-lg">Edit</button>` : ''}
                     </td>
                 </tr>
             `).join('');
         }
 
-        function editTask(index) {
-            const task = allTasks[index];
+        function prepareEdit(id) {
+            const task = allTasks.find(t => t[0] == id);
             document.getElementById('editId').value = task[0];
-            document.getElementById('taskInput').value = task[1];
-            document.getElementById('pcnInput').value = task[2];
+            document.getElementById('pcnInput').value = task[1];
+            document.getElementById('pcnTypeInput').value = task[2];
             document.getElementById('statusInput').value = task[3];
-            document.getElementById('startInput').value = task[4].split('T')[0];
-            document.getElementById('endInput').value = task[5].split('T')[0];
+            document.getElementById('descInput').value = task[4];
+            document.getElementById('startInput').value = formatDate(task[5]);
+            document.getElementById('engrTechInput').value = task[6];
+            document.getElementById('apprDateInput').value = formatDate(task[7]);
+            document.getElementById('apprEngrInput').value = task[8];
+            document.getElementById('releaseDateInput').value = formatDate(task[9]);
             document.getElementById('btnSubmit').innerText = "Update Now";
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         async function saveTask() {
-            const data = {
-                id: document.getElementById('editId').value || null,
-                task: document.getElementById('taskInput').value,
+            const editId = document.getElementById('editId').value;
+            const taskData = {
+                id: editId || null,
                 pcn: document.getElementById('pcnInput').value,
+                pcnType: document.getElementById('pcnTypeInput').value,
                 status: document.getElementById('statusInput').value,
+                desc: document.getElementById('descInput').value,
                 start: document.getElementById('startInput').value,
-                end: document.getElementById('endInput').value
+                engrTech: document.getElementById('engrTechInput').value,
+                apprDate: document.getElementById('apprDateInput').value,
+                apprEngr: document.getElementById('apprEngrInput').value,
+                releaseDate: document.getElementById('releaseDateInput').value
             };
 
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+            if (!taskData.pcn) return alert("Nhập PCN # bồ ơi!");
+
+            // --- OPTIMISTIC UI: Hiện ngay lập tức ---
+            // Gom nhóm data ảo giống cấu trúc trong Sheet để render
+            const tempRowData = ['temp-id', taskData.pcn, taskData.pcnType, taskData.status, taskData.desc, taskData.start, taskData.engrTech, taskData.apprDate, taskData.apprEngr, taskData.releaseDate];
+            
+            if (!editId) {
+                renderTable([tempRowData, ...allTasks]);
+            } else {
+                const rowIndex = allTasks.findIndex(t => t[0] == editId);
+                allTasks[rowIndex] = tempRowData;
+                renderTable(allTasks);
+            }
+
+            // Gửi data ngầm
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(taskData) });
             
             // Reset
             document.getElementById('editId').value = "";
-            document.getElementById('btnSubmit').innerText = "Save Task";
-            loadTasks();
+            document.getElementById('btnSubmit').innerText = "Save PCN";
+            document.getElementById('descInput').value = "";
+            document.getElementById('pcnInput').value = "";
+            loadTasks(); // Tải bản chuẩn
         }
 
         function exportPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF();
-            doc.text("TASK MANAGEMENT REPORT", 14, 15);
-            
-            const tableData = allTasks.map(t => [t[1], t[2], t[3], t[4].split('T')[0], t[5].split('T')[0]]);
-            
+            const doc = new jsPDF('l', 'mm', 'a4'); // Khổ ngang cho nhiều cột
+            doc.text("PCN APPROVAL & RELEASE STATUS REPORT", 14, 15);
+            // Chọn các cột quan trọng để in
+            const tableData = allTasks.map(t => [t[1], t[2], t[3], t[4].substring(0,30)+'...', t[6], t[8], formatDate(t[9])]);
             doc.autoTable({
-                head: [['Task', 'PCN', 'Status', 'Start', 'End']],
+                head: [['PCN #', 'Type', 'Status', 'Description', 'Tech', 'Appr', 'Rel Date']],
                 body: tableData,
                 startY: 25,
-                theme: 'striped'
+                styles: { fontSize: 7 },
+                headStyles: { fillColor: [15, 23, 42] }
             });
-            doc.save("Task-Report.pdf");
+            doc.save("PCN-Report.pdf");
         }
 
         loadTasks();
