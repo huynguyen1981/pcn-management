@@ -2,87 +2,137 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control Center V2</title>
+    <title>PCN Control Center V2.1 - MAX PRO</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <style>
+        th.sortable { cursor: pointer; position: relative; transition: 0.2s; }
+        th.sortable:hover { background-color: #1e293b; color: #60a5fa; }
+        th.sortable::after { content: ' ↕'; font-size: 0.8em; opacity: 0.3; margin-left: 5px; }
+        .table-text { font-size: 13px; }
+        textarea { min-height: 100px; resize: vertical; }
+    </style>
 </head>
-<body class="bg-slate-50 p-4">
-    <div class="max-w-[98%] mx-auto">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div class="bg-white p-6 rounded-2xl shadow-sm border-l-8 border-indigo-600">
-                <h1 class="text-xl font-black text-slate-800 uppercase italic">PCN Control Center V2</h1>
-                <p class="text-xs text-slate-400 mt-2">Professional Engineering Management</p>
+<body class="bg-slate-100 min-h-screen p-6">
+    <div class="max-w-full mx-auto">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-6">
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm border-t-4 border-indigo-600 flex flex-col justify-center">
+                <h1 class="text-2xl font-black text-slate-900 leading-tight uppercase italic">PCN System<br>V2.1 PRO</h1>
+                <p class="text-sm text-slate-500 mt-2">Professional Engineering Database</p>
             </div>
-            <div class="bg-white p-4 rounded-2xl shadow-sm flex items-center justify-center h-40">
+            
+            <div class="lg:col-span-2 bg-white p-4 rounded-2xl shadow-sm flex items-center justify-center min-h-[250px]">
                 <canvas id="statusChart"></canvas>
             </div>
-            <div class="bg-white p-6 rounded-2xl shadow-sm flex flex-col justify-center">
-                <button onclick="exportPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-3 rounded-xl shadow-lg transition-all active:scale-95">
-                    📄 EXPORT UNREPORTED ONLY (A3)
+
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-sm flex flex-col justify-center gap-4 text-center">
+                <button onclick="exportPDF()" class="bg-rose-600 hover:bg-rose-700 text-white font-bold py-4 rounded-xl shadow-lg transition-all active:scale-95 text-lg">
+                    📄 EXPORT REPORT (A3)
                 </button>
-                <p class="text-[10px] text-center mt-2 text-slate-400 italic">*Chỉ xuất những mục chưa đánh dấu "Reported"*</p>
+                <p class="text-xs text-slate-400 italic font-medium">Auto-filter: Only Unreported Items</p>
             </div>
         </div>
 
-        <div class="bg-white p-6 rounded-2xl shadow-sm mb-6 border border-slate-200">
+        <div class="bg-white p-8 rounded-2xl shadow-md mb-8 border border-slate-200">
             <input type="hidden" id="editId">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <input type="text" id="pcnInput" placeholder="PCN #" class="border p-2 rounded-lg text-sm outline-none focus:ring-2 focus:ring-indigo-300">
-                <select id="pcnTypeInput" class="border p-2 rounded-lg text-sm font-bold">
-                    <option value="MANDATORY">MANDATORY</option>
-                    <option value="IMMEDIATELY">IMMEDIATELY</option>
-                </select>
-                <select id="statusInput" class="border p-2 rounded-lg text-sm font-bold">
-                    <option value="IN-PROGRESS">IN-PROGRESS</option>
-                    <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
-                    <option value="RELEASED">RELEASED</option>
-                </select>
-                <div class="flex items-center gap-2 bg-slate-50 p-2 rounded-lg border">
-                    <input type="checkbox" id="reportedInput" class="w-4 h-4">
-                    <label class="text-xs font-bold text-slate-600">Mark as Reported</label>
+            <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">PCN Number</label>
+                    <input type="text" id="pcnInput" placeholder="PCN-XXX" class="w-full border-2 border-slate-100 p-3 rounded-xl focus:border-indigo-500 outline-none transition-all font-bold text-slate-700">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Type</label>
+                    <select id="pcnTypeInput" class="w-full border-2 border-slate-100 p-3 rounded-xl font-bold uppercase">
+                        <option value="MANDATORY">MANDATORY</option>
+                        <option value="IMMEDIATELY">IMMEDIATELY</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Status</label>
+                    <select id="statusInput" class="w-full border-2 border-slate-100 p-3 rounded-xl font-black text-indigo-600">
+                        <option value="IN-PROGRESS">IN-PROGRESS</option>
+                        <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
+                        <option value="RELEASED">RELEASED</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Engr. Tech</label>
+                    <input type="text" id="engrTechInput" class="w-full border-2 border-slate-100 p-3 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Appr. Engr</label>
+                    <input type="text" id="apprEngrInput" class="w-full border-2 border-slate-100 p-3 rounded-xl">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                <input type="text" id="engrTechInput" placeholder="Engr. Tech" class="border p-2 rounded-lg text-sm">
-                <input type="text" id="apprEngrInput" placeholder="Appr Engr." class="border p-2 rounded-lg text-sm">
-                <input type="text" id="attachInput" placeholder="📎 Attachment Link (Google Drive...)" class="border p-2 rounded-lg text-sm border-blue-200">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase text-blue-600">Attachment Link</label>
+                    <input type="text" id="attachInput" placeholder="Google Drive Link..." class="w-full border-2 border-blue-100 p-3 rounded-xl text-blue-600 outline-none">
+                </div>
+                <div><label class="block text-xs font-black text-slate-500 mb-2 uppercase text-emerald-600 italic">Reported?</label>
+                    <div class="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
+                        <input type="checkbox" id="reportedInput" class="w-5 h-5 accent-emerald-600">
+                        <span class="text-xs font-bold text-emerald-700 uppercase">Yes, Reported</span>
+                    </div>
+                </div>
+                <div class="md:col-span-2">
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Timeline</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <input type="date" id="startInput" title="Start" class="border p-2 rounded-lg text-xs">
+                        <input type="date" id="apprDateInput" title="Appr" class="border p-2 rounded-lg text-xs">
+                        <input type="date" id="releaseDateInput" title="Rel" class="border p-2 rounded-lg text-xs">
+                    </div>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-                <input type="date" id="startInput" class="border p-2 rounded-lg text-sm" title="Start Date">
-                <input type="date" id="apprDateInput" class="border p-2 rounded-lg text-sm" title="Appr Date">
-                <input type="date" id="releaseDateInput" class="border p-2 rounded-lg text-sm" title="Rel Date">
-                <button id="btnSubmit" onclick="saveTask()" class="bg-indigo-600 text-white font-black rounded-lg hover:bg-indigo-700 uppercase tracking-widest transition-all">Save PCN</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase">Description</label>
+                    <textarea id="descInput" placeholder="Detailed description..." class="w-full border-2 border-slate-100 p-4 rounded-xl focus:ring-2 focus:ring-indigo-200 outline-none"></textarea>
+                </div>
+                <div>
+                    <label class="block text-xs font-black text-slate-500 mb-2 uppercase text-rose-500">Remarks / Problem Issues</label>
+                    <textarea id="remarksInput" placeholder="Any issues encountered?" class="w-full border-2 border-rose-100 p-4 rounded-xl bg-rose-50/30 focus:ring-2 focus:ring-rose-200 outline-none text-rose-700"></textarea>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <textarea id="descInput" placeholder="Description..." class="border p-2 rounded-lg text-sm h-20"></textarea>
-                <textarea id="remarksInput" placeholder="Remarks / Issues phát sinh..." class="border p-2 rounded-lg text-sm h-20 border-rose-100 bg-rose-50/30"></textarea>
+            <div class="flex justify-end">
+                <button id="btnSubmit" onclick="saveTask()" class="bg-indigo-600 text-white font-black px-16 py-4 rounded-2xl hover:bg-indigo-700 shadow-xl transition-all uppercase tracking-widest text-lg">
+                    SAVE DATABASE
+                </button>
             </div>
         </div>
 
-        <div class="bg-white rounded-xl shadow-md overflow-x-auto border border-slate-200">
-            <div class="p-4 border-b">
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="🔍 Quick Search PCN/Description..." class="w-full p-2 border rounded-xl text-sm outline-none">
+        <div class="bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+            <div class="p-6 bg-slate-900 flex flex-col md:flex-row justify-between items-center gap-4">
+                <h2 class="text-white font-bold tracking-widest uppercase">Master Database View</h2>
+                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="🔍 Search PCN, Tech, or Description..." class="w-full md:w-1/3 p-3 rounded-xl bg-slate-800 border-none text-white text-sm outline-none focus:ring-2 focus:ring-indigo-500">
             </div>
-            <table class="w-full text-[11px] text-left border-collapse min-w-[1600px]">
-                <thead class="bg-slate-900 text-white uppercase italic font-light">
-                    <tr>
-                        <th class="p-3">PCN / Type</th>
-                        <th class="p-3 text-center">Status</th>
-                        <th class="p-3">Description / Remarks</th>
-                        <th class="p-3 text-center">Dates (S/A/R)</th>
-                        <th class="p-3 text-center">Tech / Appr</th>
-                        <th class="p-3 text-center">Attach</th>
-                        <th class="p-3 text-center">Reported</th>
-                        <th class="p-3 text-center">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="taskTableBody" class="text-slate-600"></tbody>
-            </table>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse min-w-[2000px]">
+                    <thead class="bg-slate-100 text-slate-500 text-[11px] font-black uppercase tracking-widest border-b">
+                        <tr>
+                            <th class="p-4 sortable" onclick="sortTable(1)">PCN #</th>
+                            <th class="p-4 sortable" onclick="sortTable(2)">Type</th>
+                            <th class="p-4 text-center sortable" onclick="sortTable(3)">Status</th>
+                            <th class="p-4 w-[400px]">Description</th>
+                            <th class="p-4 w-[250px]">Remarks</th>
+                            <th class="p-4 text-center sortable" onclick="sortTable(5)">Start</th>
+                            <th class="p-4 sortable" onclick="sortTable(6)">Engr Tech</th>
+                            <th class="p-4 text-center sortable" onclick="sortTable(7)">Appr Date</th>
+                            <th class="p-4 sortable" onclick="sortTable(8)">Appr Engr</th>
+                            <th class="p-4 text-center sortable" onclick="sortTable(9)">Rel Date</th>
+                            <th class="p-4 text-center">Attach</th>
+                            <th class="p-4 text-center sortable" onclick="sortTable(11)">Reported</th>
+                            <th class="p-4 text-center">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="taskTableBody" class="table-text text-slate-700 font-medium"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
@@ -90,41 +140,54 @@
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
         let myChart = null;
+        let currentSortCol = -1;
+        let sortAsc = true;
 
         async function loadTasks() {
-            const res = await fetch(SCRIPT_URL);
-            allTasks = await res.json();
-            renderTable(allTasks);
-            updateChart();
+            try {
+                const res = await fetch(SCRIPT_URL);
+                allTasks = await res.json();
+                renderTable(allTasks);
+                updateChart();
+            } catch (e) { alert("Lỗi tải dữ liệu!"); }
         }
 
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const body = document.getElementById('taskTableBody');
-            
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
+            const filtered = data.filter(t => 
+                t[1].toLowerCase().includes(query) || 
+                t[4].toLowerCase().includes(query) ||
+                t[6].toLowerCase().includes(query)
+            );
 
             body.innerHTML = filtered.map((row) => `
-                <tr class="border-b hover:bg-slate-50 transition ${row[11] === true ? 'bg-slate-100/50' : ''}">
-                    <td class="p-3 font-bold text-slate-900">${row[1]}<br><span class="text-[9px] text-slate-400">${row[2]}</span></td>
-                    <td class="p-3 text-center"><span class="px-2 py-1 rounded text-[9px] font-black border ${getStatusClass(row[3])}">${row[3]}</span></td>
-                    <td class="p-3 max-w-sm">
-                        <div class="font-medium">${row[4]}</div>
-                        <div class="text-[10px] text-rose-500 mt-1 italic">${row[12] ? '⚠️ ' + row[12] : ''}</div>
+                <tr class="border-b hover:bg-indigo-50/40 transition-all ${row[11] ? 'bg-slate-50 grayscale-[0.3]' : ''} ${row[0] === 'temp-id' ? 'animate-pulse bg-blue-50' : ''}">
+                    <td class="p-4 font-black text-slate-900">${row[1]}</td>
+                    <td class="p-4"><span class="text-[10px] px-2 py-0.5 bg-slate-200 rounded font-bold uppercase">${row[2]}</span></td>
+                    <td class="p-4 text-center"><span class="px-3 py-1.5 rounded-lg font-black text-[10px] shadow-sm ${getStatusClass(row[3])}">${row[3]}</span></td>
+                    <td class="p-4 whitespace-pre-wrap leading-relaxed">${row[4]}</td>
+                    <td class="p-4 whitespace-pre-wrap text-rose-600 font-bold italic border-x border-rose-50">${row[12] || '-'}</td>
+                    <td class="p-4 text-center text-slate-400 font-bold">${formatDate(row[5])}</td>
+                    <td class="p-4 font-bold text-indigo-700">${row[6]}</td>
+                    <td class="p-4 text-center text-slate-400 font-bold">${formatDate(row[7])}</td>
+                    <td class="p-4 font-bold text-slate-800">${row[8]}</td>
+                    <td class="p-4 text-center text-slate-900 font-black">${formatDate(row[9])}</td>
+                    <td class="p-4 text-center">
+                        ${row[10] ? `<a href="${row[10]}" target="_blank" class="text-blue-600 font-black underline hover:text-blue-800">VIEW</a>` : '-'}
                     </td>
-                    <td class="p-3 text-center leading-tight">S: ${formatDate(row[5])}<br>A: ${formatDate(row[7])}<br>R: ${formatDate(row[9])}</td>
-                    <td class="p-3 text-center font-medium">${row[6]}<br><span class="text-[10px] text-slate-400">${row[8]}</span></td>
-                    <td class="p-3 text-center italic">${row[10] ? `<a href="${row[10]}" target="_blank" class="text-blue-500 underline">Link</a>` : '-'}</td>
-                    <td class="p-3 text-center">${row[11] ? '✅' : '❌'}</td>
-                    <td class="p-3 text-center"><button onclick="prepareEdit('${row[0]}')" class="bg-indigo-50 text-indigo-600 px-3 py-1 rounded-lg font-bold text-[10px]">EDIT</button></td>
+                    <td class="p-4 text-center text-lg">${row[11] ? '✅' : '❌'}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="prepareEdit('${row[0]}')" class="bg-indigo-600 text-white px-4 py-2 rounded-xl font-bold shadow-md hover:scale-105 transition-all">EDIT</button>
+                    </td>
                 </tr>
             `).join('');
         }
 
         function getStatusClass(s) {
-            if (s === 'RELEASED') return 'bg-green-50 text-green-600 border-green-200';
-            if (s === 'OUT FOR APPROVAL') return 'bg-purple-50 text-purple-600 border-purple-200';
-            return 'bg-amber-50 text-amber-600 border-amber-200';
+            if (s === 'RELEASED') return 'bg-emerald-500 text-white';
+            if (s === 'OUT FOR APPROVAL') return 'bg-violet-600 text-white';
+            return 'bg-amber-400 text-white';
         }
 
         function formatDate(d) { return d ? d.split('T')[0] : '-'; }
@@ -132,21 +195,34 @@
         function updateChart() {
             const stats = { 'RELEASED': 0, 'IN-PROGRESS': 0, 'OUT FOR APPROVAL': 0 };
             allTasks.forEach(t => { if(stats[t[3]] !== undefined) stats[t[3]]++; });
-
             if (myChart) myChart.destroy();
             const ctx = document.getElementById('statusChart').getContext('2d');
             myChart = new Chart(ctx, {
-                type: 'doughnut',
+                type: 'pie',
                 data: {
                     labels: Object.keys(stats),
                     datasets: [{
                         data: Object.values(stats),
-                        backgroundColor: ['#10b981', '#f59e0b', '#8b5cf6'],
-                        borderWidth: 0
+                        backgroundColor: ['#10b981', '#f59e0b', '#7c3aed'],
+                        hoverOffset: 20
                     }]
                 },
-                options: { plugins: { legend: { position: 'right', labels: { font: { size: 10 } } } } }
+                options: { 
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { font: { size: 14, weight: 'bold' } } } } 
+                }
             });
+        }
+
+        function sortTable(colIndex) {
+            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
+            currentSortCol = colIndex;
+            allTasks.sort((a, b) => {
+                let valA = a[colIndex] ? a[colIndex].toString().toLowerCase() : "";
+                let valB = b[colIndex] ? b[colIndex].toString().toLowerCase() : "";
+                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            });
+            renderTable(allTasks);
         }
 
         async function saveTask() {
@@ -165,9 +241,28 @@
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("Nhập PCN bồ ơi!");
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-            location.reload();
+            if (!data.pcn) return alert("Bồ chưa nhập PCN # kìa!");
+
+            // Optimistic Update
+            const tempRow = ['temp-id', data.pcn, data.pcnType, data.status, data.desc, data.start, data.engrTech, data.apprDate, data.apprEngr, data.releaseDate, data.attach, data.isReported, data.remarks];
+            if (!data.id) {
+                renderTable([tempRow, ...allTasks]);
+            } else {
+                const idx = allTasks.findIndex(x => x[0] == data.id);
+                allTasks[idx] = tempRow;
+                renderTable(allTasks);
+            }
+
+            try {
+                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                // Reset form
+                document.getElementById('editId').value = "";
+                document.getElementById('pcnInput').value = "";
+                document.getElementById('descInput').value = "";
+                document.getElementById('remarksInput').value = "";
+                document.getElementById('btnSubmit').innerText = "SAVE DATABASE";
+                loadTasks(); // Tải lại bản chuẩn để mất cái animate-pulse
+            } catch (e) { alert("Lỗi kết nối!"); loadTasks(); }
         }
 
         function prepareEdit(id) {
@@ -185,23 +280,25 @@
             document.getElementById('attachInput').value = t[10];
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
-            document.getElementById('btnSubmit').innerText = "Update PCN";
+            document.getElementById('btnSubmit').innerText = "UPDATE PCN";
+            window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function exportPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a3');
-            const toExport = allTasks.filter(t => !t[11]); // Lọc chỉ lấy IS_REPORTED = false
-            const tableData = toExport.map(t => [t[1], t[2], t[3], t[4] + (t[12] ? '\nRemark: '+t[12] : ''), formatDate(t[5]), t[6], formatDate(t[9])]);
+            const toExport = allTasks.filter(t => !t[11]);
+            const tableData = toExport.map(t => [t[1], t[2], t[3], t[4], t[12], formatDate(t[5]), t[6], formatDate(t[9])]);
             doc.text("NEW PCN REPORT (UNREPORTED ONLY)", 14, 15);
             doc.autoTable({
-                head: [['PCN', 'TYPE', 'STATUS', 'DESCRIPTION & REMARKS', 'START', 'TECH', 'REL DATE']],
+                head: [['PCN #', 'TYPE', 'STATUS', 'DESCRIPTION', 'REMARKS', 'START', 'TECH', 'REL DATE']],
                 body: tableData,
                 startY: 25,
-                styles: { fontSize: 8 },
-                headStyles: { fillColor: [15, 23, 42] }
+                styles: { fontSize: 9, cellPadding: 4, overflow: 'linebreak' },
+                headStyles: { fillColor: [15, 23, 42], textColor: 255 },
+                columnStyles: { 3: { cellWidth: 100 }, 4: { cellWidth: 80 } }
             });
-            doc.save("PCN-Unreported-Only.pdf");
+            doc.save("PCN-Report.pdf");
         }
 
         loadTasks();
