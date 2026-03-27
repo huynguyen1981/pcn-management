@@ -2,9 +2,11 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control - Definitive Edition</title>
+    <title>PCN Control - Completed Edition</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -15,7 +17,7 @@
         .table-text { font-size: 14px; color: #333; }
         .desc-text { font-size: 15px; font-weight: 500; line-height: 1.6; }
         .table-header { font-size: 11px; color: #676879; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; background: #f8fafc; }
-        .sortable { cursor: pointer; transition: all 0.2s; position: relative; }
+        .sortable { cursor: pointer; transition: all 0.2s; }
         .sortable:hover { background-color: #edf2f7; color: #0073ea; }
         table { table-layout: fixed; width: 100%; border-spacing: 0; }
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
@@ -31,7 +33,8 @@
                 <h1 class="text-2xl font-black text-[#333] tracking-tight">PCN MASTER BOARD</h1>
             </div>
             <div class="flex gap-4">
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-80 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
+                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-64 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
+                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT A3</button>
                 <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
             </div>
         </div>
@@ -60,8 +63,8 @@
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="toggleModal(false)"></div>
         <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative">
-            <div class="p-6 border-b flex justify-between items-center">
-                <h2 id="modalTitle" class="text-xl font-black uppercase">PCN Editor</h2>
+            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+                <h2 id="modalTitle" class="text-xl font-black">PCN EDITOR</h2>
                 <button onclick="toggleModal(false)" class="text-3xl">&times;</button>
             </div>
             <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[75vh] overflow-y-auto">
@@ -85,22 +88,22 @@
                         <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl">
                     </div>
                     <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl">
-                        <div class="flex flex-col"><span class="text-[9px] font-bold text-slate-400">START</span><input type="date" id="startInput" class="bg-transparent text-xs"></div>
-                        <div class="flex flex-col"><span class="text-[9px] font-bold text-slate-400">APPR</span><input type="date" id="apprDateInput" class="bg-transparent text-xs"></div>
-                        <div class="flex flex-col"><span class="text-[9px] font-bold text-[#0073ea]">RELEASE</span><input type="date" id="releaseDateInput" class="bg-transparent text-xs font-bold text-[#0073ea]"></div>
+                        <input type="date" id="startInput" title="Start">
+                        <input type="date" id="apprDateInput" title="Appr">
+                        <input type="date" id="releaseDateInput" class="font-bold text-[#0073ea]">
                     </div>
                 </div>
                 <div class="space-y-6">
-                    <textarea id="descInput" placeholder="Technical Description..." class="w-full border-2 p-4 rounded-xl h-32 outline-none focus:border-[#0073ea]"></textarea>
+                    <textarea id="descInput" placeholder="Description..." class="w-full border-2 p-4 rounded-xl h-32"></textarea>
                     <textarea id="remarksInput" placeholder="Remarks & Problems..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-rose-700 italic"></textarea>
                 </div>
             </div>
-            <div class="p-8 border-t flex justify-between items-center bg-slate-50">
-                <label class="flex items-center gap-3 cursor-pointer group">
+            <div class="p-8 border-t flex justify-between items-center">
+                <label class="flex items-center gap-3 cursor-pointer">
                     <input type="checkbox" id="reportedInput" class="w-6 h-6 accent-[#00c875]">
-                    <span class="font-bold text-slate-600 group-hover:text-[#00c875]">IS REPORTED</span>
+                    <span class="font-bold">IS REPORTED</span>
                 </label>
-                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-3 rounded-xl font-black hover:bg-[#0060c1] transition-all">SAVE TO DATABASE</button>
+                <button onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-3 rounded-xl font-black">SAVE TO DATABASE</button>
             </div>
         </div>
     </div>
@@ -116,10 +119,9 @@
             try {
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
-                updatingId = null; 
+                updatingId = null;
                 renderTable(allTasks);
             } catch (e) { 
-                console.error("Lỗi:", e);
                 updatingId = null;
                 renderTable(allTasks);
             }
@@ -135,18 +137,16 @@
             const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
             ids.forEach(id => document.getElementById(id).value = "");
             document.getElementById('reportedInput').checked = false;
-            document.getElementById('modalTitle').innerText = "PCN Editor";
         }
 
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const body = document.getElementById('taskTableBody');
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query) || t[6].toLowerCase().includes(query));
+            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
 
             body.innerHTML = filtered.map((row) => {
                 const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
                 const isImmediately = row[2] === "IMMEDIATELY";
-                
                 return `
                 <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
                     <td class="p-4 font-black text-lg">${row[1]}<br>
@@ -157,7 +157,7 @@
                     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
                     <td class="p-4">
                         <div class="desc-text">${row[4]}</div>
-                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100">REMARK: ${row[12]}</div>` : ''}
+                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
                     </td>
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
@@ -166,29 +166,19 @@
                     <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
                     <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
                     <td class="p-4 text-center">
-                        <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black hover:bg-[#0073ea] hover:text-white transition-all text-xs">
-                            EDIT
-                        </button>
+                        <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
                     </td>
                 </tr>
             `}).join('');
         }
 
-        // HÀM SORT QUAN TRỌNG ĐÃ QUAY TRỞ LẠI
         function sortTable(colIndex) {
             sortAsc = (lastSortCol === colIndex) ? !sortAsc : true;
             lastSortCol = colIndex;
-            
             allTasks.sort((a, b) => {
                 let valA = a[colIndex] ? String(a[colIndex]).toLowerCase() : "";
                 let valB = b[colIndex] ? String(b[colIndex]).toLowerCase() : "";
-                
-                if (colIndex === 11) { // Sort cho checkbox
-                    valA = a[colIndex] ? 1 : 0;
-                    valB = b[colIndex] ? 1 : 0;
-                    return sortAsc ? valA - valB : valB - valA;
-                }
-                
+                if (colIndex === 11) { valA = a[colIndex] ? 1 : 0; valB = b[colIndex] ? 1 : 0; return sortAsc ? valA - valB : valB - valA; }
                 return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
             });
             renderTable(allTasks);
@@ -220,20 +210,12 @@
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("Nhập PCN # bồ ơi!");
-
+            if (!data.pcn) return alert("Bồ quên nhập PCN # kìa!");
             updatingId = id || "new"; 
             toggleModal(false);
-            renderTable(allTasks); 
-
-            try {
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-                await loadTasks();
-            } catch (e) {
-                alert("Lỗi lưu dữ liệu!");
-                updatingId = null;
-                renderTable(allTasks);
-            }
+            renderTable(allTasks);
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+            await loadTasks();
         }
 
         function prepareEdit(id) {
@@ -251,8 +233,28 @@
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
-            document.getElementById('modalTitle').innerText = "Update Entry";
             toggleModal(true);
+        }
+
+        // HÀM EXPORT PDF ĐÃ TRỞ LẠI VÀ LỢI HẠI HƠN
+        function exportPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('l', 'mm', 'a3');
+            const toExport = allTasks.filter(t => !t[11]); // Chỉ xuất cái chưa Reported
+            const tableData = toExport.map(t => [
+                t[1], t[2], t[3], 
+                t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
+                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
+            ]);
+            doc.text("MASTER PCN REPORT - PENDING LIST", 14, 20);
+            doc.autoTable({
+                head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
+                body: tableData,
+                startY: 30,
+                styles: { fontSize: 10, cellPadding: 4 },
+                headStyles: { fillColor: [0, 115, 234] }
+            });
+            doc.save("PCN-Master-Report.pdf");
         }
 
         loadTasks();
