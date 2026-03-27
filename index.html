@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control - Full Control View</title>
+    <title>PCN Control - Fix Sync UI</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -10,36 +10,31 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .container-fluid { width: 100%; padding-left: 20px; padding-right: 20px; }
+        .container-fluid { width: 100%; padding: 20px; }
         .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .status-pill { border-radius: 4px; font-size: 11px; font-weight: 700; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
-        .updating { pointer-events: none; opacity: 0.3; background-color: #f1f5f9 !important; }
+        /* Lớp mờ khi đang lưu */
+        .updating { pointer-events: none !important; opacity: 0.4 !important; background-color: #f8fafc !important; }
         .table-text { font-size: 14px; color: #333; }
         .desc-text { font-size: 15px; font-weight: 500; line-height: 1.6; }
         .table-header { font-size: 11px; color: #676879; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
-        /* Thêm hiệu ứng hover cho tiêu đề cột có thể sort */
         .sortable:hover { background-color: #edf2f7; cursor: pointer; color: #0073ea; }
         table { table-layout: fixed; width: 100%; border-spacing: 0; }
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; }
         .type-immediately { color: #ef4444; font-weight: 800; }
-        .type-mandatory { color: #676879; font-weight: 600; }
     </style>
 </head>
-<body class="bg-[#f5f6f8] min-h-screen py-6">
+<body class="bg-[#f5f6f8] min-h-screen py-4">
 
     <div class="container-fluid">
-        <div class="flex flex-col xl:flex-row justify-between items-center mb-8 gap-6 px-2">
+        <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-6">
             <div class="flex items-center gap-4">
-                <div class="w-2 h-12 bg-[#0073ea] rounded-full"></div>
-                <div>
-                    <h1 class="text-3xl font-black text-[#333] tracking-tight uppercase">PCN Master Board</h1>
-                    <p class="text-[#676879] text-sm font-semibold italic opacity-70">Interactive Sorting & Expanded Reported Status</p>
-                </div>
+                <div class="w-2 h-10 bg-[#0073ea] rounded-full"></div>
+                <h1 class="text-2xl font-black text-[#333] tracking-tight uppercase">PCN Master Board</h1>
             </div>
             <div class="flex gap-4">
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-80 border-2 border-[#c3c6d4] p-3 rounded-xl text-sm outline-none focus:border-[#0073ea] bg-white shadow-sm">
-                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">📄 EXPORT A3</button>
-                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#0060c1] transform active:scale-95 transition-all">+ NEW PCN</button>
+                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search..." class="w-80 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
+                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold text-sm shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
             </div>
         </div>
 
@@ -48,15 +43,14 @@
                 <thead class="bg-[#f5f6f8] border-b table-header">
                     <tr>
                         <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
-                        <th class="p-4 w-[140px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
+                        <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
                         <th class="p-4">Description & Remarks</th>
                         <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(5)">Start ↕</th>
                         <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(7)">Appr ↕</th>
                         <th class="p-4 w-[110px] text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
-                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Engr Tech ↕</th>
+                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
                         <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
-                        <th class="p-4 w-[60px] text-center">Att</th>
-                        <th class="p-4 w-[90px] text-center sortable" onclick="sortTable(11)">Reported ↕</th>
+                        <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Reported ↕</th>
                         <th class="p-4 w-[90px] text-center">Action</th>
                     </tr>
                 </thead>
@@ -68,59 +62,47 @@
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="toggleModal(false)"></div>
         <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative">
-            <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h2 id="modalTitle" class="text-2xl font-black text-[#333]">PCN EDITOR</h2>
-                <button onclick="toggleModal(false)" class="text-3xl text-[#676879]">&times;</button>
+            <div class="p-6 border-b flex justify-between items-center">
+                <h2 id="modalTitle" class="text-xl font-black">PCN EDITOR</h2>
+                <button onclick="toggleModal(false)" class="text-3xl">&times;</button>
             </div>
-            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[80vh] overflow-y-auto">
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[75vh] overflow-y-auto">
                 <div class="space-y-6">
                     <input type="hidden" id="editId">
                     <div class="flex gap-4">
-                        <div class="flex-1">
-                            <label class="block text-xs font-black text-[#676879] uppercase mb-2">PCN Number</label>
-                            <input type="text" id="pcnInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none focus:border-[#0073ea] font-bold text-lg">
-                        </div>
-                        <div class="w-44">
-                            <label class="block text-xs font-black text-[#676879] uppercase mb-2">Type</label>
-                            <select id="pcnTypeInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none font-bold">
-                                <option value="MANDATORY">MANDATORY</option>
-                                <option value="IMMEDIATELY">IMMEDIATELY</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Status</label>
-                        <select id="statusInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none font-black text-[#0073ea] text-lg">
-                            <option value="IN-PROGRESS">IN-PROGRESS</option>
-                            <option value="ENG REVIEW">ENG REVIEW</option>
-                            <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
-                            <option value="RELEASED">RELEASED</option>
+                        <input type="text" id="pcnInput" placeholder="PCN #" class="flex-1 border-2 p-3 rounded-xl font-bold">
+                        <select id="pcnTypeInput" class="border-2 p-3 rounded-xl font-bold">
+                            <option value="MANDATORY">MANDATORY</option>
+                            <option value="IMMEDIATELY">IMMEDIATELY</option>
                         </select>
                     </div>
+                    <select id="statusInput" class="w-full border-2 p-3 rounded-xl font-black text-[#0073ea]">
+                        <option value="IN-PROGRESS">IN-PROGRESS</option>
+                        <option value="ENG REVIEW">ENG REVIEW</option>
+                        <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
+                        <option value="RELEASED">RELEASED</option>
+                    </select>
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="engrTechInput" placeholder="Engr Tech" class="border-2 p-3 rounded-xl font-semibold">
-                        <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl font-semibold">
+                        <input type="text" id="engrTechInput" placeholder="Tech" class="border-2 p-3 rounded-xl">
+                        <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl">
                     </div>
-                    <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border-2 border-dashed">
-                        <div><label class="text-[10px] font-bold text-slate-400">START</label><input type="date" id="startInput" class="w-full bg-transparent outline-none text-xs"></div>
-                        <div><label class="text-[10px] font-bold text-slate-400">APPR</label><input type="date" id="apprDateInput" class="w-full bg-transparent outline-none text-xs"></div>
-                        <div><label class="text-[10px] font-bold text-[#0073ea]">RELEASE</label><input type="date" id="releaseDateInput" class="w-full bg-transparent outline-none text-xs font-black"></div>
+                    <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl">
+                        <input type="date" id="startInput" title="Start">
+                        <input type="date" id="apprDateInput" title="Appr">
+                        <input type="date" id="releaseDateInput" class="font-bold text-[#0073ea]">
                     </div>
                 </div>
                 <div class="space-y-6">
-                    <textarea id="descInput" placeholder="Description..." class="w-full border-2 border-slate-200 p-4 rounded-xl h-32 text-sm outline-none focus:border-[#0073ea]"></textarea>
-                    <textarea id="remarksInput" placeholder="Remarks & Problems..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-sm text-rose-700 italic outline-none"></textarea>
+                    <textarea id="descInput" placeholder="Description..." class="w-full border-2 p-4 rounded-xl h-32"></textarea>
+                    <textarea id="remarksInput" placeholder="Remarks..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-rose-700"></textarea>
                 </div>
             </div>
-            <div class="p-8 border-t flex justify-between items-center bg-slate-50">
-                <div class="flex items-center gap-6">
-                    <input type="text" id="attachInput" placeholder="📎 Drive Link..." class="text-sm border-b-2 border-slate-300 p-2 outline-none w-64 bg-transparent focus:border-[#0073ea]">
-                    <label class="flex items-center gap-3 cursor-pointer group">
-                        <input type="checkbox" id="reportedInput" class="accent-[#00c875] w-6 h-6 rounded">
-                        <span class="text-sm font-black text-[#676879] group-hover:text-[#00c875]">REPORTED</span>
-                    </label>
-                </div>
-                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-4 rounded-xl font-black shadow-xl text-sm hover:bg-[#0060c1] uppercase tracking-widest transition-all">Save Changes</button>
+            <div class="p-8 border-t flex justify-between items-center">
+                <label class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" id="reportedInput" class="w-6 h-6">
+                    <span class="font-bold">REPORTED</span>
+                </label>
+                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-3 rounded-xl font-black">SAVE CHANGES</button>
             </div>
         </div>
     </div>
@@ -128,17 +110,19 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
-        let currentSortCol = -1;
-        let sortAsc = true;
-        let updatingId = null;
+        let updatingId = null; // Biến quan trọng để kiểm soát mờ/hiện
 
         async function loadTasks() {
             try {
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
+                updatingId = null; // Giải phóng ID sau khi load xong
                 renderTable(allTasks);
+            } catch (e) { 
+                console.error(e); 
                 updatingId = null;
-            } catch (e) { console.error("Lỗi tải data:", e); }
+                renderTable(allTasks);
+            }
         }
 
         function toggleModal(show) {
@@ -148,7 +132,7 @@
         }
 
         function resetForm() {
-            const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'attachInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
+            const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
             ids.forEach(id => document.getElementById(id).value = "");
             document.getElementById('reportedInput').checked = false;
         }
@@ -156,33 +140,34 @@
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const body = document.getElementById('taskTableBody');
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query) || t[6].toLowerCase().includes(query));
+            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
 
             body.innerHTML = filtered.map((row) => {
-                const isUpdating = String(row[0]) === String(updatingId);
+                // Kiểm tra xem dòng này có đang được update không
+                const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
                 const isImmediately = row[2] === "IMMEDIATELY";
+                
                 return `
-                <tr class="border-b hover:bg-[#f0f4f8] transition-all ${row[11] ? 'bg-slate-50/80 grayscale-[0.2]' : ''} ${isUpdating ? 'updating' : ''}">
-                    <td class="p-4 font-black text-slate-800 text-lg">${row[1]}<br>
-                        <span class="text-[10px] uppercase tracking-tighter ${isImmediately ? 'type-immediately' : 'type-mandatory'}">
+                <tr class="border-b hover:bg-[#f0f4f8] ${row[11] ? 'bg-slate-50/80' : ''} ${isUpdating ? 'updating' : ''}">
+                    <td class="p-4 font-black text-lg">${row[1]}<br>
+                        <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
                             ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
                         </span>
                     </td>
                     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
                     <td class="p-4">
-                        <div class="desc-text text-slate-800">${row[4]}</div>
-                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold italic mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100">REMARK: ${row[12]}</div>` : ''}
+                        <div class="desc-text">${row[4]}</div>
+                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100">REMARK: ${row[12]}</div>` : ''}
                     </td>
-                    <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[5])}</td>
-                    <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[7])}</td>
-                    <td class="p-4 text-center font-black text-slate-900 bg-blue-50/30">${formatDateDisplay(row[9])}</td>
+                    <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
+                    <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
+                    <td class="p-4 text-center font-black bg-blue-50/30">${formatDateDisplay(row[9])}</td>
                     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
                     <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
-                    <td class="p-4 text-center text-xl">${row[10] ? `<a href="${row[10]}" target="_blank">🔗</a>` : '-'}</td>
-                    <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+                    <td class="p-4 text-center text-lg">${row[11] ? '✅' : '⏳'}</td>
                     <td class="p-4 text-center">
-                        <button onclick="prepareEdit('${row[0]}')" ${isUpdating ? 'disabled' : ''} class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black hover:bg-[#0073ea] hover:text-white transition-all text-xs">
-                            ${isUpdating ? '...' : 'EDIT'}
+                        <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black hover:bg-[#0073ea] hover:text-white transition-all text-xs">
+                            EDIT
                         </button>
                     </td>
                 </tr>
@@ -199,25 +184,6 @@
         function formatDateDisplay(d) { return (!d || d === "" || d === "-") ? "-" : d.split('T')[0]; }
         function formatDateInput(d) { return (!d || d === "" || d === "-") ? "" : d.split('T')[0]; }
 
-        function sortTable(colIndex) {
-            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
-            currentSortCol = colIndex;
-            allTasks.sort((a, b) => {
-                let valA = a[colIndex] ? String(a[colIndex]).toLowerCase() : "";
-                let valB = b[colIndex] ? String(b[colIndex]).toLowerCase() : "";
-                
-                // Logic sort riêng cho checkbox Reported (Boolean)
-                if (colIndex === 11) {
-                    valA = a[colIndex] ? 1 : 0;
-                    valB = b[colIndex] ? 1 : 0;
-                    return sortAsc ? valA - valB : valB - valA;
-                }
-
-                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-            renderTable(allTasks);
-        }
-
         async function saveTask() {
             const id = document.getElementById('editId').value;
             const data = {
@@ -231,16 +197,26 @@
                 apprDate: document.getElementById('apprDateInput').value,
                 apprEngr: document.getElementById('apprEngrInput').value,
                 releaseDate: document.getElementById('releaseDateInput').value,
-                attach: document.getElementById('attachInput').value,
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
             if (!data.pcn) return alert("Nhập PCN # bồ ơi!");
+
+            // 1. Gán ID đang cập nhật để render giao diện mờ
             updatingId = id || "new"; 
             toggleModal(false);
-            renderTable(allTasks);
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-            loadTasks();
+            renderTable(allTasks); // Cập nhật giao diện ngay để thấy lớp mờ
+
+            try {
+                // 2. Gửi dữ liệu đi
+                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                // 3. Tải lại toàn bộ dữ liệu (loadTasks sẽ reset updatingId về null)
+                await loadTasks();
+            } catch (e) {
+                alert("Lỗi lưu dữ liệu!");
+                updatingId = null;
+                renderTable(allTasks);
+            }
         }
 
         function prepareEdit(id) {
@@ -256,32 +232,12 @@
             document.getElementById('apprDateInput').value = formatDateInput(t[7]);
             document.getElementById('apprEngrInput').value = t[8];
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
-            document.getElementById('attachInput').value = t[10];
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
             toggleModal(true);
         }
 
-        function exportPDF() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a3');
-            const toExport = allTasks.filter(t => !t[11]);
-            const tableData = toExport.map(t => [
-                t[1], t[2], t[3], 
-                t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
-                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9]), t[11] ? 'YES' : 'NO'
-            ]);
-            doc.text("MASTER PCN REPORT", 14, 20);
-            doc.autoTable({
-                head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE', 'REPORTED']],
-                body: tableData,
-                startY: 30,
-                styles: { fontSize: 10, cellPadding: 4 },
-                headStyles: { fillColor: [0, 115, 234] }
-            });
-            doc.save("PCN-Full-Control.pdf");
-        }
-
+        // Tải dữ liệu ban đầu
         loadTasks();
     </script>
 </body>
