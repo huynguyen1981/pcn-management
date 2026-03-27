@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control - Ultra Wide View</title>
+    <title>PCN Control - Full Control View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -10,17 +10,17 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        /* Tràn màn hình 100% */
         .container-fluid { width: 100%; padding-left: 20px; padding-right: 20px; }
         .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
         .status-pill { border-radius: 4px; font-size: 11px; font-weight: 700; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
         .updating { pointer-events: none; opacity: 0.3; background-color: #f1f5f9 !important; }
-        /* Tăng kích thước chữ cho bảng */
         .table-text { font-size: 14px; color: #333; }
         .desc-text { font-size: 15px; font-weight: 500; line-height: 1.6; }
-        .table-header { font-size: 11px; color: #676879; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+        .table-header { font-size: 11px; color: #676879; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+        /* Thêm hiệu ứng hover cho tiêu đề cột có thể sort */
+        .sortable:hover { background-color: #edf2f7; cursor: pointer; color: #0073ea; }
         table { table-layout: fixed; width: 100%; border-spacing: 0; }
-        td { word-wrap: break-word; vertical-align: middle; padding: 16px 12px !important; }
+        td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; }
         .type-immediately { color: #ef4444; font-weight: 800; }
         .type-mandatory { color: #676879; font-weight: 600; }
     </style>
@@ -32,22 +32,14 @@
             <div class="flex items-center gap-4">
                 <div class="w-2 h-12 bg-[#0073ea] rounded-full"></div>
                 <div>
-                    <h1 class="text-3xl font-black text-[#333] tracking-tight">PCN MASTER DASHBOARD</h1>
-                    <p class="text-[#676879] text-sm font-semibold uppercase tracking-widest opacity-70 italic">Full Width & High Visibility Mode</p>
+                    <h1 class="text-3xl font-black text-[#333] tracking-tight uppercase">PCN Master Board</h1>
+                    <p class="text-[#676879] text-sm font-semibold italic opacity-70">Interactive Sorting & Expanded Reported Status</p>
                 </div>
             </div>
             <div class="flex gap-4">
-                <div class="relative">
-                    <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Quick search..." class="w-80 border-2 border-[#c3c6d4] p-3 rounded-xl text-sm outline-none focus:border-[#0073ea] bg-white shadow-sm">
-                </div>
+                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-80 border-2 border-[#c3c6d4] p-3 rounded-xl text-sm outline-none focus:border-[#0073ea] bg-white shadow-sm">
                 <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">📄 EXPORT A3</button>
-                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#0060c1] transform active:scale-95 transition-all">+ ADD NEW PCN</button>
-            </div>
-        </div>
-
-        <div class="bg-white p-6 monday-card mb-8">
-            <div class="h-40">
-                <canvas id="statusChart"></canvas>
+                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#0060c1] transform active:scale-95 transition-all">+ NEW PCN</button>
             </div>
         </div>
 
@@ -55,15 +47,16 @@
             <table class="w-full text-left">
                 <thead class="bg-[#f5f6f8] border-b table-header">
                     <tr>
-                        <th class="p-4 w-[110px] cursor-pointer" onclick="sortTable(1)">PCN # ↕</th>
-                        <th class="p-4 w-[130px] text-center">Status</th>
-                        <th class="p-4">Description & Remarks (High Clarity)</th>
-                        <th class="p-4 w-[120px] text-center">Start</th>
-                        <th class="p-4 w-[120px] text-center">Appr Date</th>
-                        <th class="p-4 w-[120px] text-center font-black text-[#0073ea]">Release</th>
-                        <th class="p-4 w-[140px]">Engr Tech</th>
-                        <th class="p-4 w-[140px]">Appr Engr</th>
+                        <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
+                        <th class="p-4 w-[140px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
+                        <th class="p-4">Description & Remarks</th>
+                        <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(5)">Start ↕</th>
+                        <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(7)">Appr ↕</th>
+                        <th class="p-4 w-[110px] text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
+                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Engr Tech ↕</th>
+                        <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
                         <th class="p-4 w-[60px] text-center">Att</th>
+                        <th class="p-4 w-[90px] text-center sortable" onclick="sortTable(11)">Reported ↕</th>
                         <th class="p-4 w-[90px] text-center">Action</th>
                     </tr>
                 </thead>
@@ -74,10 +67,10 @@
 
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="toggleModal(false)"></div>
-        <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative transform scale-95 transition-transform">
+        <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h2 id="modalTitle" class="text-2xl font-black text-[#333] italic">PCN EDITOR</h2>
-                <button onclick="toggleModal(false)" class="text-3xl text-[#676879] hover:text-red-500">&times;</button>
+                <h2 id="modalTitle" class="text-2xl font-black text-[#333]">PCN EDITOR</h2>
+                <button onclick="toggleModal(false)" class="text-3xl text-[#676879]">&times;</button>
             </div>
             <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[80vh] overflow-y-auto">
                 <div class="space-y-6">
@@ -96,7 +89,7 @@
                         </div>
                     </div>
                     <div>
-                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Process Status</label>
+                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Status</label>
                         <select id="statusInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none font-black text-[#0073ea] text-lg">
                             <option value="IN-PROGRESS">IN-PROGRESS</option>
                             <option value="ENG REVIEW">ENG REVIEW</option>
@@ -105,8 +98,8 @@
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <input type="text" id="engrTechInput" placeholder="Engr Tech Name" class="border-2 p-3 rounded-xl font-semibold">
-                        <input type="text" id="apprEngrInput" placeholder="Appr Engr Name" class="border-2 p-3 rounded-xl font-semibold">
+                        <input type="text" id="engrTechInput" placeholder="Engr Tech" class="border-2 p-3 rounded-xl font-semibold">
+                        <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl font-semibold">
                     </div>
                     <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border-2 border-dashed">
                         <div><label class="text-[10px] font-bold text-slate-400">START</label><input type="date" id="startInput" class="w-full bg-transparent outline-none text-xs"></div>
@@ -115,14 +108,8 @@
                     </div>
                 </div>
                 <div class="space-y-6">
-                    <div>
-                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Technical Description</label>
-                        <textarea id="descInput" placeholder="Nhập mô tả chi tiết..." class="w-full border-2 border-slate-200 p-4 rounded-xl h-32 text-sm outline-none focus:border-[#0073ea]"></textarea>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-black text-rose-500 uppercase mb-2">Remarks & Problems</label>
-                        <textarea id="remarksInput" placeholder="Có vấn đề gì ghi ở đây..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-sm text-rose-700 italic outline-none"></textarea>
-                    </div>
+                    <textarea id="descInput" placeholder="Description..." class="w-full border-2 border-slate-200 p-4 rounded-xl h-32 text-sm outline-none focus:border-[#0073ea]"></textarea>
+                    <textarea id="remarksInput" placeholder="Remarks & Problems..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-sm text-rose-700 italic outline-none"></textarea>
                 </div>
             </div>
             <div class="p-8 border-t flex justify-between items-center bg-slate-50">
@@ -133,7 +120,7 @@
                         <span class="text-sm font-black text-[#676879] group-hover:text-[#00c875]">REPORTED</span>
                     </label>
                 </div>
-                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-4 rounded-xl font-black shadow-xl text-sm hover:bg-[#0060c1] uppercase tracking-widest transition-all">Submit to System</button>
+                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-4 rounded-xl font-black shadow-xl text-sm hover:bg-[#0060c1] uppercase tracking-widest transition-all">Save Changes</button>
             </div>
         </div>
     </div>
@@ -141,7 +128,6 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
-        let myChart = null;
         let currentSortCol = -1;
         let sortAsc = true;
         let updatingId = null;
@@ -151,34 +137,26 @@
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
                 renderTable(allTasks);
-                updateChart();
                 updatingId = null;
-            } catch (e) { console.error("Lỗi:", e); }
+            } catch (e) { console.error("Lỗi tải data:", e); }
         }
 
         function toggleModal(show) {
             const modal = document.getElementById('pcnModal');
-            if (show) {
-                modal.classList.remove('opacity-0', 'pointer-events-none');
-                modal.querySelector('.bg-white').classList.remove('scale-95');
-            } else {
-                modal.classList.add('opacity-0', 'pointer-events-none');
-                modal.querySelector('.bg-white').classList.add('scale-95');
-                resetForm();
-            }
+            if (show) modal.classList.remove('opacity-0', 'pointer-events-none');
+            else { modal.classList.add('opacity-0', 'pointer-events-none'); resetForm(); }
         }
 
         function resetForm() {
             const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'attachInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
             ids.forEach(id => document.getElementById(id).value = "");
             document.getElementById('reportedInput').checked = false;
-            document.getElementById('modalTitle').innerText = "PCN EDITOR";
         }
 
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const body = document.getElementById('taskTableBody');
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
+            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query) || t[6].toLowerCase().includes(query));
 
             body.innerHTML = filtered.map((row) => {
                 const isUpdating = String(row[0]) === String(updatingId);
@@ -193,17 +171,18 @@
                     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
                     <td class="p-4">
                         <div class="desc-text text-slate-800">${row[4]}</div>
-                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold italic mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
+                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold italic mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100">REMARK: ${row[12]}</div>` : ''}
                     </td>
                     <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[5])}</td>
                     <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[7])}</td>
                     <td class="p-4 text-center font-black text-slate-900 bg-blue-50/30">${formatDateDisplay(row[9])}</td>
                     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
                     <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
-                    <td class="p-4 text-center text-xl">${row[10] ? `<a href="${row[10]}" target="_blank" title="View Link">🔗</a>` : '-'}</td>
+                    <td class="p-4 text-center text-xl">${row[10] ? `<a href="${row[10]}" target="_blank">🔗</a>` : '-'}</td>
+                    <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
                     <td class="p-4 text-center">
                         <button onclick="prepareEdit('${row[0]}')" ${isUpdating ? 'disabled' : ''} class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black hover:bg-[#0073ea] hover:text-white transition-all text-xs">
-                            ${isUpdating ? 'SAVING' : 'EDIT'}
+                            ${isUpdating ? '...' : 'EDIT'}
                         </button>
                     </td>
                 </tr>
@@ -211,37 +190,32 @@
         }
 
         function getStatusClass(s) {
-            if (s === 'RELEASED') return 'bg-[#00c875] text-white shadow-md shadow-green-100';
-            if (s === 'OUT FOR APPROVAL') return 'bg-[#a25ddc] text-white shadow-md shadow-purple-100';
-            if (s === 'ENG REVIEW') return 'bg-[#579bfc] text-white shadow-md shadow-blue-100';
-            return 'bg-[#fdab3d] text-white shadow-md shadow-orange-100';
+            if (s === 'RELEASED') return 'bg-[#00c875] text-white';
+            if (s === 'OUT FOR APPROVAL') return 'bg-[#a25ddc] text-white';
+            if (s === 'ENG REVIEW') return 'bg-[#579bfc] text-white';
+            return 'bg-[#fdab3d] text-white';
         }
 
         function formatDateDisplay(d) { return (!d || d === "" || d === "-") ? "-" : d.split('T')[0]; }
         function formatDateInput(d) { return (!d || d === "" || d === "-") ? "" : d.split('T')[0]; }
 
-        function updateChart() {
-            const stats = { 'RELEASED': 0, 'IN-PROGRESS': 0, 'OUT FOR APPROVAL': 0, 'ENG REVIEW': 0 };
-            allTasks.forEach(t => { if(stats[t[3]] !== undefined) stats[t[3]]++; });
-            if (myChart) myChart.destroy();
-            const ctx = document.getElementById('statusChart').getContext('2d');
-            myChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: Object.keys(stats),
-                    datasets: [{
-                        data: Object.values(stats),
-                        backgroundColor: ['#00c875', '#fdab3d', '#a25ddc', '#579bfc'],
-                        borderRadius: 8,
-                        barThickness: 50
-                    }]
-                },
-                options: { 
-                    maintainAspectRatio: false, 
-                    plugins: { legend: { display: false } },
-                    scales: { y: { grid: { display: false } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } }
+        function sortTable(colIndex) {
+            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
+            currentSortCol = colIndex;
+            allTasks.sort((a, b) => {
+                let valA = a[colIndex] ? String(a[colIndex]).toLowerCase() : "";
+                let valB = b[colIndex] ? String(b[colIndex]).toLowerCase() : "";
+                
+                // Logic sort riêng cho checkbox Reported (Boolean)
+                if (colIndex === 11) {
+                    valA = a[colIndex] ? 1 : 0;
+                    valB = b[colIndex] ? 1 : 0;
+                    return sortAsc ? valA - valB : valB - valA;
                 }
+
+                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
             });
+            renderTable(allTasks);
         }
 
         async function saveTask() {
@@ -261,14 +235,12 @@
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("Bồ chưa nhập PCN #!");
+            if (!data.pcn) return alert("Nhập PCN # bồ ơi!");
             updatingId = id || "new"; 
             toggleModal(false);
             renderTable(allTasks);
-            try {
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-                loadTasks();
-            } catch (e) { loadTasks(); }
+            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+            loadTasks();
         }
 
         function prepareEdit(id) {
@@ -287,19 +259,7 @@
             document.getElementById('attachInput').value = t[10];
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
-            document.getElementById('modalTitle').innerText = "EDIT PCN ENTRY";
             toggleModal(true);
-        }
-
-        function sortTable(colIndex) {
-            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
-            currentSortCol = colIndex;
-            allTasks.sort((a, b) => {
-                let valA = a[colIndex] ? String(a[colIndex]).toLowerCase() : "";
-                let valB = b[colIndex] ? String(b[colIndex]).toLowerCase() : "";
-                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-            renderTable(allTasks);
         }
 
         function exportPDF() {
@@ -309,17 +269,17 @@
             const tableData = toExport.map(t => [
                 t[1], t[2], t[3], 
                 t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
-                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
+                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9]), t[11] ? 'YES' : 'NO'
             ]);
-            doc.text("MASTER PCN REPORT - FULL VIEW", 14, 20);
+            doc.text("MASTER PCN REPORT", 14, 20);
             doc.autoTable({
-                head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
+                head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE', 'REPORTED']],
                 body: tableData,
                 startY: 30,
                 styles: { fontSize: 10, cellPadding: 4 },
                 headStyles: { fillColor: [0, 115, 234] }
             });
-            doc.save("PCN-FullView-Report.pdf");
+            doc.save("PCN-Full-Control.pdf");
         }
 
         loadTasks();
