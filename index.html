@@ -2,7 +2,7 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control - Completed Edition</title>
+    <title>PCN Management</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -34,7 +34,7 @@
             </div>
             <div class="flex gap-4">
                 <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-64 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
-                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT A3</button>
+                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT PDF</button>
                 <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
             </div>
         </div>
@@ -103,7 +103,7 @@
                     <input type="checkbox" id="reportedInput" class="w-6 h-6 accent-[#00c875]">
                     <span class="font-bold">IS REPORTED</span>
                 </label>
-                <button onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-3 rounded-xl font-black">SAVE TO DATABASE</button>
+                <button onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-3 rounded-xl font-black">SAVE</button>
             </div>
         </div>
     </div>
@@ -210,7 +210,7 @@
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("Bồ quên nhập PCN # kìa!");
+            if (!data.pcn) return alert("You forget to add PCN #!");
             updatingId = id || "new"; 
             toggleModal(false);
             renderTable(allTasks);
@@ -246,7 +246,7 @@
                 t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
                 formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
             ]);
-            doc.text("MASTER PCN REPORT - PENDING LIST", 14, 20);
+            doc.text("PCN REPORT", 14, 20);
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
                 body: tableData,
@@ -254,7 +254,7 @@
                 styles: { fontSize: 10, cellPadding: 4 },
                 headStyles: { fillColor: [0, 115, 234] }
             });
-            doc.save("PCN-Master-Report.pdf");
+            doc.save("PCN-Report.pdf");
         }
 
         loadTasks();
