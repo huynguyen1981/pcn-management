@@ -2,91 +2,102 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <title>PCN Control - Monday Detail</title>
+    <title>PCN Control - Ultra Wide View</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
-        .monday-card { border-radius: 8px; border: 1px solid #e6e9ef; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .status-pill { border-radius: 4px; font-size: 10px; font-weight: 700; padding: 4px 6px; text-transform: uppercase; white-space: nowrap; }
-        .updating { pointer-events: none; opacity: 0.4; background-color: #f1f5f9 !important; }
-        .table-header { font-size: 10px; color: #676879; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
-        /* Cố định không cho cuộn ngang nhưng vẫn đảm bảo chữ không bị đè */
-        table { table-layout: fixed; width: 100%; }
-        td { word-wrap: break-word; vertical-align: top; }
+        /* Tràn màn hình 100% */
+        .container-fluid { width: 100%; padding-left: 20px; padding-right: 20px; }
+        .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .status-pill { border-radius: 4px; font-size: 11px; font-weight: 700; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
+        .updating { pointer-events: none; opacity: 0.3; background-color: #f1f5f9 !important; }
+        /* Tăng kích thước chữ cho bảng */
+        .table-text { font-size: 14px; color: #333; }
+        .desc-text { font-size: 15px; font-weight: 500; line-height: 1.6; }
+        .table-header { font-size: 11px; color: #676879; font-weight: 800; text-transform: uppercase; letter-spacing: 0.08em; }
+        table { table-layout: fixed; width: 100%; border-spacing: 0; }
+        td { word-wrap: break-word; vertical-align: middle; padding: 16px 12px !important; }
+        .type-immediately { color: #ef4444; font-weight: 800; }
+        .type-mandatory { color: #676879; font-weight: 600; }
     </style>
 </head>
-<body class="bg-[#f5f6f8] min-h-screen p-4 md:p-6">
+<body class="bg-[#f5f6f8] min-h-screen py-6">
 
-    <div class="max-w-[1600px] mx-auto">
-        <div class="flex flex-col md:flex-row justify-between items-end mb-6 gap-4">
-            <div>
-                <h1 class="text-2xl font-extrabold text-[#333]">PCN Master Board</h1>
-                <p class="text-[#676879] text-xs mt-1 font-medium">Full detail view with integrated remarks</p>
+    <div class="container-fluid">
+        <div class="flex flex-col xl:flex-row justify-between items-center mb-8 gap-6 px-2">
+            <div class="flex items-center gap-4">
+                <div class="w-2 h-12 bg-[#0073ea] rounded-full"></div>
+                <div>
+                    <h1 class="text-3xl font-black text-[#333] tracking-tight">PCN MASTER DASHBOARD</h1>
+                    <p class="text-[#676879] text-sm font-semibold uppercase tracking-widest opacity-70 italic">Full Width & High Visibility Mode</p>
+                </div>
             </div>
-            <div class="flex gap-2">
-                <button onclick="exportPDF()" class="bg-white border border-[#c3c6d4] text-[#333] px-4 py-2 rounded font-bold text-xs shadow-sm hover:bg-slate-50 transition-all">📄 Export A3</button>
-                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-6 py-2 rounded font-bold text-xs shadow-md hover:bg-[#0060c1] transition-all">+ New PCN</button>
+            <div class="flex gap-4">
+                <div class="relative">
+                    <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Quick search..." class="w-80 border-2 border-[#c3c6d4] p-3 rounded-xl text-sm outline-none focus:border-[#0073ea] bg-white shadow-sm">
+                </div>
+                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-3 rounded-xl font-bold text-sm hover:bg-slate-50 transition-all">📄 EXPORT A3</button>
+                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-3 rounded-xl font-bold text-sm shadow-lg hover:bg-[#0060c1] transform active:scale-95 transition-all">+ ADD NEW PCN</button>
             </div>
         </div>
 
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-4 mb-6">
-            <div class="lg:col-span-3 bg-white p-4 monday-card flex items-center justify-center h-48">
+        <div class="bg-white p-6 monday-card mb-8">
+            <div class="h-40">
                 <canvas id="statusChart"></canvas>
-            </div>
-            <div class="bg-white p-5 monday-card flex flex-col justify-center">
-                <span class="text-[10px] font-bold text-[#676879] uppercase mb-2">Quick Search</span>
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search PCN, Tech..." class="w-full border border-[#c3c6d4] p-2 rounded text-sm outline-none focus:border-[#0073ea] bg-[#f5f6f8]">
             </div>
         </div>
 
         <div class="bg-white monday-card overflow-hidden">
-            <table class="w-full text-left border-collapse">
+            <table class="w-full text-left">
                 <thead class="bg-[#f5f6f8] border-b table-header">
                     <tr>
-                        <th class="p-3 w-[100px] cursor-pointer" onclick="sortTable(1)">PCN # ↕</th>
-                        <th class="p-3 w-[120px] text-center" onclick="sortTable(3)">Status ↕</th>
-                        <th class="p-3">Description & Remarks</th>
-                        <th class="p-3 w-[100px] text-center">Start</th>
-                        <th class="p-3 w-[100px] text-center">Appr Date</th>
-                        <th class="p-3 w-[100px] text-center font-bold text-[#333]">Release</th>
-                        <th class="p-3 w-[110px]">Engr Tech</th>
-                        <th class="p-3 w-[110px]">Appr Engr</th>
-                        <th class="p-3 w-[50px] text-center">Att</th>
-                        <th class="p-3 w-[70px] text-center">Action</th>
+                        <th class="p-4 w-[110px] cursor-pointer" onclick="sortTable(1)">PCN # ↕</th>
+                        <th class="p-4 w-[130px] text-center">Status</th>
+                        <th class="p-4">Description & Remarks (High Clarity)</th>
+                        <th class="p-4 w-[120px] text-center">Start</th>
+                        <th class="p-4 w-[120px] text-center">Appr Date</th>
+                        <th class="p-4 w-[120px] text-center font-black text-[#0073ea]">Release</th>
+                        <th class="p-4 w-[140px]">Engr Tech</th>
+                        <th class="p-4 w-[140px]">Appr Engr</th>
+                        <th class="p-4 w-[60px] text-center">Att</th>
+                        <th class="p-4 w-[90px] text-center">Action</th>
                     </tr>
                 </thead>
-                <tbody id="taskTableBody" class="text-[12px] text-[#333]"></tbody>
+                <tbody id="taskTableBody" class="table-text"></tbody>
             </table>
         </div>
     </div>
 
-    <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-opacity duration-200">
-        <div class="absolute inset-0 bg-[#333333aa]"></div>
-        <div class="bg-white w-full max-w-4xl mx-auto rounded-lg shadow-2xl z-50 overflow-hidden">
+    <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <div class="absolute inset-0 bg-[#1e293baa]" onclick="toggleModal(false)"></div>
+        <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative transform scale-95 transition-transform">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-                <h2 id="modalTitle" class="text-lg font-bold text-[#333]">Add PCN Detail</h2>
-                <button onclick="toggleModal(false)" class="text-2xl text-[#676879]">&times;</button>
+                <h2 id="modalTitle" class="text-2xl font-black text-[#333] italic">PCN EDITOR</h2>
+                <button onclick="toggleModal(false)" class="text-3xl text-[#676879] hover:text-red-500">&times;</button>
             </div>
-            <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[75vh] overflow-y-auto">
-                <div class="space-y-4">
+            <div class="p-8 grid grid-cols-1 md:grid-cols-2 gap-8 max-h-[80vh] overflow-y-auto">
+                <div class="space-y-6">
                     <input type="hidden" id="editId">
-                    <div>
-                        <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">PCN Number & Type</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="pcnInput" class="flex-1 border p-2 rounded outline-none focus:border-[#0073ea]" placeholder="PCN-XXXX">
-                            <select id="pcnTypeInput" class="border p-2 rounded outline-none font-bold">
+                    <div class="flex gap-4">
+                        <div class="flex-1">
+                            <label class="block text-xs font-black text-[#676879] uppercase mb-2">PCN Number</label>
+                            <input type="text" id="pcnInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none focus:border-[#0073ea] font-bold text-lg">
+                        </div>
+                        <div class="w-44">
+                            <label class="block text-xs font-black text-[#676879] uppercase mb-2">Type</label>
+                            <select id="pcnTypeInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none font-bold">
                                 <option value="MANDATORY">MANDATORY</option>
                                 <option value="IMMEDIATELY">IMMEDIATELY</option>
                             </select>
                         </div>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Status</label>
-                        <select id="statusInput" class="w-full border p-2 rounded outline-none font-bold text-[#0073ea]">
+                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Process Status</label>
+                        <select id="statusInput" class="w-full border-2 border-slate-200 p-3 rounded-xl outline-none font-black text-[#0073ea] text-lg">
                             <option value="IN-PROGRESS">IN-PROGRESS</option>
                             <option value="ENG REVIEW">ENG REVIEW</option>
                             <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
@@ -94,53 +105,35 @@
                         </select>
                     </div>
                     <div class="grid grid-cols-2 gap-4">
-                        <div>
-                            <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Engr. Tech</label>
-                            <input type="text" id="engrTechInput" class="w-full border p-2 rounded text-sm">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Appr. Engr</label>
-                            <input type="text" id="apprEngrInput" class="w-full border p-2 rounded text-sm">
-                        </div>
+                        <input type="text" id="engrTechInput" placeholder="Engr Tech Name" class="border-2 p-3 rounded-xl font-semibold">
+                        <input type="text" id="apprEngrInput" placeholder="Appr Engr Name" class="border-2 p-3 rounded-xl font-semibold">
                     </div>
-                    <div class="grid grid-cols-3 gap-2">
-                        <div>
-                            <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Start</label>
-                            <input type="date" id="startInput" class="w-full border p-2 rounded text-[10px]">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Appr</label>
-                            <input type="date" id="apprDateInput" class="w-full border p-2 rounded text-[10px]">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-[#333] uppercase mb-1">Release</label>
-                            <input type="date" id="releaseDateInput" class="w-full border border-indigo-300 p-2 rounded text-[10px] font-bold">
-                        </div>
+                    <div class="grid grid-cols-3 gap-3 bg-slate-50 p-4 rounded-xl border-2 border-dashed">
+                        <div><label class="text-[10px] font-bold text-slate-400">START</label><input type="date" id="startInput" class="w-full bg-transparent outline-none text-xs"></div>
+                        <div><label class="text-[10px] font-bold text-slate-400">APPR</label><input type="date" id="apprDateInput" class="w-full bg-transparent outline-none text-xs"></div>
+                        <div><label class="text-[10px] font-bold text-[#0073ea]">RELEASE</label><input type="date" id="releaseDateInput" class="w-full bg-transparent outline-none text-xs font-black"></div>
                     </div>
                 </div>
-                <div class="space-y-4">
+                <div class="space-y-6">
                     <div>
-                        <label class="block text-[10px] font-bold text-[#676879] uppercase mb-1">Description</label>
-                        <textarea id="descInput" class="w-full border p-2 rounded h-24 text-sm outline-none focus:border-[#0073ea]"></textarea>
+                        <label class="block text-xs font-black text-[#676879] uppercase mb-2">Technical Description</label>
+                        <textarea id="descInput" placeholder="Nhập mô tả chi tiết..." class="w-full border-2 border-slate-200 p-4 rounded-xl h-32 text-sm outline-none focus:border-[#0073ea]"></textarea>
                     </div>
                     <div>
-                        <label class="block text-[10px] font-bold text-rose-500 uppercase mb-1">Remarks / Issues</label>
-                        <textarea id="remarksInput" class="w-full border border-rose-100 bg-rose-50/20 p-2 rounded h-24 text-sm text-rose-700 italic outline-none"></textarea>
+                        <label class="block text-xs font-black text-rose-500 uppercase mb-2">Remarks & Problems</label>
+                        <textarea id="remarksInput" placeholder="Có vấn đề gì ghi ở đây..." class="w-full border-2 border-rose-100 bg-rose-50/30 p-4 rounded-xl h-32 text-sm text-rose-700 italic outline-none"></textarea>
                     </div>
                 </div>
             </div>
-            <div class="p-6 border-t flex justify-between items-center bg-slate-50">
-                <div class="flex items-center gap-4">
-                    <input type="text" id="attachInput" placeholder="📎 Link Drive..." class="text-xs border-b border-slate-300 p-1 outline-none w-40 bg-transparent">
-                    <label class="flex items-center gap-2 cursor-pointer">
-                        <input type="checkbox" id="reportedInput" class="accent-[#00c875] w-4 h-4">
-                        <span class="text-[10px] font-bold text-[#676879]">REPORTED</span>
+            <div class="p-8 border-t flex justify-between items-center bg-slate-50">
+                <div class="flex items-center gap-6">
+                    <input type="text" id="attachInput" placeholder="📎 Drive Link..." class="text-sm border-b-2 border-slate-300 p-2 outline-none w-64 bg-transparent focus:border-[#0073ea]">
+                    <label class="flex items-center gap-3 cursor-pointer group">
+                        <input type="checkbox" id="reportedInput" class="accent-[#00c875] w-6 h-6 rounded">
+                        <span class="text-sm font-black text-[#676879] group-hover:text-[#00c875]">REPORTED</span>
                     </label>
                 </div>
-                <div class="flex gap-2">
-                    <button onclick="toggleModal(false)" class="px-4 py-2 text-xs font-bold text-[#676879]">Cancel</button>
-                    <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-8 py-2 rounded font-bold shadow-md text-xs hover:bg-[#0060c1]">Save Changes</button>
-                </div>
+                <button id="btnSubmit" onclick="saveTask()" class="bg-[#0073ea] text-white px-12 py-4 rounded-xl font-black shadow-xl text-sm hover:bg-[#0060c1] uppercase tracking-widest transition-all">Submit to System</button>
             </div>
         </div>
     </div>
@@ -154,54 +147,63 @@
         let updatingId = null;
 
         async function loadTasks() {
-            const res = await fetch(SCRIPT_URL);
-            allTasks = await res.json();
-            renderTable(allTasks);
-            updateChart();
-            updatingId = null;
+            try {
+                const res = await fetch(SCRIPT_URL);
+                allTasks = await res.json();
+                renderTable(allTasks);
+                updateChart();
+                updatingId = null;
+            } catch (e) { console.error("Lỗi:", e); }
         }
 
         function toggleModal(show) {
             const modal = document.getElementById('pcnModal');
-            if (show) modal.classList.remove('opacity-0', 'pointer-events-none');
-            else { modal.classList.add('opacity-0', 'pointer-events-none'); resetForm(); }
+            if (show) {
+                modal.classList.remove('opacity-0', 'pointer-events-none');
+                modal.querySelector('.bg-white').classList.remove('scale-95');
+            } else {
+                modal.classList.add('opacity-0', 'pointer-events-none');
+                modal.querySelector('.bg-white').classList.add('scale-95');
+                resetForm();
+            }
         }
 
         function resetForm() {
-            document.getElementById('editId').value = "";
-            document.getElementById('pcnInput').value = "";
-            document.getElementById('descInput').value = "";
-            document.getElementById('remarksInput').value = "";
-            document.getElementById('attachInput').value = "";
+            const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'attachInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
+            ids.forEach(id => document.getElementById(id).value = "");
             document.getElementById('reportedInput').checked = false;
-            document.getElementById('modalTitle').innerText = "Add PCN Detail";
-            document.getElementById('btnSubmit').innerText = "Save Changes";
+            document.getElementById('modalTitle').innerText = "PCN EDITOR";
         }
 
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
             const body = document.getElementById('taskTableBody');
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query) || t[6].toLowerCase().includes(query));
+            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
 
             body.innerHTML = filtered.map((row) => {
-                const isUpdating = row[0] === updatingId;
+                const isUpdating = String(row[0]) === String(updatingId);
+                const isImmediately = row[2] === "IMMEDIATELY";
                 return `
-                <tr class="border-b hover:bg-[#f8fafc] transition-colors ${row[11] ? 'bg-slate-50/50 grayscale-[0.2]' : ''} ${isUpdating ? 'updating' : ''}">
-                    <td class="p-3 font-bold">${row[1]}<br><span class="text-[9px] text-slate-400 font-normal uppercase">${row[2]}</span></td>
-                    <td class="p-3 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
-                    <td class="p-3">
-                        <div class="font-medium text-slate-700 leading-snug line-clamp-2">${row[4]}</div>
-                        ${row[12] ? `<div class="text-[10px] text-rose-500 font-bold italic mt-1 bg-rose-50/50 px-1 rounded">⚠️ ${row[12]}</div>` : ''}
+                <tr class="border-b hover:bg-[#f0f4f8] transition-all ${row[11] ? 'bg-slate-50/80 grayscale-[0.2]' : ''} ${isUpdating ? 'updating' : ''}">
+                    <td class="p-4 font-black text-slate-800 text-lg">${row[1]}<br>
+                        <span class="text-[10px] uppercase tracking-tighter ${isImmediately ? 'type-immediately' : 'type-mandatory'}">
+                            ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
+                        </span>
                     </td>
-                    <td class="p-3 text-center text-slate-500">${formatDate(row[5])}</td>
-                    <td class="p-3 text-center text-slate-500">${formatDate(row[7])}</td>
-                    <td class="p-3 text-center font-bold text-slate-900">${formatDate(row[9])}</td>
-                    <td class="p-3 font-medium text-indigo-600">${row[6]}</td>
-                    <td class="p-3 font-medium text-slate-600">${row[8]}</td>
-                    <td class="p-3 text-center">${row[10] ? `<a href="${row[10]}" target="_blank">📎</a>` : '-'}</td>
-                    <td class="p-3 text-center">
-                        <button onclick="prepareEdit('${row[0]}')" ${isUpdating ? 'disabled' : ''} class="text-[#0073ea] font-bold hover:underline ${isUpdating ? 'opacity-20' : ''}">
-                            ${isUpdating ? '...' : 'Edit'}
+                    <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
+                    <td class="p-4">
+                        <div class="desc-text text-slate-800">${row[4]}</div>
+                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold italic mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
+                    </td>
+                    <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[5])}</td>
+                    <td class="p-4 text-center font-semibold text-slate-400">${formatDateDisplay(row[7])}</td>
+                    <td class="p-4 text-center font-black text-slate-900 bg-blue-50/30">${formatDateDisplay(row[9])}</td>
+                    <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
+                    <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
+                    <td class="p-4 text-center text-xl">${row[10] ? `<a href="${row[10]}" target="_blank" title="View Link">🔗</a>` : '-'}</td>
+                    <td class="p-4 text-center">
+                        <button onclick="prepareEdit('${row[0]}')" ${isUpdating ? 'disabled' : ''} class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black hover:bg-[#0073ea] hover:text-white transition-all text-xs">
+                            ${isUpdating ? 'SAVING' : 'EDIT'}
                         </button>
                     </td>
                 </tr>
@@ -209,13 +211,14 @@
         }
 
         function getStatusClass(s) {
-            if (s === 'RELEASED') return 'bg-[#00c875] text-white';
-            if (s === 'OUT FOR APPROVAL') return 'bg-[#a25ddc] text-white';
-            if (s === 'ENG REVIEW') return 'bg-[#579bfc] text-white';
-            return 'bg-[#fdab3d] text-white';
+            if (s === 'RELEASED') return 'bg-[#00c875] text-white shadow-md shadow-green-100';
+            if (s === 'OUT FOR APPROVAL') return 'bg-[#a25ddc] text-white shadow-md shadow-purple-100';
+            if (s === 'ENG REVIEW') return 'bg-[#579bfc] text-white shadow-md shadow-blue-100';
+            return 'bg-[#fdab3d] text-white shadow-md shadow-orange-100';
         }
 
-        function formatDate(d) { return d ? d.split('T')[0] : '-'; }
+        function formatDateDisplay(d) { return (!d || d === "" || d === "-") ? "-" : d.split('T')[0]; }
+        function formatDateInput(d) { return (!d || d === "" || d === "-") ? "" : d.split('T')[0]; }
 
         function updateChart() {
             const stats = { 'RELEASED': 0, 'IN-PROGRESS': 0, 'OUT FOR APPROVAL': 0, 'ENG REVIEW': 0 };
@@ -229,27 +232,16 @@
                     datasets: [{
                         data: Object.values(stats),
                         backgroundColor: ['#00c875', '#fdab3d', '#a25ddc', '#579bfc'],
-                        borderRadius: 4,
-                        barThickness: 30
+                        borderRadius: 8,
+                        barThickness: 50
                     }]
                 },
                 options: { 
                     maintainAspectRatio: false, 
                     plugins: { legend: { display: false } },
-                    scales: { y: { beginAtZero: true, grid: { display: false }, ticks: { font: { size: 9 } } }, x: { grid: { display: false }, ticks: { font: { size: 9, weight: 'bold' } } } }
+                    scales: { y: { grid: { display: false } }, x: { grid: { display: false }, ticks: { font: { weight: 'bold' } } } }
                 }
             });
-        }
-
-        function sortTable(colIndex) {
-            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
-            currentSortCol = colIndex;
-            allTasks.sort((a, b) => {
-                let valA = a[colIndex] ? a[colIndex].toString().toLowerCase() : "";
-                let valB = b[colIndex] ? b[colIndex].toString().toLowerCase() : "";
-                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
-            });
-            renderTable(allTasks);
         }
 
         async function saveTask() {
@@ -269,34 +261,45 @@
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("Bồ chưa nhập PCN # kìa!");
-            
-            updatingId = id; 
+            if (!data.pcn) return alert("Bồ chưa nhập PCN #!");
+            updatingId = id || "new"; 
             toggleModal(false);
             renderTable(allTasks);
-            
-            await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-            loadTasks();
+            try {
+                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                loadTasks();
+            } catch (e) { loadTasks(); }
         }
 
         function prepareEdit(id) {
-            const t = allTasks.find(x => x[0] == id);
+            const t = allTasks.find(x => String(x[0]) === String(id));
+            if(!t) return;
             document.getElementById('editId').value = t[0];
             document.getElementById('pcnInput').value = t[1];
             document.getElementById('pcnTypeInput').value = t[2];
             document.getElementById('statusInput').value = t[3];
             document.getElementById('descInput').value = t[4];
-            document.getElementById('startInput').value = formatDate(t[5]);
+            document.getElementById('startInput').value = formatDateInput(t[5]);
             document.getElementById('engrTechInput').value = t[6];
-            document.getElementById('apprDateInput').value = formatDate(t[7]);
+            document.getElementById('apprDateInput').value = formatDateInput(t[7]);
             document.getElementById('apprEngrInput').value = t[8];
-            document.getElementById('releaseDateInput').value = formatDate(t[9]);
+            document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('attachInput').value = t[10];
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
-            document.getElementById('modalTitle').innerText = "Edit PCN Detail";
-            document.getElementById('btnSubmit').innerText = "Update Now";
+            document.getElementById('modalTitle').innerText = "EDIT PCN ENTRY";
             toggleModal(true);
+        }
+
+        function sortTable(colIndex) {
+            sortAsc = (currentSortCol === colIndex) ? !sortAsc : true;
+            currentSortCol = colIndex;
+            allTasks.sort((a, b) => {
+                let valA = a[colIndex] ? String(a[colIndex]).toLowerCase() : "";
+                let valB = b[colIndex] ? String(b[colIndex]).toLowerCase() : "";
+                return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
+            });
+            renderTable(allTasks);
         }
 
         function exportPDF() {
@@ -306,17 +309,17 @@
             const tableData = toExport.map(t => [
                 t[1], t[2], t[3], 
                 t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
-                formatDate(t[5]), t[6], formatDate(t[7]), t[8], formatDate(t[9])
+                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
             ]);
-            doc.text("PCN STATUS REPORT", 14, 20);
+            doc.text("MASTER PCN REPORT - FULL VIEW", 14, 20);
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
                 body: tableData,
                 startY: 30,
-                styles: { fontSize: 9, cellPadding: 3 },
+                styles: { fontSize: 10, cellPadding: 4 },
                 headStyles: { fillColor: [0, 115, 234] }
             });
-            doc.save("PCN-Full-Report.pdf");
+            doc.save("PCN-FullView-Report.pdf");
         }
 
         loadTasks();
