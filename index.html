@@ -22,6 +22,48 @@
         table { table-layout: fixed; width: 100%; border-spacing: 0; }
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
         .type-immediately { color: #ef4444; font-weight: 800; }
+        /* --- PHẦN CHỈNH CHO MOBILE --- */
+        @media (max-width: 768px) {
+            /* Cho phép bảng cuộn ngang để không bị nát layout */
+            .monday-card {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            table {
+                min-width: 1000px; /* Ép bảng giữ độ rộng tối thiểu để không bị dồn chữ */
+            }
+        
+            /* Thu nhỏ Header để không chiếm hết màn hình điện thoại */
+            .flex-col {
+                padding: 10px 5px;
+            }
+        
+            h1 {
+                font-size: 1.25rem !important; /* Chữ tiêu đề nhỏ lại xíu */
+            }
+        
+            #searchInput {
+                width: 100% !important; /* Ô tìm kiếm tràn ngang mobile */
+            }
+        
+            .flex.gap-4 {
+                flex-wrap: wrap; /* Cho phép các nút Export, New PCN tự rớt dòng */
+                justify-content: center;
+            }
+        
+            button {
+                width: 48%; /* Hai nút nằm song song cho đẹp trên mobile */
+                padding: 8px 4px !important;
+                font-size: 12px !important;
+            }
+        
+            /* Modal trên mobile cho to ra dễ bấm */
+            #pcnModal .max-w-5xl {
+                margin: 10px;
+                width: calc(100% - 20px);
+            }
+        }
     </style>
 </head>
 <body class="bg-[#f5f6f8] min-h-screen py-4">
