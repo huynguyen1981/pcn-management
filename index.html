@@ -376,49 +376,38 @@
             doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);
         
             doc.autoTable({
-                // Đủ 9 cột theo yêu cầu của bồ
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
-                
                 body: toExport.map(t => [
-                    t[1], // PCN
-                    t[2], // TYPE
-                    t[3], // STATUS
-                    t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), // CONTENT & REMARKS
+                    String(t[1] || ""), 
+                    String(t[2] || ""), 
+                    String(t[3] || ""), 
+                    String(t[4] || "") + (t[12] ? "\n---\nREMARK: " + String(t[12]) : ""), 
                     fDate(t[5]), 
-                    t[6] || "-", 
+                    String(t[6] || "-"), 
                     fDate(t[7]), 
-                    t[8] || "-", 
+                    String(t[8] || "-"), 
                     fDate(t[9])
                 ]),
-                
                 startY: 35,
                 theme: 'grid',
-                styles: { fontSize: 9, cellPadding: 4, valign: 'middle', overflow: 'linebreak' },
-                headStyles: { fillColor: [0, 115, 234], textColor: 255, fontStyle: 'bold' },
+                styles: { fontSize: 9, cellPadding: 4, valign: 'middle' },
                 
-                columnStyles: {
-                    0: { cellWidth: 35 }, 1: { cellWidth: 35 }, 2: { cellWidth: 40 }, 
-                    3: { cellWidth: 'auto' }, 4: { cellWidth: 28 }, 5: { cellWidth: 28 }, 
-                    6: { cellWidth: 28 }, 7: { cellWidth: 28 }, 8: { cellWidth: 28 }
-                },
-            
-                // BƯỚC 1: TRIỆT TIÊU NỘI DUNG GỐC ĐỂ KHÔNG BỊ LEM
+                // BƯỚC 1: TRIỆT TIÊU CHỮ GỐC ĐỂ KHÔNG LEM
                 didParseCell: (data) => {
                     if (data.section === 'body' && (data.column.index === 1 || data.column.index === 2 || data.column.index === 3)) {
-                        // Cất nội dung vào một biến tạm để mình tự vẽ sau
-                        data.cell.customData = data.cell.text.join('\n');
-                        // Xóa sạch để AutoTable không bao giờ vẽ được chữ đen cũ nữa
+                        // Lưu nội dung vào biến tạm, ép kiểu String để tránh lỗi f3
+                        data.cell.customData = String(data.cell.text.join('\n') || "");
                         data.cell.text = [""]; 
                     }
                 },
             
-                // BƯỚC 2: TỰ TAY VẼ LẠI TRÊN NỀN TRẮNG TINH KHÔI
+                // BƯỚC 2: VẼ THỦ CÔNG (CÓ KIỂM TRA DỮ LIỆU)
                 didDrawCell: (data) => {
                     if (data.section !== 'body') return;
-                    const content = data.cell.customData;
+                    const content = data.cell.customData || "";
             
-                    // 1. STATUS (Index 2)
-                    if (data.column.index === 2) {
+                    // 1. STATUS (Cột 2)
+                    if (data.column.index === 2 && content) {
                         const color = getStatusColor(content);
                         const [r, g, b] = [parseInt(color.slice(1,3), 16), parseInt(color.slice(3,5), 16), parseInt(color.slice(5,7), 16)];
                         doc.setFillColor(r, g, b);
@@ -428,32 +417,34 @@
                         doc.text(content, data.cell.x + (data.cell.width / 2), data.cell.y + (data.cell.height / 2) + 2, { align: 'center' });
                     }
             
-                    // 2. TYPE (Index 1)
-                    if (data.column.index === 1) {
-                        doc.setTextColor(content === "IMMEDIATELY" ? [239, 68, 68] : [0, 0, 0]);
-                        doc.setFont("helvetica", content === "IMMEDIATELY" ? "bold" : "normal");
+                    // 2. TYPE (Cột 1)
+                    if (data.column.index === 1 && content) {
+                        const isImm = content === "IMMEDIATELY";
+                        doc.setTextColor(isImm ? [239, 68, 68] : [0, 0, 0]);
+                        doc.setFont("helvetica", isImm ? "bold" : "normal");
                         doc.text(content, data.cell.x + 4, data.cell.y + (data.cell.height / 2) + 2);
                     }
             
-                    // 3. CONTENT & REMARK (Index 3)
-                    if (data.column.index === 3) {
+                    // 3. CONTENT & REMARK (Cột 3)
+                    if (data.column.index === 3 && content) {
                         if (content.includes("---")) {
                             const parts = content.split("---");
-                            const desc = parts[0].trim();
-                            const remark = "REMARK: " + parts[1].replace("REMARK: ", "").trim();
+                            const desc = String(parts[0] || "").trim();
+                            const remark = "REMARK: " + String(parts[1] || "").replace("REMARK: ", "").trim();
             
-                            // Vẽ Description màu đen
+                            // Vẽ Description (Đen)
                             doc.setTextColor(0, 0, 0);
                             doc.setFont("helvetica", "normal");
                             doc.text(desc, data.cell.x + 4, data.cell.y + 6, { maxWidth: data.cell.width - 8 });
             
-                            // Vẽ Remark màu đỏ
-                            doc.setTextColor(225, 29, 72);
-                            doc.setFont("helvetica", "bolditalic");
-                            // Tính toán vị trí Y dựa trên số dòng của Desc
-                            const descLines = doc.splitTextToSize(desc, data.cell.width - 8).length;
-                            const remarkY = data.cell.y + 6 + (descLines * 4.5); // 4.5 là khoảng cách dòng
-                            doc.text(remark, data.cell.x + 4, remarkY, { maxWidth: data.cell.width - 8 });
+                            // Vẽ Remark (Đỏ)
+                            if (remark && remark !== "REMARK: ") {
+                                doc.setTextColor(225, 29, 72);
+                                doc.setFont("helvetica", "bolditalic");
+                                const descLines = doc.splitTextToSize(desc, data.cell.width - 8).length;
+                                const remarkY = data.cell.y + 7 + (descLines * 4.5); 
+                                doc.text(remark, data.cell.x + 4, remarkY, { maxWidth: data.cell.width - 8 });
+                            }
                         } else {
                             doc.setTextColor(0, 0, 0);
                             doc.setFont("helvetica", "normal");
