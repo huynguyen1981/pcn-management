@@ -35,10 +35,33 @@
         /* FIX CỘT: ÉP ĐỘ RỘNG TỐI THIỂU */
         /* table { table-layout: auto; width: 100%; min-width: 1200px; border-spacing: 0; } */
 
-        table { 
-            width: 100%; 
-            min-width: 1300px; /* Ép bảng rộng ra để không bị 'nhét' chữ vào 1 hàng */
+        /* Khung nhốt thanh cuộn */
+        .table-responsive-wrapper {
+            width: 100%;
+            overflow-x: auto;          /* Hiện thanh cuộn khi bảng quá rộng */
+            -webkit-overflow-scrolling: touch; /* Vuốt mượt trên iPhone */
+            border: 1px solid #e6e9ef;
+            border-radius: 12px;
+            background: white;
+        }
+        
+        /* Ép bảng phải rộng ra */
+        table {
+            width: 100%;
+            min-width: 1500px;         /* Ép bảng rộng 1500px để 9 cột không bị bóp */
             border-collapse: collapse;
+            table-layout: auto;        /* Để các cột tự co giãn theo nội dung */
+        }
+        
+        /* Ngăn Description bị biến thành 1 hàng 1 chữ cái */
+        td, th {
+            white-space: nowrap;       /* Không cho chữ tự ý xuống hàng ở các cột ngắn */
+        }
+        
+        /* Riêng cột Description thì cho phép xuống hàng nhưng phải có độ rộng */
+        td:nth-child(3) { 
+            white-space: normal !important; 
+            min-width: 400px !important; 
         }
         
         /* Đảm bảo cột Description luôn rộng rãi, không bị bóp nghẹt */
@@ -90,38 +113,42 @@
         </div>
 
         <div class="bg-white monday-card overflow-hidden">
-            <table class="w-full text-left">
-                <thead class="table-header">
-                    <tr>
-                        <th class="p-4 col-pcn sortable" onclick="sortTable(1)">PCN # ↕</th>
-                        <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
-                        <th class="p-4 col-desc">Description & Remarks</th> <th class="p-4 col-date text-center sortable" onclick="sortTable(5)">Start ↕</th>
-                        <th class="p-4 col-date text-center sortable" onclick="sortTable(7)">Appr ↕</th>
-                        <th class="p-4 col-date text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
-                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
-                        <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
-                        <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
-                        <th class="p-4 w-[90px] text-center">Action</th>
-                    </tr>
-                </thead>
-                
-                <!-- <thead class="table-header">
-                    <tr>
-                        <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
-                        <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
-                        <th class="p-4">Description & Remarks</th>
-                        <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(5)">Start ↕</th>
-                        <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(7)">Appr ↕</th>
-                        <th class="p-4 w-[110px] text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
-                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
-                        <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
-                        <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
-                        <th class="p-4 w-[90px] text-center">Action</th>
-                    </tr>
-                </thead> -->
-                
-                <tbody id="taskTableBody" class="table-text bg-white"></tbody>
-            </table>
+            <div class="container-fluid"> 
+                  <div class="table-responsive-wrapper">
+                    <table class="w-full text-left">
+                        <thead class="table-header">
+                            <tr>
+                                <th class="p-4 col-pcn sortable" onclick="sortTable(1)">PCN # ↕</th>
+                                <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
+                                <th class="p-4 col-desc">Description & Remarks</th> <th class="p-4 col-date text-center sortable" onclick="sortTable(5)">Start ↕</th>
+                                <th class="p-4 col-date text-center sortable" onclick="sortTable(7)">Appr ↕</th>
+                                <th class="p-4 col-date text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
+                                <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
+                                <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
+                                <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
+                                <th class="p-4 w-[90px] text-center">Action</th>
+                            </tr>
+                        </thead>
+                        
+                        <!-- <thead class="table-header">
+                            <tr>
+                                <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
+                                <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
+                                <th class="p-4">Description & Remarks</th>
+                                <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(5)">Start ↕</th>
+                                <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(7)">Appr ↕</th>
+                                <th class="p-4 w-[110px] text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
+                                <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
+                                <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
+                                <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
+                                <th class="p-4 w-[90px] text-center">Action</th>
+                            </tr>
+                        </thead> -->
+                        
+                        <tbody id="taskTableBody" class="table-text bg-white"></tbody>
+                    </table>
+                 </div>
+             </div>
         </div>
     </div>
 
@@ -365,7 +392,7 @@
                     6: { cellWidth: 25 }, // APPR DATE
                     7: { cellWidth: 25 }, // APPR
                     8: { cellWidth: 25 }  // REL DATE
-                ],
+                },
                 // 3. Giữ lại phần tô màu Status cho chuyên nghiệp
                 didDrawCell: (data) => {
                     if (data.section === 'body' && data.column.index === 2) { // Cột Status index là 2
