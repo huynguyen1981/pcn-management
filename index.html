@@ -24,28 +24,67 @@
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
         .type-immediately { color: #ef4444; font-weight: 800; }
         */
-        /* ------Dark Mode------- */
-        /* Màu mặc định (Light) */
+        /* ------ Dark Mode Final Fix ------- */
         :root {
             --bg-main: #f8fafc;
             --bg-card: #ffffff;
             --text-main: #1e293b;
             --border-color: #e2e8f0;
+            --hover-color: #f1f5f9;
         }
         
-        /* Màu khi bật Dark Mode */
         [data-theme='dark'] {
             --bg-main: #0f172a;
             --bg-card: #1e293b;
             --text-main: #f1f5f9;
             --border-color: #334155;
+            --hover-color: #2d3748; /* Màu tối hơn khi hover */
         }
         
+        /* Áp dụng màu nền và màu chữ tổng thể */
         body { background-color: var(--bg-main); color: var(--text-main); transition: 0.3s; }
-        .bg-white { background-color: var(--bg-card) !important; }
-        .text-gray-800, .text-gray-700 { color: var(--text-main) !important; }
+        
+        /* Ép tất cả các thẻ có nền trắng hoặc xám nhạt phải đổi theo Theme */
+        [data-theme='dark'] .bg-white, 
+        [data-theme='dark'] .bg-gray-50,
+        [data-theme='dark'] .bg-slate-50,
+        [data-theme='dark'] tr, 
+        [data-theme='dark'] td { 
+            background-color: var(--bg-card) !important; 
+            color: var(--text-main) !important;
+        }
+        
+        /* Xử lý lỗi "Trắng xóa khi rê chuột" (Hover) */
+        [data-theme='dark'] tr:hover td {
+            background-color: var(--hover-color) !important;
+        }
+        
+        /* Giữ cho Header bảng dễ nhìn */
+        [data-theme='dark'] th {
+            background-color: #1a202c !important;
+            color: #94a3b8 !important;
+            border-bottom: 2px solid var(--border-color) !important;
+        }
+        
+        /* Fix các class chữ màu xám của Tailwind bị chìm trong nền tối */
+        [data-theme='dark'] .text-gray-400,
+        [data-theme='dark'] .text-gray-500,
+        [data-theme='dark'] .text-slate-400 {
+            color: #94a3b8 !important; 
+        }
+        
+        /* Đường viền bảng */
         table, th, td { border-color: var(--border-color) !important; }
-        /* -----Dark Mode END-------*/
+        
+        /* Nút Export và Search cũng phải "ton-sur-ton" */
+        [data-theme='dark'] input, 
+        [data-theme='dark'] select {
+            background-color: #2d3748 !important;
+            color: white !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        /* ----- Dark Mode END ------- */
+        
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
@@ -129,6 +168,21 @@
             <div class="flex gap-4">
                 <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition ml-2">🌙 Dark Mode</button>
                 <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-64 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
+                <!-- Filter theo ngày tháng -->
+                <div class="flex flex-wrap gap-4 mb-4 items-center bg-gray-100 p-4 rounded-lg" id="filterContainer">
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">From:</label>
+                        <input type="date" id="dateFrom" onchange="applyFilters()" class="border p-2 rounded-lg text-black">
+                    </div>
+                    
+                    <div class="flex items-center gap-2">
+                        <label class="text-sm font-medium">To:</label>
+                        <input type="date" id="dateTo" onchange="applyFilters()" class="border p-2 rounded-lg text-black">
+                    </div>
+                
+                    <button onclick="resetFilters()" class="text-blue-600 underline ml-2">Reset</button>
+                </div>
+                <!-- End Filter theo ngày tháng -->
                 <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT PDF</button>
                 <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
             </div>
@@ -264,14 +318,68 @@
             document.getElementById('reportedInput').checked = false;
         }
 
+        //Hàm này FILTER theo searchbox >>> OK 
+        // function renderTable(data) {
+        //     const query = document.getElementById('searchInput').value.toLowerCase();
+        //     const body = document.getElementById('taskTableBody');
+        //     const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
+
+        //     body.innerHTML = filtered.map((row) => {
+        //         const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
+        //         const isImmediately = row[2] === "IMMEDIATELY";
+        //         return `
+        //         <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
+        //             <td class="p-4 font-black text-lg">${row[1]}<br>
+        //                 <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
+        //                     ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
+        //                 </span>
+        //             </td>
+        //             <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
+        //             <td class="p-4">
+        //                 <div class="desc-text">${row[4]}</div>
+        //                 ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
+        //             </td>
+        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
+        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
+        //             <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
+        //             <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
+        //             <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
+        //             <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+        //             <td class="p-4 text-center">
+        //                 <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
+        //             </td>
+        //         </tr>
+        //     `}).join('');
+        // }
+        //END - Hàm này FILTER theo searchbox >>> OK 
+        
+        //Hàm này FILTER theo searchbox và date
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
+            const dateFrom = document.getElementById('dateFrom')?.value; // Thêm dấu ? để tránh lỗi nếu chưa có ô input
+            const dateTo = document.getElementById('dateTo')?.value;
             const body = document.getElementById('taskTableBody');
-            const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
-
+        
+            // --- LOGIC LỌC SIÊU CẤP: Search + Khoảng ngày ---
+            const filtered = data.filter(t => {
+                // 1. Lọc theo từ khóa (PCN hoặc Description)
+                const matchSearch = String(t[1]).toLowerCase().includes(query) || 
+                                   String(t[4]).toLowerCase().includes(query);
+        
+                // 2. Lọc theo khoảng ngày (Cột Release Date - Index 9 cho chuẩn bài nhé bồ)
+                const taskDate = t[9] ? t[9].split('T')[0] : ""; 
+                let matchDate = true;
+                if (dateFrom && taskDate < dateFrom) matchDate = false;
+                if (dateTo && taskDate > dateTo) matchDate = false;
+        
+                return matchSearch && matchDate;
+            });
+        
+            // --- PHẦN VẼ BẢNG (Giữ nguyên logic của bồ) ---
             body.innerHTML = filtered.map((row) => {
                 const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
                 const isImmediately = row[2] === "IMMEDIATELY";
+                
                 return `
                 <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
                     <td class="p-4 font-black text-lg">${row[1]}<br>
@@ -296,7 +404,16 @@
                 </tr>
             `}).join('');
         }
-
+        
+        // Hàm reset để quay về trạng thái ban đầu
+        function resetFilters() {
+            document.getElementById('dateFrom').value = "";
+            document.getElementById('dateTo').value = "";
+            document.getElementById('searchInput').value = "";
+            renderTable(allTasks);
+        }
+        //END - Hàm này FILTER theo searchbox và date
+        
         function sortTable(colIndex) {
             sortAsc = (lastSortCol === colIndex) ? !sortAsc : true;
             lastSortCol = colIndex;
@@ -361,36 +478,36 @@
             toggleModal(true);
         }
 
-        // HÀM EXPORT PDF ĐÃ TRỞ LẠI VÀ LỢI HẠI HƠN
-        function exportPDFOK() {
-            const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('l', 'mm', 'a3');
-            const toExport = allTasks.filter(t => !t[11]); // Chỉ xuất cái chưa Reported
-            const tableData = toExport.map(t => [
-                t[1], t[2], t[3], 
-                t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
-                formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
-            ]);
-            doc.setFontSize(22);
-            doc.setTextColor(0, 115, 234);
-            doc.text("PCN REPORT", 14, 20);
+        // HÀM EXPORT PDF ĐÃ TRỞ LẠI VÀ LỢI HẠI HƠN << OK NHƯNG KO CÓ MÀU
+        // function exportPDFOK() {
+        //     const { jsPDF } = window.jspdf;
+        //     const doc = new jsPDF('l', 'mm', 'a3');
+        //     const toExport = allTasks.filter(t => !t[11]); // Chỉ xuất cái chưa Reported
+        //     const tableData = toExport.map(t => [
+        //         t[1], t[2], t[3], 
+        //         t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
+        //         formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
+        //     ]);
+        //     doc.setFontSize(22);
+        //     doc.setTextColor(0, 115, 234);
+        //     doc.text("PCN REPORT", 14, 20);
             
-            doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);        
+        //     doc.setFontSize(10);
+        //     doc.setTextColor(100, 100, 100);
+        //     doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);        
             
-            doc.autoTable({
-                head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
-                body: tableData,
-                startY: 30,
-                styles: { fontSize: 10, cellPadding: 4 },
-                headStyles: { fillColor: [0, 115, 234] }
-            });
-            doc.save("PCN-Report.pdf");
-        }
+        //     doc.autoTable({
+        //         head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
+        //         body: tableData,
+        //         startY: 30,
+        //         styles: { fontSize: 10, cellPadding: 4 },
+        //         headStyles: { fillColor: [0, 115, 234] }
+        //     });
+        //     doc.save("PCN-Report.pdf");
+        // }
         // ----Khúc này END xử lý export---- 
         
-        // ----Khúc này xử lý export---- 
+        // ----Khúc này xử lý export OK VÀ CÓ MÀU---- 
         // Hàm "thần thánh" giúp định nghĩa màu sắc đồng nhất cho Web và PDF
         function getStatusColor(s) {
             if (!s) return '#c4c4c4'; // Màu xám nếu ô trống
