@@ -24,7 +24,28 @@
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
         .type-immediately { color: #ef4444; font-weight: 800; }
         */
+        /* ------Dark Mode------- */
+        /* Màu mặc định (Light) */
+        :root {
+            --bg-main: #f8fafc;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --border-color: #e2e8f0;
+        }
         
+        /* Màu khi bật Dark Mode */
+        [data-theme='dark'] {
+            --bg-main: #0f172a;
+            --bg-card: #1e293b;
+            --text-main: #f1f5f9;
+            --border-color: #334155;
+        }
+        
+        body { background-color: var(--bg-main); color: var(--text-main); transition: 0.3s; }
+        .bg-white { background-color: var(--bg-card) !important; }
+        .text-gray-800, .text-gray-700 { color: var(--text-main) !important; }
+        table, th, td { border-color: var(--border-color) !important; }
+        /* -----Dark Mode END-------*/
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         
@@ -106,6 +127,7 @@
                 <h1 class="text-2xl font-black text-[#333] tracking-tight">PCN MASTER BOARD</h1>
             </div>
             <div class="flex gap-4">
+                <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition ml-2">🌙 Dark Mode</button>
                 <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-64 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
                 <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT PDF</button>
                 <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
@@ -218,7 +240,18 @@
                 renderTable(allTasks);
             }
         }
-
+        //----Dark Mode-----
+        function toggleDarkMode() {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', targetTheme);
+            // Lưu lại lựa chọn để F5 không bị mất
+            localStorage.setItem('theme', targetTheme);
+        }
+        // Tự động load theme cũ khi mở web
+        if(localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        //----Dark Mode END-----
+        
         function toggleModal(show) {
             const modal = document.getElementById('pcnModal');
             if (show) modal.classList.remove('opacity-0', 'pointer-events-none');
