@@ -338,7 +338,13 @@
         //         t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
         //         formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
         //     ]);
-        //     doc.text("PCN REPORT", 14, 20);
+            // doc.setFontSize(22);
+            // doc.setTextColor(0, 115, 234);
+            // doc.text("PCN REPORT", 14, 20);
+            
+            // doc.setFontSize(10);
+            // doc.setTextColor(100, 100, 100);
+            // doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);        
         //     doc.autoTable({
         //         head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
         //         body: tableData,
@@ -461,7 +467,7 @@
                             doc.text(content, data.cell.x + 4, data.cell.y + 6, { maxWidth: data.cell.width - 8 });
                         }
                     }
-                }
+                
             });
                     
             doc.save("PCN_Master_Report_Final.pdf");
