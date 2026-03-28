@@ -379,8 +379,12 @@
         
             doc.setFontSize(20);
             doc.setTextColor(0, 115, 234);
-            doc.text("MASTER PCN REPORT", 14, 20);
-        
+            doc.text("PCN REPORT", 14, 20);
+
+            doc.setFontSize(10);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);       
+            
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
                 body: toExport.map(t => [
@@ -427,7 +431,7 @@
                     }
                 }
             });
-            doc.save("PCN_Report_Final.pdf");
+            doc.save("PCN Report of HUY NGUYEN.pdf");
         }
         // ----Khúc này END xử lý export---- 
         loadTasks();
