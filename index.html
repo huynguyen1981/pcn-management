@@ -358,6 +358,19 @@
         // ----Khúc này END xử lý export---- 
         
         // ----Khúc này xử lý export---- 
+        // Hàm "thần thánh" giúp định nghĩa màu sắc đồng nhất cho Web và PDF
+        function getStatusColor(s) {
+            if (!s) return '#c4c4c4'; // Màu xám nếu ô trống
+            const status = String(s).toUpperCase();
+            
+            if (status.includes('RELEASED')) return '#00c875';        // Xanh lá (Monday.com style)
+            if (status.includes('OUT FOR APPROVAL')) return '#a25ddc'; // Tím
+            if (status.includes('ENG REVIEW')) return '#579bfc';      // Xanh dương
+            if (status.includes('IN-PROGRESS')) return '#fdab3d';      // Cam
+            
+            return '#fdab3d'; // Mặc định là màu cam cho các trường hợp khác
+        }
+        
         function exportPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a3'); 
