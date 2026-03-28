@@ -30,7 +30,7 @@
         
         /* Giao diện máy tính: Tràn màn hình */
         .container-fluid { width: 100%; padding: 20px; }
-        .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; }
+        .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; display: block;}
         
         /* FIX CỘT: ÉP ĐỘ RỘNG TỐI THIỂU */
         table { table-layout: auto; width: 100%; min-width: 1200px; border-spacing: 0; }
@@ -54,7 +54,17 @@
             .flex.gap-4 { flex-direction: column; gap: 8px; }
             button { width: 100% !important; }
         }
-        
+        /* Làm đẹp thanh cuộn cho dễ vuốt */
+        .monday-card::-webkit-scrollbar {
+            height: 8px; /* Độ dày thanh cuộn ngang */
+        }
+        .monday-card::-webkit-scrollbar-thumb {
+            background: #cbd5e1; /* Màu của thanh cuộn */
+            border-radius: 10px;
+        }
+        .monday-card::-webkit-scrollbar-track {
+            background: #f1f5f9; /* Màu nền của đường ray cuộn */
+        }
     </style>
 </head>
 <body class="bg-[#f5f6f8] min-h-screen py-4">
