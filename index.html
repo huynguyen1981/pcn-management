@@ -8,6 +8,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
+        /*
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
         .container-fluid { width: 100%; padding: 20px; }
@@ -22,48 +23,38 @@
         table { table-layout: fixed; width: 100%; border-spacing: 0; }
         td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
         .type-immediately { color: #ef4444; font-weight: 800; }
-        /* --- PHẦN CHỈNH CHO MOBILE --- */
+        */
+        
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        
+        /* Giao diện máy tính: Tràn màn hình */
+        .container-fluid { width: 100%; padding: 20px; }
+        .monday-card { border-radius: 12px; border: 1px solid #e6e9ef; box-shadow: 0 4px 12px rgba(0,0,0,0.03); overflow-x: auto; }
+        
+        /* FIX CỘT: ÉP ĐỘ RỘNG TỐI THIỂU */
+        table { table-layout: auto; width: 100%; min-width: 1200px; border-spacing: 0; }
+        
+        /* Đảm bảo cột Description luôn rộng rãi, không bị bóp nghẹt */
+        .col-desc { min-width: 400px !important; } 
+        .col-pcn { min-width: 120px; }
+        .col-date { min-width: 110px; }
+    
+        td { word-wrap: break-word; vertical-align: middle; padding: 14px 10px !important; border-bottom: 1px solid #eee; }
+        .desc-text { font-size: 15px; font-weight: 500; line-height: 1.6; white-space: normal; }
+        
+        .status-pill { border-radius: 4px; font-size: 11px; font-weight: 700; padding: 5px 8px; text-transform: uppercase; white-space: nowrap; }
+        .type-immediately { color: #ef4444; font-weight: 800; }
+    
+        /* MOBILE RESPONSIVE */
         @media (max-width: 768px) {
-            /* Cho phép bảng cuộn ngang để không bị nát layout */
-            .monday-card {
-                overflow-x: auto;
-                -webkit-overflow-scrolling: touch;
-            }
-            
-            table {
-                min-width: 1000px; /* Ép bảng giữ độ rộng tối thiểu để không bị dồn chữ */
-            }
-        
-            /* Thu nhỏ Header để không chiếm hết màn hình điện thoại */
-            .flex-col {
-                padding: 10px 5px;
-            }
-        
-            h1 {
-                font-size: 1.25rem !important; /* Chữ tiêu đề nhỏ lại xíu */
-            }
-        
-            #searchInput {
-                width: 100% !important; /* Ô tìm kiếm tràn ngang mobile */
-            }
-        
-            .flex.gap-4 {
-                flex-wrap: wrap; /* Cho phép các nút Export, New PCN tự rớt dòng */
-                justify-content: center;
-            }
-        
-            button {
-                width: 48%; /* Hai nút nằm song song cho đẹp trên mobile */
-                padding: 8px 4px !important;
-                font-size: 12px !important;
-            }
-        
-            /* Modal trên mobile cho to ra dễ bấm */
-            #pcnModal .max-w-5xl {
-                margin: 10px;
-                width: calc(100% - 20px);
-            }
+            .container-fluid { padding: 10px; }
+            h1 { font-size: 1.2rem !important; }
+            #searchInput { width: 100% !important; margin-bottom: 10px; }
+            .flex.gap-4 { flex-direction: column; gap: 8px; }
+            button { width: 100% !important; }
         }
+        
     </style>
 </head>
 <body class="bg-[#f5f6f8] min-h-screen py-4">
@@ -85,6 +76,20 @@
             <table class="w-full text-left">
                 <thead class="table-header">
                     <tr>
+                        <th class="p-4 col-pcn sortable" onclick="sortTable(1)">PCN # ↕</th>
+                        <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
+                        <th class="p-4 col-desc">Description & Remarks</th> <th class="p-4 col-date text-center sortable" onclick="sortTable(5)">Start ↕</th>
+                        <th class="p-4 col-date text-center sortable" onclick="sortTable(7)">Appr ↕</th>
+                        <th class="p-4 col-date text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
+                        <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
+                        <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
+                        <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
+                        <th class="p-4 w-[90px] text-center">Action</th>
+                    </tr>
+                </thead>
+                
+                <!-- <thead class="table-header">
+                    <tr>
                         <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
                         <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
                         <th class="p-4">Description & Remarks</th>
@@ -96,7 +101,8 @@
                         <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
                         <th class="p-4 w-[90px] text-center">Action</th>
                     </tr>
-                </thead>
+                </thead> -->
+                
                 <tbody id="taskTableBody" class="table-text bg-white"></tbody>
             </table>
         </div>
