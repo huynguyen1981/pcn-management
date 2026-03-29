@@ -93,6 +93,21 @@
         #filterContainer input[type="date"] {
             max-width: 160px;
         }
+        [data-theme='dark'] .desc-text {
+            color: #e2e8f0 !important; /* Màu xám trắng rất dễ đọc */
+        }
+        
+        /* Fix cho mấy ô ❌ trong Dark Mode không bị chói */
+        [data-theme='dark'] .bg-rose-50 {
+            background-color: #4c1d24 !important; /* Nền đỏ đậm cực tối */
+            border: 1px solid #991b1b !important;
+            color: #fca5a5 !important; /* Chữ hồng nhạt */
+        }
+        
+        /* Fix chữ trong danh sách ✅ */
+        [data-theme='dark'] .text-emerald-600 {
+            color: #34d399 !important;
+        }
         /* ----- Dark Mode END ------- */
         
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -631,13 +646,32 @@
             
             return '#fdab3d'; // Mặc định là màu cam cho các trường hợp khác
         }
+
         
         function exportPDF() {
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('l', 'mm', 'a3'); 
             const toExport = allTasks.filter(t => !t[11]);
             const fDate = (d) => (!d || d === "" || d === "-") ? "-" : d.split('T')[0];
-        
+            // Hàm phụ để xử lý text cho PDF (vì PDF không hiểu HTML)
+            function getTrackingTextForPDF(remarkContent) {
+                if (!remarkContent || !String(remarkContent).toUpperCase().includes('APPROVE')) {
+                    return remarkContent || "";
+                }
+                
+                const lines = remarkContent.split('\n');
+                let plainText = "";
+                lines.forEach(line => {
+                    const trimmed = line.trim();
+                    if (!trimmed) return;
+                    const isApp = trimmed.toUpperCase().includes('APPROVE');
+                    const name = trimmed.split(/approve/i)[0].trim();
+                    // Dùng ký tự Unicode cho PDF
+                    plainText += (isApp ? "[V] " : "[X] ") + name + "\n";
+                });
+                return plainText.trim();
+            }
+            
             doc.setFontSize(20);
             doc.setTextColor(0, 115, 234);
             doc.text("PCN REPORT", 14, 20);
@@ -648,11 +682,12 @@
             
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
-                body: toExport.map(t => [
+               body: toExport.map(t => [
                     String(t[1] || ""), 
                     String(t[2] || ""), 
                     String(t[3] || ""), 
-                    String(t[4] || "") + (t[12] ? "\nREMARK: " + String(t[12]) : ""), 
+                    // PHẦN QUAN TRỌNG:
+                    String(t[4] || "") + (t[12] ? "\n---\n" + getTrackingTextForPDF(t[12]) : ""), 
                     fDate(t[5]), 
                     String(t[6] || "-"), 
                     fDate(t[7]), 
@@ -663,7 +698,17 @@
                 theme: 'grid',
                 styles: { fontSize: 10, cellPadding: 3, valign: 'middle' },
                 headStyles: { fillColor: [0, 115, 234] },
-        
+                didDrawCell: (data) => {
+                    if (data.section === 'body' && data.column.index === 3) {
+                        const cellText = data.cell.text.join(' ');
+                        
+                        // Nếu dòng nào có dấu [X], mình sẽ tô màu đỏ cho chữ trong ô đó
+                        if (cellText.includes('[X]')) {
+                            doc.setTextColor(225, 29, 72); // Màu đỏ rose
+                            // Lưu ý: jsPDF-AutoTable sẽ tự vẽ text dựa trên styles mình set ở đây
+                        }
+                    }
+                }
                 // TUYỆT CHIÊU CUỐI: CHỈ ĐỔI MÀU CHỮ (KHÔNG VẼ ĐÈ - KHÔNG LỖI)
                 didParseCell: (data) => {
                     if (data.section === 'body') {
