@@ -374,33 +374,127 @@
         // }
         //END - Hàm này FILTER theo searchbox >>> OK 
         
-        //Hàm này FILTER theo searchbox và date
+        // //Hàm này FILTER theo searchbox và date >>> OK
+        // function renderTable(data) {
+        //     const query = document.getElementById('searchInput').value.toLowerCase();
+        //     const dateFrom = document.getElementById('dateFrom')?.value; // Thêm dấu ? để tránh lỗi nếu chưa có ô input
+        //     const dateTo = document.getElementById('dateTo')?.value;
+        //     const body = document.getElementById('taskTableBody');
+        
+        //     // --- LOGIC LỌC SIÊU CẤP: Search + Khoảng ngày ---
+        //     const filtered = data.filter(t => {
+        //         // 1. Lọc theo từ khóa (PCN hoặc Description)
+        //         const matchSearch = String(t[1]).toLowerCase().includes(query) || 
+        //                            String(t[4]).toLowerCase().includes(query);
+        
+        //         // 2. Lọc theo khoảng ngày (Cột Release Date - Index 9 cho chuẩn bài nhé bồ)
+        //         const taskDate = t[9] ? t[9].split('T')[0] : ""; 
+        //         let matchDate = true;
+        //         if (dateFrom && taskDate < dateFrom) matchDate = false;
+        //         if (dateTo && taskDate > dateTo) matchDate = false;
+        
+        //         return matchSearch && matchDate;
+        //     });
+        
+        //     // --- PHẦN VẼ BẢNG (Giữ nguyên logic của bồ) ---
+        //     body.innerHTML = filtered.map((row) => {
+        //         const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
+        //         const isImmediately = row[2] === "IMMEDIATELY";
+                
+        //         return `
+        //         <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
+        //             <td class="p-4 font-black text-lg">${row[1]}<br>
+        //                 <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
+        //                     ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
+        //                 </span>
+        //             </td>
+        //             <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
+        //             <td class="p-4">
+        //                 <div class="desc-text">${row[4]}</div>
+        //                 ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
+        //             </td>
+        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
+        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
+        //             <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
+        //             <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
+        //             <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
+        //             <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+        //             <td class="p-4 text-center">
+        //                 <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
+        //             </td>
+        //         </tr>
+        //     `}).join('');
+        // }
+        
+        // // Hàm reset để quay về trạng thái ban đầu
+        // function resetFilters() {
+        //     document.getElementById('dateFrom').value = "";
+        //     document.getElementById('dateTo').value = "";
+        //     document.getElementById('searchInput').value = "";
+        //     renderTable(allTasks);
+        // }
+        // //END - Hàm này FILTER theo searchbox và date >>> OK
+
+        //Hàm FILTER theo searchbox và date, ngoài ra test phần Approve lấy từ tracking
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
-            const dateFrom = document.getElementById('dateFrom')?.value; // Thêm dấu ? để tránh lỗi nếu chưa có ô input
+            const dateFrom = document.getElementById('dateFrom')?.value;
             const dateTo = document.getElementById('dateTo')?.value;
             const body = document.getElementById('taskTableBody');
         
-            // --- LOGIC LỌC SIÊU CẤP: Search + Khoảng ngày ---
             const filtered = data.filter(t => {
-                // 1. Lọc theo từ khóa (PCN hoặc Description)
-                const matchSearch = String(t[1]).toLowerCase().includes(query) || 
-                                   String(t[4]).toLowerCase().includes(query);
-        
-                // 2. Lọc theo khoảng ngày (Cột Release Date - Index 9 cho chuẩn bài nhé bồ)
+                const matchSearch = String(t[1]).toLowerCase().includes(query) || String(t[4]).toLowerCase().includes(query);
                 const taskDate = t[9] ? t[9].split('T')[0] : ""; 
                 let matchDate = true;
                 if (dateFrom && taskDate < dateFrom) matchDate = false;
                 if (dateTo && taskDate > dateTo) matchDate = false;
-        
                 return matchSearch && matchDate;
             });
         
-            // --- PHẦN VẼ BẢNG (Giữ nguyên logic của bồ) ---
+            // --- HÀM XỬ LÝ DANH SÁCH DUYỆT (HIỂN THỊ DẠNG NGANG/LƯỚI) ---
+            function parseTrackingList(remarkContent) {
+                if (!remarkContent || !String(remarkContent).toUpperCase().includes('APPROVE')) return null;
+                
+                const lines = remarkContent.split('\n');
+                let htmlResult = '<div class="grid grid-cols-2 gap-x-4 gap-y-1 mt-3 pt-2 border-t border-slate-100">';
+                let count = 0;
+        
+                lines.forEach(line => {
+                    const trimmedLine = line.trim();
+                    if (trimmedLine === "") return;
+        
+                    const isApproved = trimmedLine.toUpperCase().includes('APPROVE');
+                    // Lấy tên (bỏ phần Approve... phía sau)
+                    const name = trimmedLine.split(/approve/i)[0].trim(); 
+        
+                    if (isApproved) {
+                        htmlResult += `
+                            <div class="flex items-center gap-1 text-[11px] text-emerald-600 font-medium">
+                                <span>✅</span> <span class="truncate">${name}</span>
+                            </div>`;
+                    } else {
+                        htmlResult += `
+                            <div class="flex items-center gap-1 text-[11px] text-rose-600 font-bold bg-rose-50 px-1 rounded">
+                                <span>❌</span> <span class="truncate">${name}</span>
+                            </div>`;
+                    }
+                    count++;
+                });
+        
+                htmlResult += '</div>';
+                return count > 0 ? htmlResult : null;
+            }
+        
             body.innerHTML = filtered.map((row) => {
                 const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
                 const isImmediately = row[2] === "IMMEDIATELY";
                 
+                // Lấy danh sách tracking nếu có
+                const trackingHtml = parseTrackingList(row[12]);
+                // Nếu không phải tracking thì hiện Remark như bình thường
+                const normalRemark = (!trackingHtml && row[12]) ? 
+                    `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : '';
+        
                 return `
                 <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
                     <td class="p-4 font-black text-lg">${row[1]}<br>
@@ -409,15 +503,19 @@
                         </span>
                     </td>
                     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
-                    <td class="p-4">
-                        <div class="desc-text">${row[4]}</div>
-                        ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
+                    
+                    <td class="p-4 min-w-[300px]">
+                        <div class="desc-text font-medium text-slate-700">${row[4]}</div>
+                        ${trackingHtml || normalRemark}
                     </td>
+        
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
                     <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
                     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-                    <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
+                    
+                    <td class="p-4 font-bold text-slate-600 text-center">${row[8] || '-'}</td>
+                    
                     <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
                     <td class="p-4 text-center">
                         <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
@@ -425,15 +523,7 @@
                 </tr>
             `}).join('');
         }
-        
-        // Hàm reset để quay về trạng thái ban đầu
-        function resetFilters() {
-            document.getElementById('dateFrom').value = "";
-            document.getElementById('dateTo').value = "";
-            document.getElementById('searchInput').value = "";
-            renderTable(allTasks);
-        }
-        //END - Hàm này FILTER theo searchbox và date
+        //Hàm FILTER theo searchbox và date, ngoài ra test phần Approve lấy từ tracking
         
         function sortTable(colIndex) {
             sortAsc = (lastSortCol === colIndex) ? !sortAsc : true;
