@@ -172,12 +172,12 @@
                 <div class="flex flex-wrap gap-4 mb-4 items-center bg-gray-100 p-4 rounded-lg" id="filterContainer">
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-medium">From:</label>
-                        <input type="date" id="dateFrom" onchange="applyFilters()" class="border p-2 rounded-lg text-black">
+                        <input type="date" id="dateFrom" onchange="renderTable(allTasks)" class="border p-2 rounded-lg text-black">
                     </div>
                     
                     <div class="flex items-center gap-2">
                         <label class="text-sm font-medium">To:</label>
-                        <input type="date" id="dateTo" onchange="applyFilters()" class="border p-2 rounded-lg text-black">
+                        <input type="date" id="dateTo" onchange="renderTable(allTasks)" class="border p-2 rounded-lg text-black">
                     </div>
                 
                     <button onclick="resetFilters()" class="text-blue-600 underline ml-2">Reset</button>
