@@ -83,6 +83,16 @@
             color: white !important;
             border: 1px solid var(--border-color) !important;
         }
+        [data-theme='dark'] #filterContainer {
+            background-color: #1e293b !important;
+        }
+        [data-theme='dark'] .label-date {
+            color: #f1f5f9 !important; /* Hiện chữ From/To màu trắng sáng */
+        }
+        /* Ép input không được to quá mức */
+        #filterContainer input[type="date"] {
+            max-width: 160px;
+        }
         /* ----- Dark Mode END ------- */
         
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
@@ -165,26 +175,37 @@
                 <div class="w-2 h-10 bg-[#0073ea] rounded-full"></div>
                 <h1 class="text-2xl font-black text-[#333] tracking-tight">PCN MASTER BOARD</h1>
             </div>
-            <div class="flex gap-4">
-                <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-lg hover:bg-gray-600 transition ml-2">🌙 Dark Mode</button>
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." class="w-64 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea]">
-                <!-- Filter theo ngày tháng -->
-                <div class="flex flex-wrap gap-4 mb-4 items-center bg-gray-100 p-4 rounded-lg" id="filterContainer">
+            <div class="flex flex-wrap items-center gap-3">
+                <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition flex items-center gap-2 text-sm shrink-0">
+                    🌙 Dark Mode
+                </button>
+            
+                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." 
+                    class="w-48 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea] text-black">
+            
+                <div class="flex items-center gap-2 bg-gray-100 p-1 px-3 rounded-xl border-2 border-transparent" id="filterContainer">
                     <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium">From:</label>
-                        <input type="date" id="dateFrom" onchange="renderTable(allTasks)" class="border p-2 rounded-lg text-black">
+                        <label class="text-[12px] font-bold text-gray-600 label-date">From:</label>
+                        <input type="date" id="dateFrom" onchange="renderTable(allTasks)" 
+                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
                     </div>
                     
-                    <div class="flex items-center gap-2">
-                        <label class="text-sm font-medium">To:</label>
-                        <input type="date" id="dateTo" onchange="renderTable(allTasks)" class="border p-2 rounded-lg text-black">
+                    <div class="flex items-center gap-2 border-l border-gray-300 pl-2">
+                        <label class="text-[12px] font-bold text-gray-600 label-date">To:</label>
+                        <input type="date" id="dateTo" onchange="renderTable(allTasks)" 
+                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
                     </div>
                 
-                    <button onclick="resetFilters()" class="text-blue-600 underline ml-2">Reset</button>
+                    <button onclick="resetFilters()" class="text-blue-600 text-[12px] font-bold hover:underline ml-1 shrink-0">Reset</button>
                 </div>
-                <!-- End Filter theo ngày tháng -->
-                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-6 py-2 rounded-xl font-bold text-sm hover:bg-slate-50">📄 EXPORT PDF</button>
-                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-8 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1]">+ NEW PCN</button>
+            
+                <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 shrink-0">
+                    📄 EXPORT PDF
+                </button>
+                
+                <button onclick="toggleModal(true)" class="bg-[#0073ea] text-white px-6 py-2 rounded-xl font-bold shadow-lg hover:bg-[#0060c1] shrink-0">
+                    + NEW PCN
+                </button>
             </div>
         </div>
 
