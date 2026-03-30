@@ -735,29 +735,24 @@
                 },
             
                 didDrawCell: (data) => {
+                    // Chỉ can thiệp vào cột Content & Remarks (Index 3)
                     if (data.section === 'body' && data.column.index === 3) {
                         const doc = data.doc;
                         const cell = data.cell;
                         const paddingLeft = cell.x + cell.padding('left');
                         
-                        // Quan trọng: Lấy lại danh sách dòng đầy đủ
+                        // 1. LẤY NỘI DUNG DÒNG (AutoTable đã tự cắt dòng cho bồ rồi)
                         const lines = cell.text; 
-                        
-                        // Tính toán vị trí Y bắt đầu vẽ
+                        if (!lines || lines.length === 0) return;
+                
+                        // 2. TÍNH TOÁN VỊ TRÍ Y (Quan trọng để không lệch chữ)
                         let cursorY = cell.y + cell.padding('top') + (doc.getFontSize() / 2);
                 
-                        // Xóa text gốc để vẽ đè lên (nhưng mình vẫn giữ mảng lines để loop)
-                        cell.text = []; 
-                
+                        // 3. DUYỆT TỪNG DÒNG ĐỂ TÔ MÀU
                         lines.forEach((line) => {
                             const cleanLine = line.trim();
-                            if (!cleanLine) return;
                 
-                            // Mặc định màu chữ nội dung chính
-                            doc.setTextColor(51, 65, 85); 
-                            doc.setFont("helvetica", "normal");
-                
-                            // TÔ MÀU THEO TỪNG TRƯỜNG HỢP
+                            // Kiểm tra nội dung để quyết định màu sắc
                             if (cleanLine.includes('[X]')) {
                                 doc.setTextColor(225, 29, 72); // Đỏ cho người chưa duyệt
                                 doc.setFont("helvetica", "bold");
@@ -767,19 +762,21 @@
                                 doc.setFont("helvetica", "normal");
                             }
                             else if (cleanLine.includes('REMARK:')) {
-                                doc.setTextColor(225, 29, 72); // Đỏ cho mục Remark
+                                doc.setTextColor(225, 29, 72); // Đỏ cho Remark
                                 doc.setFont("helvetica", "bolditalic");
                             }
-                            // Nếu là dòng gạch ngang tách biệt
-                            else if (cleanLine.includes('---')) {
-                                doc.setTextColor(203, 213, 225);
+                            else {
+                                // Nội dung Description bình thường thì để màu xám đen mặc định
+                                doc.setTextColor(51, 65, 85); 
+                                doc.setFont("helvetica", "normal");
                             }
                 
-                            // Vẽ dòng đó ra PDF
+                            // VẼ CHỮ ĐÈ LÊN (Không xóa text gốc, chỉ vẽ đè đúng vị trí)
                             doc.text(line, paddingLeft, cursorY);
                             
-                            // Nhảy xuống dòng tiếp theo
-                            cursorY += doc.getLineHeight();
+                            // Nhảy xuống dòng tiếp theo dựa trên line height của thư viện
+                            cursorY += (cell.styles.lineHeight || 1.15) * doc.getFontSize() * 0.3527; 
+                            // 0.3527 là hệ số chuyển đổi từ pt sang mm
                         });
                     }
                 }
