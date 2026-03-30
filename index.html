@@ -655,21 +655,25 @@
             const fDate = (d) => (!d || d === "" || d === "-") ? "-" : d.split('T')[0];
             // Hàm phụ để xử lý text cho PDF (vì PDF không hiểu HTML)
             function getTrackingTextForPDF(remarkContent) {
-                if (!remarkContent || !String(remarkContent).toUpperCase().includes('APPROVE')) {
-                    return remarkContent || "";
+                if (!remarkContent) return "";
+    
+                // Kiểm tra nếu là danh sách Approve từ Outlook
+                if (String(remarkContent).toUpperCase().includes('APPROVE')) {
+                    const lines = remarkContent.split('\n');
+                    let plainText = "";
+                    lines.forEach(line => {
+                        const trimmed = line.trim();
+                        if (!trimmed) return;
+                        const isApp = trimmed.toUpperCase().includes('APPROVE');
+                        // Lấy tên người, bỏ chữ Approve phía sau
+                        const name = trimmed.split(/approve/i)[0].trim();
+                        plainText += (isApp ? "[V] " : "[X] ") + name + "\n";
+                    });
+                    return plainText.trim();
                 }
                 
-                const lines = remarkContent.split('\n');
-                let plainText = "";
-                lines.forEach(line => {
-                    const trimmed = line.trim();
-                    if (!trimmed) return;
-                    const isApp = trimmed.toUpperCase().includes('APPROVE');
-                    const name = trimmed.split(/approve/i)[0].trim();
-                    // Dùng ký tự Unicode cho PDF
-                    plainText += (isApp ? "[✔️] " : "[❌] ") + name + "\n";
-                });
-                return plainText.trim();
+                // Nếu là Remark bình thường
+                return "REMARK: " + remarkContent;
             }
             
             doc.setFontSize(20);
@@ -703,8 +707,9 @@
                         const cellText = data.cell.text.join(' ');
                         
                         // Nếu dòng nào có dấu [X], mình sẽ tô màu đỏ cho chữ trong ô đó
-                        if (cellText.includes('[❌]')) {
+                        if (cellText.includes('[X]')) {
                             doc.setTextColor(225, 29, 72); // Màu đỏ rose
+                            doc.setFont("helvetica", "bold");
                             // Lưu ý: jsPDF-AutoTable sẽ tự vẽ text dựa trên styles mình set ở đây
                         }
                     }
