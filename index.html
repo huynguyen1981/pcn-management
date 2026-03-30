@@ -702,18 +702,48 @@
                 theme: 'grid',
                 styles: { fontSize: 10, cellPadding: 3, valign: 'middle' },
                 headStyles: { fillColor: [0, 115, 234] },
+                
                 didDrawCell: (data) => {
+                    // Chỉ xử lý cột Content & Remarks (Index 3)
                     if (data.section === 'body' && data.column.index === 3) {
-                        const cellText = data.cell.text.join(' ');
+                        const doc = data.doc;
+                        const cell = data.cell;
+                        const padding = cell.padding('left');
+                        let cursorY = cell.y + cell.padding('top') + (doc.getFontSize() / 2); // Điểm bắt đầu vẽ dòng 1
+                
+                        // Xóa nội dung mặc định mà AutoTable vừa vẽ để mình vẽ đè lên
+                        // (Bản chất AutoTable đã vẽ rồi, giờ mình vẽ đè với màu sắc riêng)
                         
-                        // Nếu dòng nào có dấu [X], mình sẽ tô màu đỏ cho chữ trong ô đó
-                        if (cellText.includes('[X]')) {
-                            doc.setTextColor(225, 29, 72); // Màu đỏ rose
-                            doc.setFont("helvetica", "bold");
-                            // Lưu ý: jsPDF-AutoTable sẽ tự vẽ text dựa trên styles mình set ở đây
-                        }
+                        doc.setFont(cell.styles.font, cell.styles.fontStyle);
+                
+                        cell.text.forEach((line) => {
+                            // Kiểm tra nội dung từng dòng
+                            if (line.includes('[X]')) {
+                                doc.setTextColor(225, 29, 72); // Đỏ cho người chưa duyệt
+                                doc.setFont("helvetica", "bold");
+                            } else if (line.includes('[V]')) {
+                                doc.setTextColor(16, 185, 129); // Xanh cho người đã duyệt
+                                doc.setFont("helvetica", "normal");
+                            } else if (line.includes('REMARK:')) {
+                                doc.setTextColor(225, 29, 72); // Đỏ cho Remark
+                                doc.setFont("helvetica", "italic");
+                            } else {
+                                doc.setTextColor(51, 65, 85); // Màu Slate mặc định cho Content
+                                doc.setFont("helvetica", "normal");
+                            }
+                
+                            // Vẽ dòng chữ này tại đúng vị trí của nó
+                            doc.text(line, cell.x + padding, cursorY);
+                            
+                            // Nhảy xuống dòng tiếp theo (tính theo độ cao font chữ)
+                            cursorY += doc.getLineHeight();
+                        });
+                
+                        // Trả về false để báo cho AutoTable biết là mình đã tự vẽ text rồi, đừng vẽ đè lên nữa
+                        return false; 
                     }
-                },
+                }
+                
                 // TUYỆT CHIÊU CUỐI: CHỈ ĐỔI MÀU CHỮ (KHÔNG VẼ ĐÈ - KHÔNG LỖI)
                 didParseCell: (data) => {
                     if (data.section === 'body') {
