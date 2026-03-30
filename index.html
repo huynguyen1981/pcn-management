@@ -667,7 +667,7 @@
                     const isApp = trimmed.toUpperCase().includes('APPROVE');
                     const name = trimmed.split(/approve/i)[0].trim();
                     // Dùng ký tự Unicode cho PDF
-                    plainText += (isApp ? "[V] " : "[X] ") + name + "\n";
+                    plainText += (isApp ? "[✔️] " : "[❌] ") + name + "\n";
                 });
                 return plainText.trim();
             }
@@ -703,7 +703,7 @@
                         const cellText = data.cell.text.join(' ');
                         
                         // Nếu dòng nào có dấu [X], mình sẽ tô màu đỏ cho chữ trong ô đó
-                        if (cellText.includes('[X]')) {
+                        if (cellText.includes('[❌]')) {
                             doc.setTextColor(225, 29, 72); // Màu đỏ rose
                             // Lưu ý: jsPDF-AutoTable sẽ tự vẽ text dựa trên styles mình set ở đây
                         }
