@@ -738,29 +738,47 @@
                     if (data.section === 'body' && data.column.index === 3) {
                         const doc = data.doc;
                         const cell = data.cell;
-                        // Lấy lại nội dung gốc từ dữ liệu thô (raw) vì cell.text đã bị xóa ở trên
-                        const rawContent = data.row.raw[3]; 
-                        const lines = doc.splitTextToSize(rawContent, cell.width - cell.padding('left') - cell.padding('right'));
-            
+                        const paddingLeft = cell.x + cell.padding('left');
+                        
+                        // Quan trọng: Lấy lại danh sách dòng đầy đủ
+                        const lines = cell.text; 
+                        
+                        // Tính toán vị trí Y bắt đầu vẽ
                         let cursorY = cell.y + cell.padding('top') + (doc.getFontSize() / 2);
-            
+                
+                        // Xóa text gốc để vẽ đè lên (nhưng mình vẫn giữ mảng lines để loop)
+                        cell.text = []; 
+                
                         lines.forEach((line) => {
-                            // Set style dựa trên nội dung dòng
-                            if (line.includes('[X]')) {
-                                doc.setTextColor(225, 29, 72); 
+                            const cleanLine = line.trim();
+                            if (!cleanLine) return;
+                
+                            // Mặc định màu chữ nội dung chính
+                            doc.setTextColor(51, 65, 85); 
+                            doc.setFont("helvetica", "normal");
+                
+                            // TÔ MÀU THEO TỪNG TRƯỜNG HỢP
+                            if (cleanLine.includes('[X]')) {
+                                doc.setTextColor(225, 29, 72); // Đỏ cho người chưa duyệt
                                 doc.setFont("helvetica", "bold");
-                            } else if (line.includes('[V]')) {
-                                doc.setTextColor(16, 185, 129);
-                                doc.setFont("helvetica", "normal");
-                            } else if (line.includes('REMARK:')) {
-                                doc.setTextColor(225, 29, 72);
-                                doc.setFont("helvetica", "bolditalic");
-                            } else {
-                                doc.setTextColor(51, 65, 85);
+                            } 
+                            else if (cleanLine.includes('[V]')) {
+                                doc.setTextColor(16, 185, 129); // Xanh cho người đã duyệt
                                 doc.setFont("helvetica", "normal");
                             }
-            
-                            doc.text(line, cell.x + cell.padding('left'), cursorY);
+                            else if (cleanLine.includes('REMARK:')) {
+                                doc.setTextColor(225, 29, 72); // Đỏ cho mục Remark
+                                doc.setFont("helvetica", "bolditalic");
+                            }
+                            // Nếu là dòng gạch ngang tách biệt
+                            else if (cleanLine.includes('---')) {
+                                doc.setTextColor(203, 213, 225);
+                            }
+                
+                            // Vẽ dòng đó ra PDF
+                            doc.text(line, paddingLeft, cursorY);
+                            
+                            // Nhảy xuống dòng tiếp theo
                             cursorY += doc.getLineHeight();
                         });
                     }
