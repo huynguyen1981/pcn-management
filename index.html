@@ -352,7 +352,21 @@
                 renderTable(allTasks); // Vẽ lại bảng để mọi thứ sáng lại bình thường
             }
         }
-
+        
+        // --- HÀM RESET BỘ LỌC VÀ LÀM SÁNG BẢNG ---
+        function resetFilters() {
+            // 1. Xóa nội dung trong Search box và 2 ô Date
+            document.getElementById('searchInput').value = "";
+            if (document.getElementById('dateFrom')) document.getElementById('dateFrom').value = "";
+            if (document.getElementById('dateTo')) document.getElementById('dateTo').value = "";
+        
+            // 2. Quan trọng: Đảm bảo không còn ID nào đang bị mờ (reset updatingId)
+            updatingId = null;
+        
+            // 3. Vẽ lại bảng với đầy đủ dữ liệu gốc
+            renderTable(allTasks);
+        }
+        
         function handleCancel() {
             updatingId = null; // Bấm Cancel thì cho sáng lại ngay
             toggleModal(false);
