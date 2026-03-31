@@ -345,7 +345,14 @@
         function toggleModal(show) {
             const modal = document.getElementById('pcnModal');
             if (show) modal.classList.remove('opacity-0', 'pointer-events-none');
-            else { modal.classList.add('opacity-0', 'pointer-events-none'); resetForm(); }
+            else { 
+                modal.classList.add('opacity-0', 'pointer-events-none'); 
+                  // --- THÊM DÒNG NÀY ---
+                updatingId = null; // Giải phóng trạng thái edit khi đóng modal (Cancel)
+                // ---------------------
+                resetForm(); 
+                renderTable(allTasks); // Vẽ lại bảng để mọi thứ sáng lại bình thường
+            }
         }
 
         function resetForm() {
