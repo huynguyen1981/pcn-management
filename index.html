@@ -511,29 +511,37 @@
                     `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : '';
         
                 return `
-                <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
+                <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} 
+                    ${isUpdating ? 'bg-blue-50/50 border-l-4 border-blue-500' : ''} 
+                    ${(updatingId !== null && !isUpdating) ? 'opacity-30 pointer-events-none grayscale' : ''}">
+                    
                     <td class="p-4 font-black text-lg">${row[1]}<br>
                         <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
                             ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
                         </span>
                     </td>
+                    
                     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
                     
                     <td class="p-4 min-w-[300px]">
                         <div class="desc-text font-medium text-slate-700">${row[4]}</div>
                         ${trackingHtml || normalRemark}
                     </td>
-        
+                
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
                     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
                     <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
                     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-                    
                     <td class="p-4 font-bold text-slate-600 text-center">${row[8] || '-'}</td>
-                    
                     <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+                    
                     <td class="p-4 text-center">
-                        <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
+                        <button onclick="prepareEdit('${row[0]}')" 
+                            ${updatingId !== null ? 'disabled' : ''} 
+                            class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs 
+                            ${updatingId !== null ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0073ea] hover:text-white'}">
+                            EDIT
+                        </button>
                     </td>
                 </tr>
             `}).join('');
@@ -589,6 +597,7 @@
         function prepareEdit(id) {
             const t = allTasks.find(x => String(x[0]) === String(id));
             if(!t) return;
+            updatingId = id; // << THÊM DÒNG NÀY: Để hệ thống biết đang edit dòng nào
             document.getElementById('editId').value = t[0];
             document.getElementById('pcnInput').value = t[1];
             document.getElementById('pcnTypeInput').value = t[2];
@@ -601,6 +610,7 @@
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
+            renderTable(allTasks); // << THÊM DÒNG NÀY: Để bảng vẽ lại và làm mờ các hàng khác
             toggleModal(true);
         }
 
