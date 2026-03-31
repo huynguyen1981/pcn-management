@@ -484,7 +484,7 @@
         
             const filtered = data.filter(t => {
                 const matchSearch = String(t[1]).toLowerCase().includes(query) || String(t[4]).toLowerCase().includes(query);
-                const taskDate = t[9] ? t[9].split('T')[0] : ""; 
+                const taskDate = t[5] ? t[5].split('T')[0] : ""; 
                 let matchDate = true;
                 if (dateFrom && taskDate < dateFrom) matchDate = false;
                 if (dateTo && taskDate > dateTo) matchDate = false;
