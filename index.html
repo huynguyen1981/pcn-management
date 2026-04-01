@@ -308,7 +308,7 @@
                     <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="engrTechInput" placeholder="Tech" class="border-2 p-3 rounded-xl">
                         <!-- <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl"> -->
-                       <label class="block text-sm font-black mb-2 text-slate-700 uppercase tracking-wider">APPROVE BY (Select multiple)</label>
+                       <label class="block text-sm font-black mb-2 text-slate-700 uppercase tracking-wider">APPROVE BY</label>
                         <div id="engrContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 border-2 border-slate-200 rounded-xl max-h-40 overflow-y-auto bg-white shadow-inner">
                             </div>
                     </div>
@@ -362,8 +362,7 @@
 
         async function loadTasks() {
             try {
-                // Gọi hàm này ngay khi load web (trong hàm loadTasks hoặc cuối script)
-                renderEngrCheckboxes();
+              
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
                 updatingId = null;
@@ -687,6 +686,7 @@
             const t = allTasks.find(x => String(x[0]) === String(id));
             
             if(!t) return;
+            
             updatingId = id; // << THÊM DÒNG NÀY: Để hệ thống biết đang edit dòng nào
             document.getElementById('editId').value = t[0];
             document.getElementById('pcnInput').value = t[1];
@@ -705,6 +705,7 @@
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
+            
             renderTable(allTasks); // << THÊM DÒNG NÀY: Để bảng vẽ lại và làm mờ các hàng khác
             toggleModal(true);
         }
@@ -955,7 +956,12 @@
             doc.save("PCN Report of HUY NGUYEN.pdf");
         }
         // ----Khúc này END xử lý export---- 
-        loadTasks();
+        // TẦNG 3: ĐIỂM KÍCH HOẠT (Nằm ở cuối cùng)
+        // Đảm bảo mọi thứ ở trên đã sẵn sàng mới bắt đầu chạy
+        window.onload = function() {
+            renderEngrCheckboxes(); // Vẽ danh sách chọn trước
+            loadTasks();            // Lấy dữ liệu hiển thị bảng sau
+        };
     </script>
 </body>
 </html>
