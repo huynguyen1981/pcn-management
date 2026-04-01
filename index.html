@@ -421,9 +421,22 @@
         }
         
         function resetForm() {
-            const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'engrTechInput', 'apprEngrInput', 'startInput', 'apprDateInput', 'releaseDateInput'];
-            ids.forEach(id => document.getElementById(id).value = "");
-            document.getElementById('reportedInput').checked = false;
+            const ids = ['editId', 'pcnInput', 'descInput', 'remarksInput', 'pcnTypeInput', 'statusInput', 'engrTechInput', 'apprDateInput', 'releaseDateInput', 'startInput'];
+            
+            ids.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.value = "";
+                }
+            });
+        
+            // Reset Checkbox reported
+            const reported = document.getElementById('reportedInput');
+            if (reported) reported.checked = false;
+        
+            // QUAN TRỌNG: Xóa sạch các tick chọn trong danh sách Engineer
+            const engrChecks = document.querySelectorAll('input[name="engrCheck"]');
+            engrChecks.forEach(ck => ck.checked = false);
         }
 
         //Hàm này FILTER theo searchbox >>> OK 
@@ -686,48 +699,54 @@
         // }
 
         async function saveTask() {
-            const id = document.getElementById('editId').value;
-            
-            // GOM DANH SÁCH ENGINEER ĐÃ CHỌN
-            const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
-                                   .map(el => el.value)
-                                   .join('; ');
-        
-            const data = {
-                id: id || null,
-                pcn: document.getElementById('pcnInput').value,
-                pcnType: document.getElementById('pcnTypeInput').value,
-                status: document.getElementById('statusInput').value,
-                desc: document.getElementById('descInput').value,
-                start: document.getElementById('startInput').value,
-                engrTech: document.getElementById('engrTechInput').value,
-                apprDate: document.getElementById('apprDateInput').value,
-                
-                // --- THAY ĐỔI Ở ĐÂY ---
-                apprEngr: selectedEngrs, // Lấy từ checkbox thay vì input cũ
-                // ---------------------
-                
-                releaseDate: document.getElementById('releaseDateInput').value,
-                isReported: document.getElementById('reportedInput').checked,
-                remarks: document.getElementById('remarksInput').value
-            };
-        
-            if (!data.pcn) return alert("Please enter PCN #!");
-        
-            updatingId = id || "new"; 
-            toggleModal(false); 
-            renderTable(allTasks); 
-        
             try {
+                const id = document.getElementById('editId').value;
+                
+                // Gom danh sách - Đoạn này ổn!
+                const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
+                                           .map(el => el.value)
+                                           .join('; ');
+        
+                // PHẢI KIỂM TRA ID TRƯỚC KHI LẤY VALUE (Để tránh lỗi null như trong hình)
+                const getVal = (id) => document.getElementById(id) ? document.getElementById(id).value : "";
+        
+                const data = {
+                    id: id || null,
+                    pcn: getVal('pcnInput'),
+                    pcnType: getVal('pcnTypeInput'),
+                    status: getVal('statusInput'),
+                    desc: getVal('descInput'),
+                    start: getVal('startInput'),
+                    engrTech: getVal('engrTechInput'),
+                    apprDate: getVal('apprDateInput'),
+                    apprEngr: selectedEngrs,
+                    releaseDate: getVal('releaseDateInput'),
+                    isReported: document.getElementById('reportedInput') ? document.getElementById('reportedInput').checked : false,
+                    remarks: getVal('remarksInput')
+                };
+        
+                if (!data.pcn) return alert("Please enter PCN #!");
+        
+                // Trạng thái chờ
+                updatingId = id || "new"; 
+                renderTable(allTasks); 
+        
+                // Gửi data
                 const resp = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                
                 if (resp.ok) {
-                    await loadTasks(); // loadTasks sẽ tự reset updatingId = null
+                    // LƯU XONG MỚI ĐÓNG VÀ RESET
+                    toggleModal(false); 
+                    await loadTasks(); 
+                } else {
+                    throw new Error("Server response not ok");
                 }
+        
             } catch (e) {
                 console.error("Save error:", e);
                 updatingId = null;
                 renderTable(allTasks);
-                alert("Lỗi lưu dữ liệu rồi bồ ơi!");
+                alert("Lỗi rồi bồ: " + e.message);
             }
         }
         
