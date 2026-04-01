@@ -184,40 +184,27 @@
         /* Giao diện 1 cột từ trên xuống */
         #engrContainer {
             display: flex;
-            flex-direction: column; /* Xếp hàng dọc */
-            gap: 4px;
-            padding: 8px;
+            flex-direction: column; 
+            gap: 8px;
+            padding: 12px;
             border: 2px solid #e2e8f0;
             border-radius: 12px;
-            max-height: 200px; /* Độ cao vừa phải để cuộn */
+            max-height: 200px;
             overflow-y: auto;
-            background-color: #ffffff;
+            background: white;
+            width: 100%; /* Đảm bảo rộng hết khung */
         }
-    
         .engr-item {
             display: flex;
             align-items: center;
-            padding: 8px;
+            padding: 6px 10px;
             border-radius: 8px;
+            cursor: pointer;
             transition: background 0.2s;
-            cursor: pointer;
         }
-    
-        .engr-item:hover {
-            background-color: #f8fafc;
-        }
-    
-        .engr-item input[type="checkbox"] {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-    
-        .engr-item span {
-            margin-left: 12px;
-            font-size: 14px;
-            color: #334155;
-        }
+        .engr-item:hover { background: #f1f5f9; }
+        .engr-item input { width: 18px; height: 18px; cursor: pointer; }
+        .engr-item span { margin-left: 10px; font-size: 14px; color: #334155; }
         
     </style>
 </head>
@@ -658,12 +645,54 @@
         function formatDateDisplay(d) { return (!d || d === "" || d === "-") ? "-" : d.split('T')[0]; }
         function formatDateInput(d) { return (!d || d === "" || d === "-") ? "" : d.split('T')[0]; }
 
+        // async function saveTask() {
+        //     const id = document.getElementById('editId').value;
+        //     // Trong hàm saveTask, thay dòng lấy giá trị apprEngr bằng đoạn này:
+        //     const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
+        //                                .map(el => el.value)
+        //                                .join('; ');
+        //     const data = {
+        //         id: id || null,
+        //         pcn: document.getElementById('pcnInput').value,
+        //         pcnType: document.getElementById('pcnTypeInput').value,
+        //         status: document.getElementById('statusInput').value,
+        //         desc: document.getElementById('descInput').value,
+        //         start: document.getElementById('startInput').value,
+        //         engrTech: document.getElementById('engrTechInput').value,
+        //         apprDate: document.getElementById('apprDateInput').value,
+        //         apprEngr: selectedEngrs,
+        //         releaseDate: document.getElementById('releaseDateInput').value,
+        //         isReported: document.getElementById('reportedInput').checked,
+        //         remarks: document.getElementById('remarksInput').value
+        //     };
+        //     if (!data.pcn) return alert("You forget to add PCN #!");
+        //     updatingId = id || "new"; 
+        //     toggleModal(false);
+        //     renderTable(allTasks);
+        //     try {
+        //         // 4. Gửi data đi (vẫn đang mờ...)
+        //         await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                
+        //         // 5. Load lại data mới nhất từ Google Sheets
+        //         // Trong hàm loadTasks của bồ đã có sẵn lệnh updatingId = null
+        //         // nên khi nó chạy xong, bảng sẽ tự động SÁNG lại và cập nhật data mới.
+        //         await loadTasks(); 
+                
+        //     } catch (e) {
+        //         console.error("Error:", e);
+        //         updatingId = null; // Lỡ lỗi thì cũng cho sáng lại để còn bấm tiếp
+        //         renderTable(allTasks);
+        //     }
+        // }
+
         async function saveTask() {
             const id = document.getElementById('editId').value;
-            // Trong hàm saveTask, thay dòng lấy giá trị apprEngr bằng đoạn này:
+            
+            // GOM DANH SÁCH ENGINEER ĐÃ CHỌN
             const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
-                                       .map(el => el.value)
-                                       .join('; ');
+                                   .map(el => el.value)
+                                   .join('; ');
+        
             const data = {
                 id: id || null,
                 pcn: document.getElementById('pcnInput').value,
@@ -673,31 +702,35 @@
                 start: document.getElementById('startInput').value,
                 engrTech: document.getElementById('engrTechInput').value,
                 apprDate: document.getElementById('apprDateInput').value,
-                apprEngr: selectedEngrs,
+                
+                // --- THAY ĐỔI Ở ĐÂY ---
+                apprEngr: selectedEngrs, // Lấy từ checkbox thay vì input cũ
+                // ---------------------
+                
                 releaseDate: document.getElementById('releaseDateInput').value,
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
             };
-            if (!data.pcn) return alert("You forget to add PCN #!");
+        
+            if (!data.pcn) return alert("Please enter PCN #!");
+        
             updatingId = id || "new"; 
-            toggleModal(false);
-            renderTable(allTasks);
+            toggleModal(false); 
+            renderTable(allTasks); 
+        
             try {
-                // 4. Gửi data đi (vẫn đang mờ...)
-                await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-                
-                // 5. Load lại data mới nhất từ Google Sheets
-                // Trong hàm loadTasks của bồ đã có sẵn lệnh updatingId = null
-                // nên khi nó chạy xong, bảng sẽ tự động SÁNG lại và cập nhật data mới.
-                await loadTasks(); 
-                
+                const resp = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
+                if (resp.ok) {
+                    await loadTasks(); // loadTasks sẽ tự reset updatingId = null
+                }
             } catch (e) {
-                console.error("Error:", e);
-                updatingId = null; // Lỡ lỗi thì cũng cho sáng lại để còn bấm tiếp
+                console.error("Save error:", e);
+                updatingId = null;
                 renderTable(allTasks);
+                alert("Lỗi lưu dữ liệu rồi bồ ơi!");
             }
         }
-
+        
         function prepareEdit(id) {
             const t = allTasks.find(x => String(x[0]) === String(id));
             
