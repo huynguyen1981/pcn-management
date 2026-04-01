@@ -363,31 +363,17 @@
         let lastSortCol = -1;
         const ENGINEER_LIST = ["BRETT L.", "AUGUST F.", "WILL D.", "SHAWN H.", "AMANDA D."];
         
-       function renderEngrCheckboxes() {
+      function renderEngrCheckboxes() {
             const container = document.getElementById('engrContainer');
-            
-            // Kiểm tra xem có tìm thấy cái div đó không
-            if (!container) {
-                console.error("LỖI: Không tìm thấy thẻ id='engrContainer' trong HTML!");
-                return;
-            }
+            if (!container) return;
         
-            // Kiểm tra xem ENGINEER_DATA có dữ liệu không
-            if (typeof ENGINEER_LIST === 'undefined' || ENGINEER_LIST.length === 0) {
-                console.error("LỖI: Biến ENGINEER_LIST đang trống hoặc chưa khai báo!");
-                container.innerHTML = "<p class='text-red-500'>No engineer data found!</p>";
-                return;
-            }
-        
-            // Vẽ danh sách 1 cột
-            container.innerHTML = ENGINEER_LIST.map((engr, index) => `
+            // Ở đây 'name' chính là từng chuỗi trong ENGINEER_LIST
+            container.innerHTML = ENGINEER_LIST.map((name, index) => `
                 <label class="engr-item">
-                    <input type="checkbox" name="engrCheck" value="${engr.name}">
-                    <span>${engr.name}</span>
+                    <input type="checkbox" name="engrCheck" value="${name}" id="engr_${index}">
+                    <span>${name}</span>
                 </label>
             `).join('');
-            
-            console.log("Đã vẽ xong danh sách kỹ sư!");
         }
 
         async function loadTasks() {
@@ -728,10 +714,16 @@
             document.getElementById('apprDateInput').value = formatDateInput(t[7]);
             // document.getElementById('apprEngrInput').value = t[8];
             // Trong hàm prepareEdit, tìm chỗ gán giá trị cho Appr Engr và thay bằng:
-            const savedEngrs = t[8] ? t[8].split('; ') : [];
-            document.querySelectorAll('input[name="engrCheck"]').forEach(ck => {
-                ck.checked = savedEngrs.includes(ck.value);
+            // Bên trong hàm prepareEdit...
+            const savedString = String(t[8] || ""); // Cột Appr Engr
+            const savedArray = savedString.split(';').map(n => n.trim()); // Cắt chuỗi thành mảng tên
+            
+            const checkboxes = document.querySelectorAll('input[name="engrCheck"]');
+            checkboxes.forEach(ck => {
+                // So sánh trực tiếp giá trị của checkbox với mảng tên đã lưu
+                ck.checked = savedArray.includes(ck.value);
             });
+            
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
