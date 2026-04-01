@@ -181,21 +181,43 @@
             background: #f1f5f9; /* Màu nền của đường ray cuộn */
         }
 
-        /* Custom scrollbar cho danh sách Engineer */
-        #engrContainer::-webkit-scrollbar { width: 5px; }
-        #engrContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        
-        /* Style cho từng item checkbox */
+        /* Giao diện 1 cột từ trên xuống */
+        #engrContainer {
+            display: flex;
+            flex-direction: column; /* Xếp hàng dọc */
+            gap: 4px;
+            padding: 8px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            max-height: 200px; /* Độ cao vừa phải để cuộn */
+            overflow-y: auto;
+            background-color: #ffffff;
+        }
+    
         .engr-item {
             display: flex;
             align-items: center;
-            padding: 6px 10px;
-            border-radius: 6px;
-            transition: all 0.2s;
-            border: 1px solid transparent;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.2s;
+            cursor: pointer;
         }
-        .engr-item:hover { background: #f1f5f9; border-color: #e2e8f0; }
-        input[type="checkbox"]:checked + span { font-weight: bold; color: #1e293b; }
+    
+        .engr-item:hover {
+            background-color: #f8fafc;
+        }
+    
+        .engr-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+    
+        .engr-item span {
+            margin-left: 12px;
+            font-size: 14px;
+            color: #334155;
+        }
         
     </style>
 </head>
@@ -341,23 +363,31 @@
         let lastSortCol = -1;
         const ENGINEER_LIST = ["BRETT L.", "AUGUST F.", "WILL D.", "SHAWN H.", "AMANDA D."];
         
-        function renderEngrCheckboxes() {
-           const container = document.getElementById('engrContainer');
-            if (!container) return; // Bảo vệ nếu không tìm thấy div
+       function renderEngrCheckboxes() {
+            const container = document.getElementById('engrContainer');
+            
+            // Kiểm tra xem có tìm thấy cái div đó không
+            if (!container) {
+                console.error("LỖI: Không tìm thấy thẻ id='engrContainer' trong HTML!");
+                return;
+            }
         
-            // ENGINEER_LIST là cái mảng JSON tui chỉ bồ ở trên đó
+            // Kiểm tra xem ENGINEER_DATA có dữ liệu không
+            if (typeof ENGINEER_LIST === 'undefined' || ENGINEER_LIST.length === 0) {
+                console.error("LỖI: Biến ENGINEER_LIST đang trống hoặc chưa khai báo!");
+                container.innerHTML = "<p class='text-red-500'>No engineer data found!</p>";
+                return;
+            }
+        
+            // Vẽ danh sách 1 cột
             container.innerHTML = ENGINEER_LIST.map((engr, index) => `
-                <div class="flex items-center gap-2 p-1 hover:bg-slate-50 rounded">
-                    <input type="checkbox" 
-                           name="engrCheck" 
-                           id="engr_${index}" 
-                           value="${engr.name}" 
-                           class="w-4 h-4 cursor-pointer">
-                    <label for="engr_${index}" class="text-sm cursor-pointer select-none">
-                        ${engr.name}
-                    </label>
-                </div>
+                <label class="engr-item">
+                    <input type="checkbox" name="engrCheck" value="${engr.name}">
+                    <span>${engr.name}</span>
+                </label>
             `).join('');
+            
+            console.log("Đã vẽ xong danh sách kỹ sư!");
         }
 
         async function loadTasks() {
@@ -958,10 +988,12 @@
         // ----Khúc này END xử lý export---- 
         // TẦNG 3: ĐIỂM KÍCH HOẠT (Nằm ở cuối cùng)
         // Đảm bảo mọi thứ ở trên đã sẵn sàng mới bắt đầu chạy
-        window.onload = function() {
-            renderEngrCheckboxes(); // Vẽ danh sách chọn trước
-            loadTasks();            // Lấy dữ liệu hiển thị bảng sau
-        };
+       // ĐÂY LÀ CHỖ QUAN TRỌNG NHẤT
+        window.addEventListener('DOMContentLoaded', (event) => {
+            console.log('DOM fully loaded and parsed');
+            renderEngrCheckboxes(); // Chạy cái này đầu tiên
+            loadTasks();            // Sau đó mới load bảng
+        });
     </script>
 </body>
 </html>
