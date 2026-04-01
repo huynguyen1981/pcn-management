@@ -282,6 +282,7 @@
                         </select>
                     </div>
                     <select id="statusInput" class="w-full border-2 p-3 rounded-xl font-black text-[#0073ea]">
+                        <option value="NOT START YET">NOT START YET</option>
                         <option value="IN-PROGRESS">IN-PROGRESS</option>
                         <option value="ENG REVIEW">ENG REVIEW</option>
                         <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
@@ -289,7 +290,9 @@
                     </select>
                     <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="engrTechInput" placeholder="Tech" class="border-2 p-3 rounded-xl">
-                        <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl">
+                        <!-- <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl"> -->
+                        <label class="block text-sm font-bold mb-2">APPROVE BY (Select multiple)</label>
+                        <div id="engrContainer" class="grid grid-cols-2 gap-2 p-3 border rounded-lg max-h-32 overflow-y-auto bg-slate-50"></div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl">
                         <input type="date" id="startInput" title="Start">
@@ -318,6 +321,17 @@
         let updatingId = null;
         let sortAsc = true;
         let lastSortCol = -1;
+        const ENGINEER_LIST = ["Brett L.", "August F.", "Will D.", "Shawn H.", "Amanda D."];
+        
+        function renderEngrCheckboxes() {
+            const container = document.getElementById('engrContainer');
+            container.innerHTML = ENGINEER_LIST.map(name => `
+                <label class="flex items-center gap-2 cursor-pointer hover:bg-white p-1 rounded">
+                    <input type="checkbox" name="engrCheck" value="${name}" class="w-4 h-4">
+                    <span class="text-sm">${name}</span>
+                </label>
+            `).join('');
+        }
 
         async function loadTasks() {
             try {
@@ -325,11 +339,14 @@
                 allTasks = await res.json();
                 updatingId = null;
                 renderTable(allTasks);
+                // Gọi hàm này ngay khi load web (trong hàm loadTasks hoặc cuối script)
+                renderEngrCheckboxes();
             } catch (e) { 
                 updatingId = null;
                 renderTable(allTasks);
             }
         }
+        
         //----Dark Mode-----
         function toggleDarkMode() {
             const currentTheme = document.documentElement.getAttribute('data-theme');
@@ -589,6 +606,9 @@
             if (s === 'RELEASED') return 'bg-[#00c875] text-white';
             if (s === 'OUT FOR APPROVAL') return 'bg-[#a25ddc] text-white';
             if (s === 'ENG REVIEW') return 'bg-[#579bfc] text-white';
+            // --- THÊM DÒNG NÀY ---
+            if (s === 'NOT START YET') return 'bg-slate-400 text-white'; 
+            // ---------------------
             return 'bg-[#fdab3d] text-white';
         }
 
@@ -597,6 +617,10 @@
 
         async function saveTask() {
             const id = document.getElementById('editId').value;
+            // Trong hàm saveTask, thay dòng lấy giá trị apprEngr bằng đoạn này:
+            const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
+                                       .map(el => el.value)
+                                       .join('; ');
             const data = {
                 id: id || null,
                 pcn: document.getElementById('pcnInput').value,
@@ -606,7 +630,7 @@
                 start: document.getElementById('startInput').value,
                 engrTech: document.getElementById('engrTechInput').value,
                 apprDate: document.getElementById('apprDateInput').value,
-                apprEngr: document.getElementById('apprEngrInput').value,
+                apprEngr: selectedEngrs,
                 releaseDate: document.getElementById('releaseDateInput').value,
                 isReported: document.getElementById('reportedInput').checked,
                 remarks: document.getElementById('remarksInput').value
@@ -633,6 +657,7 @@
 
         function prepareEdit(id) {
             const t = allTasks.find(x => String(x[0]) === String(id));
+            
             if(!t) return;
             updatingId = id; // << THÊM DÒNG NÀY: Để hệ thống biết đang edit dòng nào
             document.getElementById('editId').value = t[0];
@@ -643,7 +668,12 @@
             document.getElementById('startInput').value = formatDateInput(t[5]);
             document.getElementById('engrTechInput').value = t[6];
             document.getElementById('apprDateInput').value = formatDateInput(t[7]);
-            document.getElementById('apprEngrInput').value = t[8];
+            // document.getElementById('apprEngrInput').value = t[8];
+            // Trong hàm prepareEdit, tìm chỗ gán giá trị cho Appr Engr và thay bằng:
+            const savedEngrs = t[8] ? t[8].split('; ') : [];
+            document.querySelectorAll('input[name="engrCheck"]').forEach(ck => {
+                ck.checked = savedEngrs.includes(ck.value);
+            });
             document.getElementById('releaseDateInput').value = formatDateInput(t[9]);
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
@@ -690,7 +720,9 @@
             if (status.includes('OUT FOR APPROVAL')) return '#a25ddc'; // Tím
             if (status.includes('ENG REVIEW')) return '#579bfc';      // Xanh dương
             if (status.includes('IN-PROGRESS')) return '#fdab3d';      // Cam
-            
+            // --- THÊM DÒNG NÀY ---
+            if (status.includes('NOT START YET')) return '#94a3b8'; // Màu xám xanh (slate-400)
+            // ---------------------
             return '#fdab3d'; // Mặc định là màu cam cho các trường hợp khác
         }
 
