@@ -179,7 +179,23 @@
         .monday-card::-webkit-scrollbar-track {
             background: #f1f5f9; /* Màu nền của đường ray cuộn */
         }
-       
+
+        /* Custom scrollbar cho danh sách Engineer */
+        #engrContainer::-webkit-scrollbar { width: 5px; }
+        #engrContainer::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Style cho từng item checkbox */
+        .engr-item {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-radius: 6px;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+        }
+        .engr-item:hover { background: #f1f5f9; border-color: #e2e8f0; }
+        input[type="checkbox"]:checked + span { font-weight: bold; color: #1e293b; }
+        
     </style>
 </head>
 <body class="bg-[#f5f6f8] min-h-screen py-4">
@@ -291,8 +307,9 @@
                     <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="engrTechInput" placeholder="Tech" class="border-2 p-3 rounded-xl">
                         <!-- <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl"> -->
-                        <label class="block text-sm font-bold mb-2">APPROVE BY (Select multiple)</label>
-                        <div id="engrContainer" class="grid grid-cols-2 gap-2 p-3 border rounded-lg max-h-32 overflow-y-auto bg-slate-50"></div>
+                       <label class="block text-sm font-black mb-2 text-slate-700 uppercase tracking-wider">APPROVE BY (Select multiple)</label>
+                        <div id="engrContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 border-2 border-slate-200 rounded-xl max-h-40 overflow-y-auto bg-white shadow-inner">
+                            </div>
                     </div>
                     <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl">
                         <input type="date" id="startInput" title="Start">
@@ -325,22 +342,25 @@
         
         function renderEngrCheckboxes() {
             const container = document.getElementById('engrContainer');
-            container.innerHTML = ENGINEER_LIST.map(name => `
-                <label class="flex items-center gap-2 cursor-pointer hover:bg-white p-1 rounded">
-                    <input type="checkbox" name="engrCheck" value="${name}" class="w-4 h-4">
-                    <span class="text-sm">${name}</span>
+            if (!container) return;
+            
+            container.innerHTML = ENGINEER_DATA.map(engr => `
+                <label class="engr-item cursor-pointer">
+                    <input type="checkbox" name="engrCheck" value="${engr.name}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
+                    <span class="ml-2 text-[13px] text-slate-600 truncate">${engr.name}</span>
                 </label>
             `).join('');
         }
 
         async function loadTasks() {
             try {
+                // Gọi hàm này ngay khi load web (trong hàm loadTasks hoặc cuối script)
+                renderEngrCheckboxes();
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
                 updatingId = null;
                 renderTable(allTasks);
-                // Gọi hàm này ngay khi load web (trong hàm loadTasks hoặc cuối script)
-                renderEngrCheckboxes();
+               
             } catch (e) { 
                 updatingId = null;
                 renderTable(allTasks);
