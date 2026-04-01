@@ -200,6 +200,7 @@
             padding: 6px 10px;
             border-radius: 8px;
             cursor: pointer;
+            width: 100%; /* Quan trọng: Để nó chiếm hết chiều rộng khung */
             transition: background 0.2s;
         }
         .engr-item:hover { background: #f1f5f9; }
@@ -314,13 +315,25 @@
                         <option value="OUT FOR APPROVAL">OUT FOR APPROVAL</option>
                         <option value="RELEASED">RELEASED</option>
                     </select>
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 gap-4">
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">ENG TECH (DESIGNER)</label>
+                            <select id="engrTechInput" class="border-2 p-3 rounded-xl bg-white focus:border-indigo-500 outline-none transition-all">
+                                </select>
+                        </div>
+                    
+                        <div class="flex flex-col gap-1">
+                            <label class="text-[10px] font-bold text-slate-400 uppercase ml-1">APPROVE BY</label>
+                            <div id="engrContainer" class="border-2 border-slate-200 rounded-xl max-h-40 overflow-y-auto bg-white shadow-inner flex flex-col gap-1 p-2">
+                                </div>
+                        </div>
+                    </div>
+                    <!-- <div class="grid grid-cols-2 gap-4">
                         <input type="text" id="engrTechInput" placeholder="Tech" class="border-2 p-3 rounded-xl">
-                        <!-- <input type="text" id="apprEngrInput" placeholder="Appr Engr" class="border-2 p-3 rounded-xl"> -->
                        <label class="block text-sm font-black mb-2 text-slate-700 uppercase tracking-wider">APPROVE BY</label>
                         <div id="engrContainer" class="grid grid-cols-2 sm:grid-cols-3 gap-2 p-3 border-2 border-slate-200 rounded-xl max-h-40 overflow-y-auto bg-white shadow-inner">
                             </div>
-                    </div>
+                    </div> -->
                     <div class="grid grid-cols-3 gap-2 bg-slate-50 p-3 rounded-xl">
                         <input type="date" id="startInput" title="Start">
                         <input type="date" id="apprDateInput" title="Appr">
@@ -349,20 +362,31 @@
         let sortAsc = true;
         let lastSortCol = -1;
         const ENGINEER_LIST = ["BRETT L.", "AUGUST F.", "WILL D.", "SHAWN H.", "AMANDA D."];
+        const DESIGNER_LIST = ["H.NGUYEN", "W.DOAN"]; // Bồ tự thêm tên team mình vào nha
         
-      function renderEngrCheckboxes() {
-            const container = document.getElementById('engrContainer');
-            if (!container) return;
-        
-            // Ở đây 'name' chính là từng chuỗi trong ENGINEER_LIST
-            container.innerHTML = ENGINEER_LIST.map((name, index) => `
-                <label class="engr-item">
-                    <input type="checkbox" name="engrCheck" value="${name}" id="engr_${index}">
-                    <span>${name}</span>
-                </label>
-            `).join('');
+        function renderEngrCheckboxes() {
+                const container = document.getElementById('engrContainer');
+                if (!container) return;
+            
+                // Ở đây 'name' chính là từng chuỗi trong ENGINEER_LIST
+                container.innerHTML = ENGINEER_LIST.map((name, index) => `
+                    <label class="engr-item">
+                        <input type="checkbox" name="engrCheck" value="${name}" id="engr_${index}">
+                        <span>${name}</span>
+                    </label>
+                `).join('');
         }
 
+        function renderDesignerSelect() {
+            const select = document.getElementById('engrTechInput');
+            if (!select) return;
+        
+            let options = '<option value="">-- Select Designer --</option>';
+            options += DESIGNER_LIST.map(name => `<option value="${name}">${name}</option>`).join('');
+            
+            select.innerHTML = options;
+        }
+        
         async function loadTasks() {
             try {
               
@@ -1036,6 +1060,7 @@
         window.addEventListener('DOMContentLoaded', (event) => {
             console.log('DOM fully loaded and parsed');
             renderEngrCheckboxes(); // Chạy cái này đầu tiên
+            renderDesignerSelect(); // Danh sách chọn 1 (Eng Tech/Designer)
             loadTasks();            // Sau đó mới load bảng
         });
     </script>
