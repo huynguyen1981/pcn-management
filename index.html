@@ -342,18 +342,18 @@
         const ENGINEER_LIST = ["BRETT L.", "AUGUST F.", "WILL D.", "SHAWN H.", "AMANDA D."];
         
         function renderEngrCheckboxes() {
-            const container = document.getElementById('engrContainer');
-            if (!container) return;
-            
-            // Dùng id riêng biệt cho mỗi checkbox để browser không bị lú
+           const container = document.getElementById('engrContainer');
+            if (!container) return; // Bảo vệ nếu không tìm thấy div
+        
+            // ENGINEER_LIST là cái mảng JSON tui chỉ bồ ở trên đó
             container.innerHTML = ENGINEER_LIST.map((engr, index) => `
-                <div class="engr-item">
+                <div class="flex items-center gap-2 p-1 hover:bg-slate-50 rounded">
                     <input type="checkbox" 
                            name="engrCheck" 
                            id="engr_${index}" 
                            value="${engr.name}" 
                            class="w-4 h-4 cursor-pointer">
-                    <label for="engr_${index}" class="ml-2 text-[13px] text-slate-600 cursor-pointer select-none truncate">
+                    <label for="engr_${index}" class="text-sm cursor-pointer select-none">
                         ${engr.name}
                     </label>
                 </div>
