@@ -345,11 +345,18 @@
             const container = document.getElementById('engrContainer');
             if (!container) return;
             
-            container.innerHTML = ENGINEER_LIST.map(engr => `
-                <label class="engr-item cursor-pointer">
-                    <input type="checkbox" name="engrCheck" value="${engr.name}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
-                    <span class="ml-2 text-[13px] text-slate-600 truncate">${engr.name}</span>
-                </label>
+            // Dùng id riêng biệt cho mỗi checkbox để browser không bị lú
+            container.innerHTML = ENGINEER_LIST.map((engr, index) => `
+                <div class="engr-item">
+                    <input type="checkbox" 
+                           name="engrCheck" 
+                           id="engr_${index}" 
+                           value="${engr.name}" 
+                           class="w-4 h-4 cursor-pointer">
+                    <label for="engr_${index}" class="ml-2 text-[13px] text-slate-600 cursor-pointer select-none truncate">
+                        ${engr.name}
+                    </label>
+                </div>
             `).join('');
         }
 
