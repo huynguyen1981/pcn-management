@@ -8,6 +8,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <style>
+         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
         /*
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; }
@@ -110,8 +112,7 @@
         }
         /* ----- Dark Mode END ------- */
         
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
-        body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
+       
         
         /* Giao diện máy tính: Tràn màn hình */
         .container-fluid { width: 100%; padding: 20px; }
@@ -344,7 +345,7 @@
             const container = document.getElementById('engrContainer');
             if (!container) return;
             
-            container.innerHTML = ENGINEER_DATA.map(engr => `
+            container.innerHTML = ENGINEER_LIST.map(engr => `
                 <label class="engr-item cursor-pointer">
                     <input type="checkbox" name="engrCheck" value="${engr.name}" class="w-4 h-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500">
                     <span class="ml-2 text-[13px] text-slate-600 truncate">${engr.name}</span>
