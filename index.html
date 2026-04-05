@@ -520,7 +520,7 @@
         
         // 3. Hàm lọc nhanh Pending (Khác RELEASE)
         function filterPending() {
-            const filtered = allTasks.filter(t => t[3] !== "RELEASE");
+            const filtered = allTasks.filter(t => t[3] !== "RELEASED");
             renderTable(filtered);
         }
                
