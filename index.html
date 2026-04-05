@@ -328,6 +328,19 @@
                  </div>
              </div>
         </div>
+        <footer class="mt-12 pb-8 text-center">
+        <div class="flex flex-col items-center gap-2">
+            <div class="w-20 h-[1px] bg-slate-200 mb-2"></div>
+            
+            <p class="text-[11px] font-semibold text-slate-400 tracking-[0.2em] uppercase">
+                © <span id="currentYear">2026</span> PCN MASTER BOARD • HUY NGUYEN
+            </p>
+            
+            <p class="text-[10px] text-slate-400/70 italic flex items-center gap-1">
+                Built with <span class="text-red-400 text-xs">❤</span> for Engineering Excellence
+            </p>
+        </div>
+        </footer>
     </div>
 
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
@@ -393,7 +406,8 @@
             </div>
         </div>
     </div>
-
+   
+    
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
@@ -1162,6 +1176,11 @@
             renderDesignerSelect(); // Danh sách chọn 1 (Eng Tech/Designer)
             renderFilterDesigner(); // Vẽ list Designer trong thanh Lọc (MỚI)
             loadTasks();            // Sau đó mới load bảng
+            // MẸO NHỎ CỦA BỒ ĐÂY: Tự động cập nhật năm hiện tại
+            const yearEl = document.getElementById('currentYear');
+            if (yearEl) {
+                yearEl.innerText = new Date().getFullYear();
+            }
         });
     </script>
 </body>
