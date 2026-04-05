@@ -224,7 +224,7 @@
                     🌙 Dark Mode
                 </button>
             
-                <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." 
+                <!-- <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." 
                     class="w-48 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea] text-black">
             
                 <div class="flex items-center gap-2 bg-gray-100 p-1 px-3 rounded-xl border-2 border-transparent" id="filterContainer">
@@ -241,8 +241,38 @@
                     </div>
                 
                     <button onclick="resetFilters()" class="text-blue-600 text-[12px] font-bold hover:underline ml-1 shrink-0">Reset</button>
+                </div> -->
+
+                <!-- Search bổ sung phần My Task, Pending -->
+                <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search anything..." 
+                    class="w-48 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea] text-black">
+                
+                <div class="flex items-center gap-2 bg-gray-100 p-1 px-3 rounded-xl border-2 border-transparent" id="filterContainer">
+                    <div class="flex items-center gap-2">
+                        <label class="text-[12px] font-bold text-gray-600 label-date">From:</label>
+                        <input type="date" id="dateFrom" onchange="applyFilters()" 
+                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
+                    </div>
+                    
+                    <div class="flex items-center gap-2 border-l border-gray-300 pl-2">
+                        <label class="text-[12px] font-bold text-gray-600 label-date">To:</label>
+                        <input type="date" id="dateTo" onchange="applyFilters()" 
+                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
+                    </div>
+                
+                    <div class="flex items-center gap-2 border-l border-gray-300 pl-2">
+                        <label class="text-[12px] font-bold text-gray-600">My Tasks:</label>
+                        <select id="filterDesigner" onchange="applyFilters()" 
+                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[110px] outline-none bg-white">
+                            </select>
+                    </div>
+                
+                    <button onclick="filterPending()" class="text-amber-600 text-[12px] font-bold hover:underline ml-2 shrink-0">Pending</button>
+                
+                    <button onclick="resetFilters()" class="text-blue-600 text-[12px] font-bold hover:underline ml-1 shrink-0">Reset</button>
                 </div>
-            
+                <!-- END Search bổ sung phần My Task, Pending -->
+                
                 <button onclick="exportPDF()" class="bg-white border-2 border-[#c3c6d4] text-[#333] px-4 py-2 rounded-xl font-bold text-sm hover:bg-slate-50 shrink-0">
                     📄 EXPORT PDF
                 </button>
@@ -365,6 +395,16 @@
         let lastSortCol = -1;
         const ENGINEER_LIST = ["BRETT L.", "AUGUST F.", "WILL D.", "SHAWN H.", "AMANDA D.", "ADAM S."];
         const DESIGNER_LIST = ["H.NGUYEN", "W.DOAN"]; // Bồ tự thêm tên team mình vào nha
+        function copyToClipboard(pcn, desc, status) {
+            const text = `[PCN: ${pcn}] - ${desc} - Status: ${status}`;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                // Thông báo nhẹ cho người dùng biết đã copy thành công
+                alert("Đã copy thông tin PCN: " + pcn);
+            }).catch(err => {
+                console.error('Lỗi copy:', err);
+            });
+        }
         
         function renderEngrCheckboxes() {
                 const container = document.getElementById('engrContainer');
@@ -432,14 +472,59 @@
             document.getElementById('searchInput').value = "";
             if (document.getElementById('dateFrom')) document.getElementById('dateFrom').value = "";
             if (document.getElementById('dateTo')) document.getElementById('dateTo').value = "";
-        
+            document.getElementById('filterDesigner').value = "";
+
             // 2. Quan trọng: Đảm bảo không còn ID nào đang bị mờ (reset updatingId)
             updatingId = null;
         
             // 3. Vẽ lại bảng với đầy đủ dữ liệu gốc
             renderTable(allTasks);
         }
+
+        // 1. Hàm vẽ danh sách Designer vào ô Lọc (Gọi trong window.onload)
+        function renderFilterDesigner() {
+            const select = document.getElementById('filterDesigner');
+            if (!select) return;
+            let options = '<option value="">All</option>';
+            options += DESIGNER_LIST.map(name => `<option value="${name}">${name}</option>`).join('');
+            select.innerHTML = options;
+        }
         
+        // 2. Hàm lọc TỔNG HỢP (Search + Date + Designer)
+        function applyFilters() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            const from = document.getElementById('dateFrom').value;
+            const to = document.getElementById('dateTo').value;
+            const designer = document.getElementById('filterDesigner').value;
+        
+            const filtered = allTasks.filter(t => {
+                // Lọc Search (PCN hoặc Description)
+                const matchSearch = t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query);
+                
+                // Lọc Designer (Cột 6)
+                const matchDesigner = designer === "" || t[6] === designer;
+        
+                // Lọc Ngày (Cột 5 - Start Date)
+                let matchDate = true;
+                if (from || to) {
+                    const dateVal = new Date(t[5]);
+                    if (from && dateVal < new Date(from)) matchDate = false;
+                    if (to && dateVal > new Date(to)) matchDate = false;
+                }
+        
+                return matchSearch && matchDesigner && matchDate;
+            });
+        
+            renderTable(filtered); // Vẽ lại bảng với dữ liệu đã lọc
+        }
+        
+        // 3. Hàm lọc nhanh Pending (Khác RELEASE)
+        function filterPending() {
+            const filtered = allTasks.filter(t => t[3] !== "RELEASE");
+            renderTable(filtered);
+        }
+               
+                
         function handleCancel() {
             updatingId = null; // Bấm Cancel thì cho sáng lại ngay
             toggleModal(false);
@@ -1068,6 +1153,7 @@
             console.log('DOM fully loaded and parsed');
             renderEngrCheckboxes(); // Chạy cái này đầu tiên
             renderDesignerSelect(); // Danh sách chọn 1 (Eng Tech/Designer)
+            renderFilterDesigner(); // Vẽ list Designer trong thanh Lọc (MỚI)
             loadTasks();            // Sau đó mới load bảng
         });
     </script>
