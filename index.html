@@ -212,7 +212,21 @@
     </style>
 </head>
 <body class="bg-[#f5f6f8] min-h-screen py-4">
-
+    <!-- ----Sidebar----- -->
+    <aside class="fixed left-0 top-0 h-screen w-16 bg-white border-r border-slate-200 flex flex-col items-center py-6 gap-8 z-50 shadow-sm">
+        <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border border-indigo-100 shadow-sm">
+            <img src="./favicon.svg" alt="Logo" class="w-6 h-6">
+        </div>
+    
+        <nav id="sidebarNav" class="flex flex-col gap-6">
+            </nav>
+    </aside>
+    
+    <style>
+        body { padding-left: 64px; } /* Đẩy nội dung sang phải 64px (bằng chiều rộng sidebar) */
+    </style>
+    <!-- ----END Sidebar----- -->
+    
     <div class="container-fluid">
         <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-6">
             <!-- <div class="flex items-center gap-4">
@@ -409,6 +423,46 @@
    
     
     <script>
+        // DATABASE MINI: Dễ dàng quản lý và mở rộng
+        // DATABASE MINI: Giờ chỉ cần dán link web vào là xong!
+        const SIDEBAR_LINKS = [
+            { 
+                name: "ZNews", 
+                url: "https://znews.vn", 
+                iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=znews.vn" 
+            },
+            { 
+                name: "Google", 
+                url: "https://www.google.com", 
+                iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=google.com" 
+            },
+            { 
+                name: "YouTube", 
+                url: "https://www.youtube.com", 
+                iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=youtube.com" 
+            },
+            { 
+                name: "GitHub", 
+                url: "https://github.com", 
+                iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=github.com" 
+            }
+        ];
+        
+        function renderSidebar() {
+            const nav = document.getElementById('sidebarNav');
+            if (!nav) return;
+            
+            nav.innerHTML = SIDEBAR_LINKS.map(link => `
+                <a href="${link.url}" target="_blank" title="${link.name}" 
+                   class="group relative flex items-center justify-center p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                    ${link.icon}
+                    <span class="absolute left-14 bg-slate-800 text-white text-[10px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+                        ${link.name}
+                    </span>
+                </a>
+            `).join('');
+        }
+        
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
         let updatingId = null;
@@ -1176,6 +1230,7 @@
             renderDesignerSelect(); // Danh sách chọn 1 (Eng Tech/Designer)
             renderFilterDesigner(); // Vẽ list Designer trong thanh Lọc (MỚI)
             loadTasks();            // Sau đó mới load bảng
+            renderSidebar(); // GỌI Ở ĐÂY NÈ BỒ!
             // MẸO NHỎ CỦA BỒ ĐÂY: Tự động cập nhật năm hiện tại
             const yearEl = document.getElementById('currentYear');
             if (yearEl) {
