@@ -677,6 +677,31 @@
             applyFilters();
         }
 
+        // function updateColoredStats(data) {
+        //     const stats = {
+        //         'NOT START YET': 0,
+        //         'IN-PROGRESS': 0,
+        //         'ENG REVIEW': 0,
+        //         'OUT FOR APPROVAL': 0,
+        //         'RELEASED': 0
+        //     };
+        
+        //     // 1. Đếm số lượng từ dữ liệu thực tế
+        //     data.forEach(item => {
+        //         if (stats[item.status] !== undefined) stats[item.status]++;
+        //     });
+        
+        //     // 2. Hàm vẽ thanh bar mini
+        //     const makeBar = (num) => "█".repeat(Math.min(num, 3)) + "░".repeat(Math.max(0, 3 - num));
+        
+        //     // 3. Đổ dữ liệu vào từng ID với màu đã định sẵn
+        //     document.getElementById('stat-nsy').innerText = `NSY: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
+        //     document.getElementById('stat-prog').innerText = `PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
+        //     document.getElementById('stat-rev').innerText = `REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
+        //     document.getElementById('stat-appr').innerText = `APPR: ${stats['OUT FOR APPROVAL']} ${makeBar(stats['OUT FOR APPROVAL'])}`;
+        //     document.getElementById('stat-rep').innerText = `REL: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
+        // }
+
         function updateColoredStats(data) {
             const stats = {
                 'NOT START YET': 0,
@@ -686,22 +711,25 @@
                 'RELEASED': 0
             };
         
-            // 1. Đếm số lượng từ dữ liệu thực tế
-            data.forEach(item => {
-                if (stats[item.status] !== undefined) stats[item.status]++;
+            // QUAN TRỌNG: Kiểm tra cột Status của bồ là t[?] 
+            // Tui ví dụ là t[2], bồ sửa lại số này cho đúng thực tế nhé
+            data.forEach(t => {
+                const statusValue = t[3] ? t[3].toString().toUpperCase().trim() : ''; 
+                if (stats[statusValue] !== undefined) {
+                    stats[statusValue]++;
+                }
             });
         
-            // 2. Hàm vẽ thanh bar mini
+            // Cập nhật lên giao diện
             const makeBar = (num) => "█".repeat(Math.min(num, 3)) + "░".repeat(Math.max(0, 3 - num));
         
-            // 3. Đổ dữ liệu vào từng ID với màu đã định sẵn
             document.getElementById('stat-nsy').innerText = `NSY: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
             document.getElementById('stat-prog').innerText = `PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
             document.getElementById('stat-rev').innerText = `REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
             document.getElementById('stat-appr').innerText = `APPR: ${stats['OUT FOR APPROVAL']} ${makeBar(stats['OUT FOR APPROVAL'])}`;
             document.getElementById('stat-rep').innerText = `REL: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
         }
-                
+        
         function renderSidebar() {
             const nav = document.getElementById('sidebarNav');
             if (!nav) return;
