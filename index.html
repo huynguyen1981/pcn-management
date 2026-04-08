@@ -281,72 +281,31 @@
             background-color: #334155 !important;
         }
 
-        /* ============================================================
-           BẢN CHỐT: TỔNG LỰC MODAL DARK MODE (VỨT HẾT ĐỐNG CŨ)
-           ============================================================ */
-        
-        /* 1. NỀN TỔNG THỂ MODAL */
-        .dark .modal-content, 
-        .dark [id*="Modal"] {
-            background-color: #1e293b !important; /* Slate 800 */
-            color: #f1f5f9 !important;
-        }
-        
-        /* 2. HEADER MODAL (Cái nóc nhà bồ ghét nhất đây) */
-        .dark .modal-header,
-        .dark [class*="modal-header"] {
+        /* TRỊ DỨT ĐIỂM HEADER VÀ DATE - BẢN KHÔNG CÒN GÌ ĐỂ MẤT */
+        .dark .modal-header, 
+        .dark div[class*="header"], 
+        .dark header {
+            background: #1e293b !important;
             background-color: #1e293b !important;
-            border-bottom: 1px solid #334155 !important;
             color: #ffffff !important;
         }
         
-        .dark .modal-header h2, 
-        .dark .modal-header h3,
-        .dark .modal-header button {
+        .dark .modal-header h2 {
             color: #ffffff !important;
         }
         
-        /* 3. CÁC Ô NHẬP LIỆU (INPUT, SELECT, TEXTAREA, DATE) */
-        .dark input, 
-        .dark select, 
-        .dark textarea,
-        .dark input[type="date"] {
-            background-color: #0f172a !important; /* Nền tối sâu */
-            color: #ffffff !important;           /* Chữ trắng tinh */
-            border: 1px solid #475569 !important; /* Viền rõ ràng */
-            color-scheme: dark !important;       /* Icon lịch trắng */
-        }
-        
-        /* Fix dứt điểm mấy cái dải trắng bao quanh Date Input */
-        .dark .modal-content div.bg-white,
-        .dark .modal-content .flex.gap-2 {
+        /* Ép chết mấy cái ô Date và dải trắng */
+        .dark .modal-content div, 
+        .dark .modal-content section {
             background-color: transparent !important;
         }
         
-        /* 4. CHỮ NHÃN & CẢNH BÁO (LABEL, DESCRIPTION) */
-        .dark label, 
-        .dark .modal-content span, 
-        .dark .modal-content p,
-        .dark .text-slate-600 {
-            color: #cbd5e1 !important; /* Xám sáng dễ đọc */
-        }
-        
-        /* Ô Remark "Not yet check in" (Màu đỏ trên nền tối) */
-        .dark .modal-content div[class*="bg-gray"],
-        .dark .modal-content div[class*="bg-slate-100"] {
-            background-color: #334155 !important;
-            color: #f87171 !important; /* Đỏ san hô cực nổi */
-        }
-        
-        /* 5. CHI TIẾT CUỐI CÙNG (VẠCH KẺ, FOOTER) */
-        .dark .border-t, 
-        .dark hr {
-            border-color: #334155 !important;
-        }
-        
-        /* Fix placeholder tàng hình */
-        .dark ::placeholder {
-            color: #64748b !important;
+        .dark input[type="date"], 
+        .dark .modal-content input, 
+        .dark .modal-content select {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #475569 !important;
         }
     </style>
 </head>
