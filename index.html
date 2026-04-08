@@ -324,6 +324,27 @@
         .dark .modal-header button {
             color: #ffffff !important;
         }
+        /* --- DARK MODE SUPREME FIX --- */
+        .dark .modal-content, .dark input, .dark select, .dark textarea {
+            background-color: #0f172a !important; /* Nền tối hẳn */
+            color: #ffffff !important;           /* Chữ trắng tinh */
+            border-color: #334155 !important;
+        }
+        
+        /* Fix cái ô Remark "Not yet check in" bị mờ chữ */
+        .dark .modal-content div.bg-gray-100, 
+        .dark .modal-content div.bg-slate-100 {
+            background-color: #1e293b !important;
+            color: #f87171 !important; /* Đỏ rực cho bồ dễ thấy cảnh báo */
+        }
+        
+        /* Fix tiêu đề Modal bị tàng hình */
+        .dark .modal-header h2 { color: white !important; }
+        
+        /* Các nhãn chữ (Label) */
+        .dark .modal-content label, .dark .modal-content p {
+            color: #cbd5e1 !important;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
