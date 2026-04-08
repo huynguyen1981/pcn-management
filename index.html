@@ -650,7 +650,7 @@
         
             const filtered = allTasks.filter(t => {
                 // Check Tab trước
-                const isReported = row[11] === true || row[11] === "TRUE"; 
+                const isReported = t[11] === true || t[11] === "TRUE"; 
                 if (currentTab === 'ONGOING' && isReported) return false;
                 if (currentTab === 'REPORTED' && !isReported) return false;
             
