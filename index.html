@@ -345,6 +345,54 @@
         .dark .modal-content label, .dark .modal-content p {
             color: #cbd5e1 !important;
         }
+
+        /* --- TỔNG LỰC MODAL: HEADER + DATE + INPUT --- */
+
+        /* 1. Ép màu Header và nền Modal */
+        .dark .modal-header {
+            background-color: #1e293b !important;
+            border-bottom: 1px solid #334155 !important;
+            color: #ffffff !important;
+        }
+        
+        .dark .modal-content {
+            background-color: #1e293b !important;
+        }
+        
+        /* 2. Ép màu chữ Header và nút (x) */
+        .dark .modal-header h2, 
+        .dark .modal-header button,
+        .dark .modal-header .close-btn {
+            color: #ffffff !important;
+        }
+        
+        /* 3. Đặc trị Date Input và các dải trắng ở chân Modal */
+        .dark input[type="date"] {
+            color-scheme: dark !important; /* Hiện icon lịch trắng */
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #475569 !important;
+        }
+        
+        /* Xử lý các thẻ div bọc ngoài Date bị dính class bg-white */
+        .dark .modal-content div.bg-white, 
+        .dark .modal-content .flex.gap-2.mb-4 {
+            background-color: transparent !important;
+        }
+        
+        /* 4. Ép màu lại cho Input/Select (phòng hờ chưa ăn) */
+        .dark .modal-content input, 
+        .dark .modal-content select, 
+        .dark .modal-content textarea {
+            background-color: #0f172a !important;
+            color: #ffffff !important;
+            border: 1px solid #475569 !important;
+        }
+        
+        /* 5. Vạch kẻ ngang cuối Modal */
+        .dark .border-t {
+            border-color: #334155 !important;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
