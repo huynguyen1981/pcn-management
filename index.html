@@ -220,31 +220,39 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-       /* --- DARK MODE FIX DỨT ĐIỂM --- */
+       /* --- DARK MODE FIX TỔNG THỂ (CHO CẢ ON GOING & REPORTED) --- */
         .dark body {
-            background-color: #0f172a !important;
+            background-color: #0f172a !important; /* Nền xanh đen sâu */
         }
         
-        /* Ép mọi ngóc ngách của Table sang màu tối */
+        /* Ép nền bảng và các ô về Slate 800 */
         .dark #pcnTable, 
         .dark #pcnTable tr, 
-        .dark #pcnTable td,
-        .dark #pcnTable th {
-            background-color: #1e293b !important; /* Slate 800 */
-            border-color: #334155 !important;    /* Slate 700 */
-            color: #f1f5f9 !important;           /* Chữ trắng rõ */
+        .dark #pcnTable td {
+            background-color: #1e293b !important;
+            border-color: #334155 !important;
+            transition: background-color 0.2s;
         }
         
-        /* Sửa các chữ đang bị mờ trong Table */
-        .dark #pcnTable td div, 
-        .dark #pcnTable td span,
-        .dark #pcnTable td .desc-text {
-            color: #cbd5e1 !important; /* Màu xám trắng rất dễ đọc */
-        }
-        
-        /* Làm nổi bật số PCN # */
+        /* Sửa Title PCN MASTER BOARD và PCN # bị đen */
+        .dark h1, .dark .text-slate-800, 
         .dark #pcnTable td.font-black {
             color: #ffffff !important;
+        }
+        
+        /* ĐẶC TRỊ CHO ON GOING: ÉP MÀU CHỮ DESCRIPTION */
+        /* Nó sẽ tìm tất cả class text-slate-700 bên trong table ở Dark Mode và đổi màu */
+        .dark #pcnTable .text-slate-700,
+        .dark #pcnTable .desc-text {
+            color: #cbd5e1 !important; /* Xám sáng, dễ đọc cực kỳ */
+        }
+        
+        /* Sửa các chữ phụ bị mờ (Mandatory, Date...) */
+        .dark .text-slate-400, 
+        .dark .text-slate-500,
+        .dark #pcnTable td.text-slate-400,
+        .dark #pcnTable td.text-slate-600 {
+            color: #94a3b8 !important; /* Slate 400 sáng hơn */
         }
         
         /* Sửa tiêu đề bảng */
@@ -253,20 +261,15 @@
             color: #ffffff !important;
         }
         
-        /* Cột Release (màu xanh dương mờ cho ngựa) */
+        /* Hover dòng cho nó ngựa */
+        .dark #pcnTable tbody tr:hover td {
+            background-color: #334155 !important;
+        }
+        
+        /* Xử lý các ô có nền đặc biệt (như cột Release màu xanh) */
         .dark .bg-blue-50\/20 {
-            background-color: #1e3a8a44 !important; /* Xanh đêm mờ */
+            background-color: #1e3a8a33 !important; /* Xanh dương cực tối */
             color: #93c5fd !important;
-        }
-        
-        /* Chốt cái tiêu đề PCN Master Board */
-        .dark h1, .dark .text-slate-800 {
-            color: #ffffff !important;
-        }
-        
-        /* Giữ lại animation cho mượt */
-        #pcnTable tbody tr {
-            animation: fadeInUp 0.3s ease-out forwards;
         }
     </style>
 </head>
@@ -1467,6 +1470,91 @@
                 yearEl.innerText = new Date().getFullYear();
             }
         });
+
+        // --- Logic Chuyển Đổi ---
+        function quickConvert() {
+            const val = parseFloat(document.getElementById('conv-input').value) || 0;
+            const type = document.getElementById('conv-unit').value;
+            let res = 0;
+            let unitText = "";
+        
+            switch(type) {
+                case 'in-mm': res = val * 25.4; unitText = "mm"; break;
+                case 'in-cm': res = val * 2.54; unitText = "cm"; break;
+                case 'oz-ml': res = val * 29.57; unitText = "ml"; break;
+                case 'gal-l': res = val * 3.785; unitText = "Liters"; break;
+                case 'mm-in': res = val / 25.4; unitText = "inch"; break;
+            }
+        
+            document.getElementById('res-val').innerText = res % 1 === 0 ? res : res.toFixed(2);
+            document.getElementById('res-unit').innerText = unitText;
+        }
+        
+        // --- Tính năng Kéo Thả (Draggable) ---
+        dragElement(document.getElementById("converter-widget"));
+        
+        function dragElement(elmnt) {
+            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            const header = document.getElementById("converter-header");
+            if (header) { header.onmousedown = dragMouseDown; }
+        
+            function dragMouseDown(e) {
+                e.preventDefault();
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                document.onmouseup = closeDragElement;
+                document.onmousemove = elementDrag;
+            }
+        
+            function elementDrag(e) {
+                e.preventDefault();
+                pos1 = pos3 - e.clientX;
+                pos2 = pos4 - e.clientY;
+                pos3 = e.clientX;
+                pos4 = e.clientY;
+                elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
+                elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
+                elmnt.style.bottom = "auto"; // Hủy bỏ bottom mặc định để di chuyển tự do
+                elmnt.style.right = "auto";
+            }
+        
+            function closeDragElement() {
+                document.onmouseup = null;
+                document.onmousemove = null;
+            }
+        }
     </script>
+    <!-- ---------CONVERSION---------- -->
+    <div id="converter-widget" class="fixed bottom-5 right-5 w-64 bg-white dark:bg-slate-800 shadow-2xl rounded-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden transition-all duration-300 transform scale-90 hover:scale-100 origin-bottom-right">
+        <div id="converter-header" class="bg-slate-100 dark:bg-slate-700 p-3 cursor-move flex justify-between items-center">
+            <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
+                <span class="animate-pulse">⚡</span> QUICK CONVERTER
+            </span>
+            <button onclick="document.getElementById('converter-widget').classList.toggle('hidden')" class="text-slate-400 hover:text-red-500">×</button>
+        </div>
+        
+        <div class="p-4 space-y-3">
+            <div class="flex gap-2">
+                <input type="number" id="conv-input" oninput="quickConvert()" placeholder="Value..." 
+                    class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-sm focus:ring-2 focus:ring-blue-500 outline-none dark:text-white">
+                
+                <select id="conv-unit" onchange="quickConvert()" 
+                    class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-xs outline-none dark:text-white">
+                    <option value="in-mm">Inch → mm</option>
+                    <option value="in-cm">Inch → cm</option>
+                    <option value="oz-ml">oz → ml</option>
+                    <option value="gal-l">gal → Liter</option>
+                    <option value="mm-in">mm → Inch</option>
+                </select>
+            </div>
+            
+            <div id="conv-result" class="bg-blue-50 dark:bg-blue-900/30 p-3 rounded-xl text-center">
+                <span class="text-2xl font-black text-blue-600 dark:text-blue-400" id="res-val">0</span>
+                <span class="text-xs text-blue-400 ml-1" id="res-unit">mm</span>
+            </div>
+        </div>
+    </div>
+    <!-- ---------END CONVERSION---------- -->
+
 </body>
 </html>
