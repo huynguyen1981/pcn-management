@@ -613,7 +613,8 @@
                 modal.classList.add('opacity-0', 'pointer-events-none'); 
                  
                 resetForm(); 
-                renderTable(allTasks); // Vẽ lại bảng để mọi thứ sáng lại bình thường
+                // renderTable(allTasks); // Vẽ lại bảng để mọi thứ sáng lại bình thường
+                applyFilters();
             }
         }
         
@@ -629,7 +630,8 @@
             updatingId = null;
         
             // 3. Vẽ lại bảng với đầy đủ dữ liệu gốc
-            renderTable(allTasks);
+            // renderTable(allTasks);
+            applyFilters();
         }
 
         // 1. Hàm vẽ danh sách Designer vào ô Lọc (Gọi trong window.onload)
@@ -677,6 +679,11 @@
         
         // 3. Hàm lọc nhanh Pending (Khác RELEASE)
         function filterPending() {
+            // 1. Kiểm tra nếu đang ở Tab REPORTED thì tự động đá sang ONGOING
+            if (currentTab === 'REPORTED') {
+                // Gọi hàm switchTab để nó đổi màu nút và cập nhật biến currentTab cho mình luôn
+                switchTab('ONGOING'); 
+            }
             const filtered = allTasks.filter(t => t[3] !== "RELEASED");
             renderTable(filtered);
         }
@@ -685,7 +692,8 @@
         function handleCancel() {
             updatingId = null; // Bấm Cancel thì cho sáng lại ngay
             toggleModal(false);
-            renderTable(allTasks); 
+            // renderTable(allTasks); 
+            applyFilters();
         }
         
         function resetForm() {
@@ -910,7 +918,8 @@
                 if (colIndex === 11) { valA = a[colIndex] ? 1 : 0; valB = b[colIndex] ? 1 : 0; return sortAsc ? valA - valB : valB - valA; }
                 return sortAsc ? valA.localeCompare(valB) : valB.localeCompare(valA);
             });
-            renderTable(allTasks);
+            // renderTable(allTasks);
+            applyFilters();
         }
 
         function getStatusClass(s) {
@@ -997,7 +1006,8 @@
         
                 // Trạng thái chờ
                 updatingId = id || "new"; 
-                renderTable(allTasks); 
+                // renderTable(allTasks); 
+                applyFilters();
         
                 // Gửi data
                 const resp = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
@@ -1006,7 +1016,8 @@
                    // CHIÊU NÀY NÈ: Đóng Modal và làm sáng bảng NGAY LẬP TỨC
                     toggleModal(false); 
                     updatingId = null; 
-                    renderTable(allTasks); 
+                    // renderTable(allTasks); 
+                    applyFilters();
         
                     // Sau đó mới lẳng lặng đi load lại dữ liệu mới ở dưới nền
                     await loadTasks(); 
@@ -1018,7 +1029,8 @@
             } catch (e) {
                 console.error("Save error:", e);
                 updatingId = null;
-                renderTable(allTasks);
+                // renderTable(allTasks);
+                applyFilters();
                 alert("Lỗi rồi bồ: " + e.message);
             }
         }
@@ -1053,7 +1065,8 @@
             document.getElementById('reportedInput').checked = t[11];
             document.getElementById('remarksInput').value = t[12];
             
-            renderTable(allTasks); // << THÊM DÒNG NÀY: Để bảng vẽ lại và làm mờ các hàng khác
+            // renderTable(allTasks); // << THÊM DÒNG NÀY: Để bảng vẽ lại và làm mờ các hàng khác
+            applyFilters();
             toggleModal(true);
         }
 
