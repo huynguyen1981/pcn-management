@@ -582,15 +582,15 @@
         
         async function loadTasks() {
             try {
-              
+            
                 const res = await fetch(SCRIPT_URL);
                 allTasks = await res.json();
                 updatingId = null;
-                renderTable(allTasks);
+                applyFilters(); 
                
             } catch (e) { 
                 updatingId = null;
-                renderTable(allTasks);
+                applyFilters(); 
             }
         }
         
