@@ -9,6 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class' // Ép Tailwind nghe lời class "dark" mình vừa viết
+        }
+    </script>
     <style>
          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
         body { font-family: 'Inter', sans-serif; overflow-x: hidden; }
@@ -251,8 +256,22 @@
                 <h1 class="text-2xl font-black text-[#333] tracking-tight uppercase">PCN MASTER BOARD</h1>
             </div>
             <div class="flex flex-wrap items-center gap-3">
-                <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition flex items-center gap-2 text-sm shrink-0">
+                <!-- <button onclick="toggleDarkMode()" class="bg-gray-700 text-white px-4 py-2 rounded-xl hover:bg-gray-600 transition flex items-center gap-2 text-sm shrink-0">
                     🌙 Dark Mode
+                </button> -->
+
+                <button onclick="toggleDarkMode()" 
+                        class="relative w-14 h-8 flex items-center bg-slate-200 dark:bg-slate-700 rounded-full p-1 transition-all duration-500 shadow-inner focus:outline-none group">
+                    
+                    <div id="theme-toggle-icon" 
+                         class="w-6 h-6 flex items-center justify-center bg-white dark:bg-slate-900 rounded-full shadow-md transform transition-all duration-500 translate-x-0 dark:translate-x-6">
+                        
+                        <svg id="sun-icon" class="w-4 h-4 text-orange-500 block dark:hidden group-hover:rotate-45 transition-transform" 
+                             fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 2.293a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zm4.707 4.707a1 1 0 010 1.414l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 17.95a1 1 0 011.414 0l.707.707a1 1 0 01-1.414 1.414l-.707-.707a1 1 0 010-1.414zM3 11a1 1 0 100-2H2a1 1 0 100 2h1zm2.05-6.707a1 1 0 010 1.414l-.707.707A1 1 0 012.93 5.05l.707-.707a1 1 0 011.414 0zM10 6a4 4 0 100 8 4 4 0 000-8z"></path></svg>
+                        
+                        <svg id="moon-icon" class="w-4 h-4 text-yellow-300 hidden dark:block group-hover:-rotate-12 transition-transform" 
+                             fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
+                    </div>
                 </button>
             
                 <!-- <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." 
@@ -594,17 +613,43 @@
             }
         }
         
-        //----Dark Mode-----
+        // //----Dark Mode-----
+        // function toggleDarkMode() {
+        //     const currentTheme = document.documentElement.getAttribute('data-theme');
+        //     const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        //     document.documentElement.setAttribute('data-theme', targetTheme);
+        //     // Lưu lại lựa chọn để F5 không bị mất
+        //     localStorage.setItem('theme', targetTheme);
+            
+        // }
+        // // Tự động load theme cũ khi mở web
+        // if(localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+        // //----Dark Mode END-----
+
+        // ---- Dark Mode Nâng Cấp (Chạy theo Class của Tailwind) ----
         function toggleDarkMode() {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', targetTheme);
-            // Lưu lại lựa chọn để F5 không bị mất
-            localStorage.setItem('theme', targetTheme);
+            // 1. Toggle class "dark" trên thẻ html
+            const isDark = document.documentElement.classList.toggle('dark');
+            
+            // 2. Lưu lại lựa chọn để F5 không bị mất
+            localStorage.setItem('theme', isDark ? 'dark' : 'light');
         }
-        // Tự động load theme cũ khi mở web
-        if(localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        //----Dark Mode END-----
+        
+        // Hàm khởi tạo theme (Bỏ cái này vào ngay đầu file hoặc trong window.onload)
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+            if (savedTheme === 'dark' || (!savedTheme && prefersDark)) {
+                document.documentElement.classList.add('dark');
+            } else {
+                document.documentElement.classList.remove('dark');
+            }
+        }
+        
+        // Chạy khởi tạo ngay lập tức để tránh bị "nháy" màn hình trắng khi load
+        initTheme();
+        // ---- Dark Mode END ----
         
         function toggleModal(show) {
             const modal = document.getElementById('pcnModal');
