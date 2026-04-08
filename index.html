@@ -280,6 +280,45 @@
         .dark #pcnTable tbody tr:hover td {
             background-color: #334155 !important;
         }
+
+        /* --- FIX MODAL DARK MODE (DÀNH RIÊNG CHO FORM) --- */
+        .dark .modal-content, 
+        .dark #pcnModal { 
+            background-color: #1e293b !important; /* Nền Slate 800 */
+            color: #f1f5f9 !important;
+        }
+        
+        /* Ép màu cho tất cả các ô nhập liệu */
+        .dark .modal-content input, 
+        .dark .modal-content select, 
+        .dark .modal-content textarea {
+            background-color: #0f172a !important; /* Nền tối hẳn xuống */
+            color: #ffffff !important;           /* Chữ trắng tinh */
+            border: 1px solid #334155 !important; /* Viền Slate 700 */
+        }
+        
+        /* Fix chữ trong cái ô trắng xóa ở hình 2 của bồ */
+        .dark input::placeholder, 
+        .dark textarea::placeholder {
+            color: #94a3b8 !important; /* Màu placeholder xám nhạt */
+        }
+        
+        /* Fix mấy cái Label (Tên ô nhập liệu) */
+        .dark .modal-content label, 
+        .dark .modal-content p {
+            color: #cbd5e1 !important;
+        }
+        
+        /* Fix cái ô ghi chú Remark (Vùng màu xám ở hình 2) */
+        .dark .bg-gray-100, .dark .bg-slate-100 {
+            background-color: #334155 !important;
+            color: #f1f5f9 !important;
+        }
+        
+        /* Fix cái Header "PCN EDITOR" bị tàng hình */
+        .dark .modal-header h2 {
+            color: #ffffff !important;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -1526,6 +1565,8 @@
                 case 'oz-ml': res = val * 29.57; unitText = "ml"; break;
                 case 'gal-l': res = val * 3.785; unitText = "Liters"; break;
                 case 'mm-in': res = val / 25.4; unitText = "inch"; break;
+                case 'cm-in': res = val / 2.54; unitText = "inch"; break;
+                case 'm-in': res = (val * 100) / 2.54; unitText = "inch"; break; // Đổi m -> cm rồi -> inch
             }
         
             document.getElementById('res-val').innerText = res % 1 === 0 ? res : res.toFixed(2);
@@ -1598,9 +1639,11 @@
                     class="w-1/2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-600 rounded-lg p-2 text-xs outline-none dark:text-white">
                     <option value="in-mm">Inch → mm</option>
                     <option value="in-cm">Inch → cm</option>
+                    <option value="mm-in">mm → Inch</option>
+                    <option value="cm-in">cm → Inch</option>
+                    <option value="m-in">m → Inch</option>
                     <option value="oz-ml">oz → ml</option>
                     <option value="gal-l">gal → Liter</option>
-                    <option value="mm-in">mm → Inch</option>
                 </select>
             </div>
             
