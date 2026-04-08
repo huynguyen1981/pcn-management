@@ -466,59 +466,54 @@
 
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
         <style>
-            /* --- CHIẾN DỊCH GIẢI CỨU MODAL ( FINAL BOSS ) --- */
+            /* --- CHIẾN DỊCH GIẢI CỨU MODAL: TRUY QUÉT TẬN GỐC --- */
 
-            /* 1. Ép nền tổng thể Modal sang tối */
-            body.dark .modal-content, 
-            body.dark [id*="Modal"] {
-                background-color: #1e293b !important; /* Nền Slate 800 */
+            /* 1. Ép nền tổng thể cho cái hộp trắng to đùng (Modal Box) */
+            body.dark #pcnModal .bg-white {
+                background-color: #1e293b !important;
+                color: #f1f5f9 !important;
             }
             
-            /* 2. Ép cái Header (Nóc nhà bồ ghét nhất) phải đen */
-            body.dark .modal-header,
-            body.dark [class*="modal-header"] {
-                background-color: #0f172a !important; /* Đen hẳn để phân biệt */
-                color: #ffffff !important;
-                border-bottom: 1px solid #334155 !important;
-            }
-            
-            /* Fix tiêu đề PCN EDITOR và nút đóng (x) bị tàng hình */
-            body.dark .modal-header h2,
-            body.dark .modal-header h3,
-            body.dark .modal-header button {
-                color: #ffffff !important;
-                opacity: 1 !important;
-            }
-            
-            /* 3. TRIỆT TIÊU CÁC Ô TRẮNG (TRỌNG TÂM LỖI HÌNH CUỐI) */
-            body.dark .modal-content input,
-            body.dark .modal-content select,
-            body.dark .modal-content textarea,
-            body.dark .modal-content .bg-white { /* Nhắm trực tiếp vào class .bg-white */
-                background-color: #0f172a !important; /* Ép về nền đen */
-                color: #ffffff !important;           /* Ép chữ trắng */
-                border: 1px solid #475569 !important;
-            }
-            
-            /* 4. Fix chữ bị mờ trong Modal */
-            body.dark .modal-content label,
-            body.dark .modal-content span,
-            body.dark .modal-content .text-slate-600,
-            body.dark .modal-content .text-slate-500 {
-                color: #cbd5e1 !important; /* Xám sáng */
-            }
-            
-            /* Ô Remark "Not yet check in" (Màu đỏ trên nền tối) */
-            body.dark .modal-content div[class*="bg-gray"],
-            body.dark .modal-content div[class*="bg-slate-100"] {
-                background-color: #334155 !important;
-                color: #f87171 !important; /* Đỏ san hô rực rỡ */
-            }
-            
-            /* 5. Vạch kẻ ngang cuối Modal cho nó mượt */
-            body.dark .modal-content hr, 
-            body.dark .border-t {
+            /* 2. Ép Header (Nóc nhà) - Chỗ có chữ PCN EDITOR */
+            body.dark #pcnModal .bg-slate-50,
+            body.dark #pcnModal .border-b {
+                background-color: #0f172a !important; /* Đen sâu */
                 border-color: #334155 !important;
+                color: #ffffff !important;
+            }
+            
+            /* 3. Ép mấy cái ô Input và Select tàng hình */
+            body.dark #pcnModal input, 
+            body.dark #pcnModal select, 
+            body.dark #pcnModal textarea {
+                background-color: #0f172a !important;
+                color: #ffffff !important;
+                border-color: #475569 !important;
+            }
+            
+            /* 4. Fix cái cụm chứa 3 ô DATE (Cái dải xám xịt bg-slate-50) */
+            body.dark #pcnModal .bg-slate-50.p-3 {
+                background-color: #0f172a !important;
+                border: 1px solid #334155 !important;
+            }
+            
+            /* 5. Fix danh sách APPROVE BY (Cái container cuộn cuộn) */
+            body.dark #pcnModal #engrContainer {
+                background-color: #0f172a !important;
+                border-color: #475569 !important;
+            }
+            
+            /* 6. Fix ô Remark màu đỏ cho bồ (bg-rose-50/30) */
+            body.dark #pcnModal #remarksInput {
+                background-color: #442727 !important; /* Đỏ tối */
+                color: #fca5a5 !important;           /* Chữ hồng nhạt dễ đọc */
+                border-color: #7f1d1d !important;
+            }
+            
+            /* 7. Chữ tiêu đề PCN EDITOR và dấu X */
+            body.dark #pcnModal h2, 
+            body.dark #pcnModal button {
+                color: #ffffff !important;
             }
         </style>
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="handleCancel()"></div>
