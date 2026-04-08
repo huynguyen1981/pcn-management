@@ -220,56 +220,65 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
-       /* --- DARK MODE FIX TỔNG THỂ (CHO CẢ ON GOING & REPORTED) --- */
+       /* --- DARK MODE FIX DỨT ĐIỂM (BẢN HOÀN THIỆN) --- */
         .dark body {
-            background-color: #0f172a !important; /* Nền xanh đen sâu */
+            background-color: #0f172a !important;
         }
         
-        /* Ép nền bảng và các ô về Slate 800 */
+        /* 1. ÉP NỀN TẤT CẢ CÁC DÒNG (KỂ CẢ DÒNG ĐANG UPDATE HAY ON-GOING) */
+        /* Tui thêm các class cụ thể bồ dùng trong JS như bg-blue-50/50, bg-slate-50/50 vào đây */
         .dark #pcnTable, 
         .dark #pcnTable tr, 
-        .dark #pcnTable td {
-            background-color: #1e293b !important;
+        .dark #pcnTable td,
+        .dark .bg-white, 
+        .dark .bg-slate-50\/50, 
+        .dark .bg-blue-50\/20,
+        .dark .bg-blue-50\/50 {
+            background-color: #1e293b !important; /* Màu Slate 800 */
             border-color: #334155 !important;
-            transition: background-color 0.2s;
+            color: #f1f5f9 !important;
         }
         
-        /* Sửa Title PCN MASTER BOARD và PCN # bị đen */
-        .dark h1, .dark .text-slate-800, 
-        .dark #pcnTable td.font-black {
+        /* 2. ÉP MÀU CHỮ CHO DESCRIPTION (CHỖ BỒ BỊ MỜ) */
+        /* Chỉ đích danh các class bồ dùng trong JS để ép nó sáng lên */
+        .dark #pcnTable .text-slate-700, 
+        .dark #pcnTable .desc-text,
+        .dark #pcnTable .font-medium {
+            color: #cbd5e1 !important; /* Trắng xám dễ đọc */
+        }
+        
+        /* 3. LÀM SÁNG CÁC CHỮ PHỤ (PCN #, DATE, DESIGNER) */
+        .dark #pcnTable .font-black,
+        .dark #pcnTable .text-indigo-600,
+        .dark #pcnTable .text-slate-600 {
             color: #ffffff !important;
         }
         
-        /* ĐẶC TRỊ CHO ON GOING: ÉP MÀU CHỮ DESCRIPTION */
-        /* Nó sẽ tìm tất cả class text-slate-700 bên trong table ở Dark Mode và đổi màu */
-        .dark #pcnTable .text-slate-700,
-        .dark #pcnTable .desc-text {
-            color: #cbd5e1 !important; /* Xám sáng, dễ đọc cực kỳ */
+        .dark #pcnTable .text-slate-400,
+        .dark #pcnTable .text-slate-500 {
+            color: #94a3b8 !important; /* Xám xanh nhạt */
         }
         
-        /* Sửa các chữ phụ bị mờ (Mandatory, Date...) */
-        .dark .text-slate-400, 
-        .dark .text-slate-500,
-        .dark #pcnTable td.text-slate-400,
-        .dark #pcnTable td.text-slate-600 {
-            color: #94a3b8 !important; /* Slate 400 sáng hơn */
-        }
-        
-        /* Sửa tiêu đề bảng */
+        /* 4. SỬA CÁC Ô ĐẶC BIỆT */
         .dark #pcnTable thead th {
             background-color: #334155 !important;
             color: #ffffff !important;
         }
         
-        /* Hover dòng cho nó ngựa */
-        .dark #pcnTable tbody tr:hover td {
-            background-color: #334155 !important;
+        /* Cột Release (màu xanh dương mờ cho "ngựa") */
+        .dark .bg-blue-50\/20, .dark .bg-blue-50\/10 {
+            background-color: #1e3a8a44 !important;
+            color: #93c5fd !important;
         }
         
-        /* Xử lý các ô có nền đặc biệt (như cột Release màu xanh) */
-        .dark .bg-blue-50\/20 {
-            background-color: #1e3a8a33 !important; /* Xanh dương cực tối */
-            color: #93c5fd !important;
+        /* 5. FIX TITLE CHÍNH */
+        .dark h1, .dark .text-slate-800 {
+            color: #ffffff !important;
+        }
+        
+        /* Hover dòng */
+        .dark #pcnTable tbody tr:hover td {
+            background-color: #334155 !important;
         }
     </style>
 </head>
@@ -282,7 +291,13 @@
         </div> -->
     
         <nav id="sidebarNav" class="flex flex-col gap-6">
+            <div onclick="toggleConverter()" 
+                 class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-slate-700 group" 
+                 title="Quick Converter">
+                <span class="text-xl group-hover:scale-110 transition-transform">🔄</span>
+            </div>
             </nav>
+        
     </aside>
     
     <style>
@@ -540,6 +555,12 @@
                 iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=znews.vn" 
             },
             { 
+                name: "Google Translate", 
+                color: "bg-blue-500",
+                url: "https://translate.google.com/?sl=en&tl=vi&op=translate", 
+                iconUrl: "https://www.google.com/s2/favicons?sz=64&domain=translate.google.com" 
+            },
+            { 
                 name: "Google", 
                 color: "bg-blue-500",
                 url: "https://www.google.com", 
@@ -605,7 +626,23 @@
                 `;
             }).join('');
         }
-        
+
+        function toggleConverter() {
+            const widget = document.getElementById('converter-widget');
+            if (widget) {
+                // Nếu đang có class 'hidden' thì gỡ ra, nếu không thì thêm vào
+                widget.classList.toggle('hidden');
+                
+                // Mẹo: Nếu bồ muốn mỗi lần bật nó lại hiện ra ở vị trí mặc định 
+                // (để khỏi mất công đi tìm nếu lỡ kéo đi đâu mất)
+                if (!widget.classList.contains('hidden')) {
+                    widget.style.bottom = "20px";
+                    widget.style.right = "20px";
+                    widget.style.top = "auto";
+                    widget.style.left = "auto";
+                }
+            }
+        }                        
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
         let allTasks = [];
         let updatingId = null;
@@ -1464,6 +1501,10 @@
             renderFilterDesigner(); // Vẽ list Designer trong thanh Lọc (MỚI)
             loadTasks();            // Sau đó mới load bảng
             renderSidebar(); // GỌI Ở ĐÂY NÈ BỒ!
+            const widget = document.getElementById("converter-widget");
+            if (widget) {
+                dragElement(widget);
+            }
             // MẸO NHỎ CỦA BỒ ĐÂY: Tự động cập nhật năm hiện tại
             const yearEl = document.getElementById('currentYear');
             if (yearEl) {
@@ -1489,16 +1530,26 @@
             document.getElementById('res-val').innerText = res % 1 === 0 ? res : res.toFixed(2);
             document.getElementById('res-unit').innerText = unitText;
         }
-        
-        // --- Tính năng Kéo Thả (Draggable) ---
-        dragElement(document.getElementById("converter-widget"));
+    
+        // Đợi web load xong mới kích hoạt kéo thả
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const widget = document.getElementById("converter-widget");
+            if(widget) dragElement(widget);
+        });
         
         function dragElement(elmnt) {
-            var pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
+            let pos1 = 0, pos2 = 0, pos3 = 0, pos4 = 0;
             const header = document.getElementById("converter-header");
-            if (header) { header.onmousedown = dragMouseDown; }
+            
+            // Nếu có header thì nắm header kéo, không thì nắm cả cái hộp
+            if (header) {
+                header.onmousedown = dragMouseDown;
+            } else {
+                elmnt.onmousedown = dragMouseDown;
+            }
         
             function dragMouseDown(e) {
+                e = e || window.event;
                 e.preventDefault();
                 pos3 = e.clientX;
                 pos4 = e.clientY;
@@ -1507,14 +1558,18 @@
             }
         
             function elementDrag(e) {
+                e = e || window.event;
                 e.preventDefault();
                 pos1 = pos3 - e.clientX;
                 pos2 = pos4 - e.clientY;
                 pos3 = e.clientX;
                 pos4 = e.clientY;
+                
+                // Tính toán vị trí mới
                 elmnt.style.top = (elmnt.offsetTop - pos2) + "px";
                 elmnt.style.left = (elmnt.offsetLeft - pos1) + "px";
-                elmnt.style.bottom = "auto"; // Hủy bỏ bottom mặc định để di chuyển tự do
+                // QUAN TRỌNG: Hủy bỏ các vị trí cố định ban đầu
+                elmnt.style.bottom = "auto";
                 elmnt.style.right = "auto";
             }
         
@@ -1525,7 +1580,7 @@
         }
     </script>
     <!-- ---------CONVERSION---------- -->
-    <div id="converter-widget" class="fixed bottom-5 right-5 w-64 bg-white dark:bg-slate-800 shadow-2xl rounded-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden transition-all duration-300 transform scale-90 hover:scale-100 origin-bottom-right">
+    <div id="converter-widget" class="hidden fixed bg-white dark:bg-slate-800 shadow-2xl rounded-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden" style="width: 250px; bottom: 20px; right: 20px;">
         <div id="converter-header" class="bg-slate-100 dark:bg-slate-700 p-3 cursor-move flex justify-between items-center">
             <span class="text-xs font-bold text-slate-600 dark:text-slate-300 flex items-center gap-2">
                 <span class="animate-pulse">⚡</span> QUICK CONVERTER
