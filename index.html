@@ -281,47 +281,48 @@
             background-color: #334155 !important;
         }
 
-        /* --- FIX MODAL DARK MODE (DÀNH RIÊNG CHO FORM) --- */
+        /* --- FIX MODAL DARK MODE SIÊU CẤP --- */
         .dark .modal-content, 
-        .dark #pcnModal { 
+        .dark [id*="Modal"] { 
             background-color: #1e293b !important; /* Nền Slate 800 */
             color: #f1f5f9 !important;
         }
         
-        /* Ép màu cho tất cả các ô nhập liệu */
+        /* Ép các ô Input, Select, Textarea phải tối nền - sáng chữ */
         .dark .modal-content input, 
         .dark .modal-content select, 
-        .dark .modal-content textarea {
-            background-color: #0f172a !important; /* Nền tối hẳn xuống */
+        .dark .modal-content textarea,
+        .dark .modal-content .bg-white { 
+            background-color: #0f172a !important; /* Nền xanh đen sâu */
             color: #ffffff !important;           /* Chữ trắng tinh */
-            border: 1px solid #334155 !important; /* Viền Slate 700 */
+            border: 1px solid #475569 !important; /* Viền Slate 600 cho rõ */
         }
         
-        /* Fix chữ trong cái ô trắng xóa ở hình 2 của bồ */
+        /* Fix lỗi chữ placeholder bị mờ */
         .dark input::placeholder, 
         .dark textarea::placeholder {
-            color: #94a3b8 !important; /* Màu placeholder xám nhạt */
+            color: #64748b !important;
         }
         
-        /* Fix mấy cái Label (Tên ô nhập liệu) */
+        /* Fix các đoạn text nhãn (Designer, Approve By...) */
         .dark .modal-content label, 
-        .dark .modal-content p {
-            color: #cbd5e1 !important;
+        .dark .modal-content span,
+        .dark .modal-content p,
+        .dark .modal-content .text-slate-600 {
+            color: #cbd5e1 !important; /* Xám sáng */
         }
         
-        /* Fix cái ô ghi chú Remark (Vùng màu xám ở hình 2) */
-        .dark .bg-gray-100, .dark .bg-slate-100 {
+        /* Fix cái ô Remark màu xám xịt ở giữa hình */
+        .dark .modal-content div[class*="bg-gray"],
+        .dark .modal-content div[class*="bg-slate-100"] {
             background-color: #334155 !important;
-            color: #f1f5f9 !important;
+            color: #f87171 !important; /* Giữ màu đỏ cho dòng cảnh báo Not yet CHECK IN */
         }
         
-        /* Fix cái Header "PCN EDITOR" bị tàng hình */
-        .dark .modal-header h2 {
+        /* Fix Header "PCN EDITOR" và nút đóng (x) */
+        .dark .modal-header h2, 
+        .dark .modal-header button {
             color: #ffffff !important;
-        }
-        .dark .modal-header {
-            background-color: #111827 !important; /* Màu gần như đen cho Header */
-            border-bottom: 1px solid #374151 !important;
         }
     </style>
 </head>
