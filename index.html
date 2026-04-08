@@ -281,31 +281,49 @@
             background-color: #334155 !important;
         }
 
-        /* TRỊ DỨT ĐIỂM HEADER VÀ DATE - BẢN KHÔNG CÒN GÌ ĐỂ MẤT */
-        .dark .modal-header, 
-        .dark div[class*="header"], 
-        .dark header {
-            background: #1e293b !important;
+        /* --- CHIẾN DỊCH GIẢI CỨU MODAL --- */
+        body.dark .modal-content, 
+        body.dark [id*="Modal"] {
             background-color: #1e293b !important;
-            color: #ffffff !important;
         }
         
-        .dark .modal-header h2 {
+        /* Ép cái Header (Nóc nhà) phải đen */
+        body.dark .modal-header,
+        body.dark [class*="modal-header"] {
+            background-color: #0f172a !important; /* Đen hẳn để phân biệt */
             color: #ffffff !important;
+            border-bottom: 1px solid #334155 !important;
         }
         
-        /* Ép chết mấy cái ô Date và dải trắng */
-        .dark .modal-content div, 
-        .dark .modal-content section {
-            background-color: transparent !important;
-        }
-        
-        .dark input[type="date"], 
-        .dark .modal-content input, 
-        .dark .modal-content select {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
+        /* TRIỆT TIÊU CÁC Ô TRẮNG (TRỌNG TÂM LỖI HÌNH CUỐI) */
+        body.dark .modal-content .bg-white,
+        body.dark .modal-content input,
+        body.dark .modal-content select,
+        body.dark .modal-content textarea {
+            background-color: #0f172a !important; /* Ép về nền đen */
+            color: #ffffff !important;           /* Ép chữ trắng */
             border: 1px solid #475569 !important;
+        }
+        
+        /* Sửa chữ mờ ở mấy cái nhãn (Designer, Approve By) */
+        body.dark .modal-content label,
+        body.dark .modal-content span,
+        body.dark .modal-content .text-slate-500,
+        body.dark .modal-content .text-slate-400 {
+            color: #cbd5e1 !important;
+        }
+        
+        /* Fix tiêu đề PCN EDITOR và nút (x) bị tàng hình */
+        body.dark .modal-header h2,
+        body.dark .modal-header button {
+            color: #ffffff !important;
+            opacity: 1 !important;
+        }
+        
+        /* Ô Remark "Not yet check in" */
+        body.dark .modal-content .bg-gray-100,
+        body.dark .modal-content .bg-slate-100 {
+            background-color: #334155 !important;
         }
     </style>
 </head>
