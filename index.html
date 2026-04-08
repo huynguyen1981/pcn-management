@@ -281,117 +281,72 @@
             background-color: #334155 !important;
         }
 
-        /* --- FIX MODAL DARK MODE SIÊU CẤP --- */
+        /* ============================================================
+           BẢN CHỐT: TỔNG LỰC MODAL DARK MODE (VỨT HẾT ĐỐNG CŨ)
+           ============================================================ */
+        
+        /* 1. NỀN TỔNG THỂ MODAL */
         .dark .modal-content, 
-        .dark [id*="Modal"] { 
-            background-color: #1e293b !important; /* Nền Slate 800 */
+        .dark [id*="Modal"] {
+            background-color: #1e293b !important; /* Slate 800 */
             color: #f1f5f9 !important;
         }
         
-        /* Ép các ô Input, Select, Textarea phải tối nền - sáng chữ */
-        .dark .modal-content input, 
-        .dark .modal-content select, 
-        .dark .modal-content textarea,
-        .dark .modal-content .bg-white { 
-            background-color: #0f172a !important; /* Nền xanh đen sâu */
-            color: #ffffff !important;           /* Chữ trắng tinh */
-            border: 1px solid #475569 !important; /* Viền Slate 600 cho rõ */
-        }
-        
-        /* Fix lỗi chữ placeholder bị mờ */
-        .dark input::placeholder, 
-        .dark textarea::placeholder {
-            color: #64748b !important;
-        }
-        
-        /* Fix các đoạn text nhãn (Designer, Approve By...) */
-        .dark .modal-content label, 
-        .dark .modal-content span,
-        .dark .modal-content p,
-        .dark .modal-content .text-slate-600 {
-            color: #cbd5e1 !important; /* Xám sáng */
-        }
-        
-        /* Fix cái ô Remark màu xám xịt ở giữa hình */
-        .dark .modal-content div[class*="bg-gray"],
-        .dark .modal-content div[class*="bg-slate-100"] {
-            background-color: #334155 !important;
-            color: #f87171 !important; /* Giữ màu đỏ cho dòng cảnh báo Not yet CHECK IN */
-        }
-        
-        /* Fix Header "PCN EDITOR" và nút đóng (x) */
-        .dark .modal-header h2, 
-        .dark .modal-header button {
-            color: #ffffff !important;
-        }
-        /* --- DARK MODE SUPREME FIX --- */
-        .dark .modal-content, .dark input, .dark select, .dark textarea {
-            background-color: #0f172a !important; /* Nền tối hẳn */
-            color: #ffffff !important;           /* Chữ trắng tinh */
-            border-color: #334155 !important;
-        }
-        
-        /* Fix cái ô Remark "Not yet check in" bị mờ chữ */
-        .dark .modal-content div.bg-gray-100, 
-        .dark .modal-content div.bg-slate-100 {
-            background-color: #1e293b !important;
-            color: #f87171 !important; /* Đỏ rực cho bồ dễ thấy cảnh báo */
-        }
-        
-        /* Fix tiêu đề Modal bị tàng hình */
-        .dark .modal-header h2 { color: white !important; }
-        
-        /* Các nhãn chữ (Label) */
-        .dark .modal-content label, .dark .modal-content p {
-            color: #cbd5e1 !important;
-        }
-
-        /* --- TỔNG LỰC MODAL: HEADER + DATE + INPUT --- */
-
-        /* 1. Ép màu Header và nền Modal */
-        .dark .modal-header {
+        /* 2. HEADER MODAL (Cái nóc nhà bồ ghét nhất đây) */
+        .dark .modal-header,
+        .dark [class*="modal-header"] {
             background-color: #1e293b !important;
             border-bottom: 1px solid #334155 !important;
             color: #ffffff !important;
         }
         
-        .dark .modal-content {
-            background-color: #1e293b !important;
-        }
-        
-        /* 2. Ép màu chữ Header và nút (x) */
         .dark .modal-header h2, 
-        .dark .modal-header button,
-        .dark .modal-header .close-btn {
+        .dark .modal-header h3,
+        .dark .modal-header button {
             color: #ffffff !important;
         }
         
-        /* 3. Đặc trị Date Input và các dải trắng ở chân Modal */
+        /* 3. CÁC Ô NHẬP LIỆU (INPUT, SELECT, TEXTAREA, DATE) */
+        .dark input, 
+        .dark select, 
+        .dark textarea,
         .dark input[type="date"] {
-            color-scheme: dark !important; /* Hiện icon lịch trắng */
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            border: 1px solid #475569 !important;
+            background-color: #0f172a !important; /* Nền tối sâu */
+            color: #ffffff !important;           /* Chữ trắng tinh */
+            border: 1px solid #475569 !important; /* Viền rõ ràng */
+            color-scheme: dark !important;       /* Icon lịch trắng */
         }
         
-        /* Xử lý các thẻ div bọc ngoài Date bị dính class bg-white */
-        .dark .modal-content div.bg-white, 
-        .dark .modal-content .flex.gap-2.mb-4 {
+        /* Fix dứt điểm mấy cái dải trắng bao quanh Date Input */
+        .dark .modal-content div.bg-white,
+        .dark .modal-content .flex.gap-2 {
             background-color: transparent !important;
         }
         
-        /* 4. Ép màu lại cho Input/Select (phòng hờ chưa ăn) */
-        .dark .modal-content input, 
-        .dark .modal-content select, 
-        .dark .modal-content textarea {
-            background-color: #0f172a !important;
-            color: #ffffff !important;
-            border: 1px solid #475569 !important;
+        /* 4. CHỮ NHÃN & CẢNH BÁO (LABEL, DESCRIPTION) */
+        .dark label, 
+        .dark .modal-content span, 
+        .dark .modal-content p,
+        .dark .text-slate-600 {
+            color: #cbd5e1 !important; /* Xám sáng dễ đọc */
         }
         
-        /* 5. Vạch kẻ ngang cuối Modal */
-        .dark .border-t {
+        /* Ô Remark "Not yet check in" (Màu đỏ trên nền tối) */
+        .dark .modal-content div[class*="bg-gray"],
+        .dark .modal-content div[class*="bg-slate-100"] {
+            background-color: #334155 !important;
+            color: #f87171 !important; /* Đỏ san hô cực nổi */
+        }
+        
+        /* 5. CHI TIẾT CUỐI CÙNG (VẠCH KẺ, FOOTER) */
+        .dark .border-t, 
+        .dark hr {
             border-color: #334155 !important;
+        }
+        
+        /* Fix placeholder tàng hình */
+        .dark ::placeholder {
+            color: #64748b !important;
         }
     </style>
 </head>
