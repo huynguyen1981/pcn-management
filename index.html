@@ -281,50 +281,6 @@
             background-color: #334155 !important;
         }
 
-        /* --- CHIẾN DỊCH GIẢI CỨU MODAL --- */
-        body.dark .modal-content, 
-        body.dark [id*="Modal"] {
-            background-color: #1e293b !important;
-        }
-        
-        /* Ép cái Header (Nóc nhà) phải đen */
-        body.dark .modal-header,
-        body.dark [class*="modal-header"] {
-            background-color: #0f172a !important; /* Đen hẳn để phân biệt */
-            color: #ffffff !important;
-            border-bottom: 1px solid #334155 !important;
-        }
-        
-        /* TRIỆT TIÊU CÁC Ô TRẮNG (TRỌNG TÂM LỖI HÌNH CUỐI) */
-        body.dark .modal-content .bg-white,
-        body.dark .modal-content input,
-        body.dark .modal-content select,
-        body.dark .modal-content textarea {
-            background-color: #0f172a !important; /* Ép về nền đen */
-            color: #ffffff !important;           /* Ép chữ trắng */
-            border: 1px solid #475569 !important;
-        }
-        
-        /* Sửa chữ mờ ở mấy cái nhãn (Designer, Approve By) */
-        body.dark .modal-content label,
-        body.dark .modal-content span,
-        body.dark .modal-content .text-slate-500,
-        body.dark .modal-content .text-slate-400 {
-            color: #cbd5e1 !important;
-        }
-        
-        /* Fix tiêu đề PCN EDITOR và nút (x) bị tàng hình */
-        body.dark .modal-header h2,
-        body.dark .modal-header button {
-            color: #ffffff !important;
-            opacity: 1 !important;
-        }
-        
-        /* Ô Remark "Not yet check in" */
-        body.dark .modal-content .bg-gray-100,
-        body.dark .modal-content .bg-slate-100 {
-            background-color: #334155 !important;
-        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -509,6 +465,62 @@
     </div>
 
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
+        <style>
+            /* --- CHIẾN DỊCH GIẢI CỨU MODAL ( FINAL BOSS ) --- */
+
+            /* 1. Ép nền tổng thể Modal sang tối */
+            body.dark .modal-content, 
+            body.dark [id*="Modal"] {
+                background-color: #1e293b !important; /* Nền Slate 800 */
+            }
+            
+            /* 2. Ép cái Header (Nóc nhà bồ ghét nhất) phải đen */
+            body.dark .modal-header,
+            body.dark [class*="modal-header"] {
+                background-color: #0f172a !important; /* Đen hẳn để phân biệt */
+                color: #ffffff !important;
+                border-bottom: 1px solid #334155 !important;
+            }
+            
+            /* Fix tiêu đề PCN EDITOR và nút đóng (x) bị tàng hình */
+            body.dark .modal-header h2,
+            body.dark .modal-header h3,
+            body.dark .modal-header button {
+                color: #ffffff !important;
+                opacity: 1 !important;
+            }
+            
+            /* 3. TRIỆT TIÊU CÁC Ô TRẮNG (TRỌNG TÂM LỖI HÌNH CUỐI) */
+            body.dark .modal-content input,
+            body.dark .modal-content select,
+            body.dark .modal-content textarea,
+            body.dark .modal-content .bg-white { /* Nhắm trực tiếp vào class .bg-white */
+                background-color: #0f172a !important; /* Ép về nền đen */
+                color: #ffffff !important;           /* Ép chữ trắng */
+                border: 1px solid #475569 !important;
+            }
+            
+            /* 4. Fix chữ bị mờ trong Modal */
+            body.dark .modal-content label,
+            body.dark .modal-content span,
+            body.dark .modal-content .text-slate-600,
+            body.dark .modal-content .text-slate-500 {
+                color: #cbd5e1 !important; /* Xám sáng */
+            }
+            
+            /* Ô Remark "Not yet check in" (Màu đỏ trên nền tối) */
+            body.dark .modal-content div[class*="bg-gray"],
+            body.dark .modal-content div[class*="bg-slate-100"] {
+                background-color: #334155 !important;
+                color: #f87171 !important; /* Đỏ san hô rực rỡ */
+            }
+            
+            /* 5. Vạch kẻ ngang cuối Modal cho nó mượt */
+            body.dark .modal-content hr, 
+            body.dark .border-t {
+                border-color: #334155 !important;
+            }
+        </style>
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="handleCancel()"></div>
         <div class="bg-white w-full max-w-5xl mx-auto rounded-2xl shadow-2xl z-50 overflow-hidden relative">
             <div class="p-6 border-b flex justify-between items-center bg-slate-50">
