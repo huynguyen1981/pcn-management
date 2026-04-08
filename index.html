@@ -289,14 +289,15 @@
         <!-- <div class="w-10 h-10 bg-indigo-50 rounded-xl flex items-center justify-center border border-indigo-100 shadow-sm">
             <img src="./favicon.svg" alt="Logo" class="w-6 h-6">
         </div> -->
+
+        <div onclick="toggleConverter()" 
+             class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 group border border-blue-100 dark:border-blue-800" 
+             title="Quick Converter">
+            <span class="text-xl group-hover:rotate-12 transition-transform">🔄</span>
+        </div>
     
-        <nav id="sidebarNav" class="flex flex-col gap-6">
-            <div onclick="toggleConverter()" 
-                 class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all hover:bg-blue-50 dark:hover:bg-slate-700 group" 
-                 title="Quick Converter">
-                <span class="text-xl group-hover:scale-110 transition-transform">🔄</span>
-            </div>
-            </nav>
+        <div class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></div>
+        <nav id="sidebarNav" class="flex flex-col gap-6"></nav>
         
     </aside>
     
