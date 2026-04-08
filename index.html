@@ -408,6 +408,13 @@
                     class="px-6 py-2 rounded-xl text-sm font-bold transition-all duration-200 text-slate-500 hover:bg-slate-200">
                 ✅ REPORTED
             </button>
+            <div id="quick-stats" class="text-[10px] font-mono flex gap-3 items-center">
+                <span class="text-slate-400" id="stat-nsy"></span>
+                <span class="text-blue-400" id="stat-prog"></span>
+                <span class="text-purple-400" id="stat-rev"></span>
+                <span class="text-orange-400" id="stat-appr"></span>
+                <span class="text-emerald-400" id="stat-rep"></span>
+            </div>
         </div>
         <!--END ------Sử dụng TAB------ -->
         
@@ -669,7 +676,32 @@
             // Chạy bộ lọc tổng hợp để vẽ lại bảng
             applyFilters();
         }
+
+        function updateColoredStats(data) {
+            const stats = {
+                'NOT START YET': 0,
+                'IN-PROGRESS': 0,
+                'ENG REVIEW': 0,
+                'OUT FOR APPROVAL': 0,
+                'RELEASED': 0
+            };
         
+            // 1. Đếm số lượng từ dữ liệu thực tế
+            data.forEach(item => {
+                if (stats[item.status] !== undefined) stats[item.status]++;
+            });
+        
+            // 2. Hàm vẽ thanh bar mini
+            const makeBar = (num) => "█".repeat(Math.min(num, 3)) + "░".repeat(Math.max(0, 3 - num));
+        
+            // 3. Đổ dữ liệu vào từng ID với màu đã định sẵn
+            document.getElementById('stat-nsy').innerText = `NSY: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
+            document.getElementById('stat-prog').innerText = `PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
+            document.getElementById('stat-rev').innerText = `REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
+            document.getElementById('stat-appr').innerText = `APPR: ${stats['OUT FOR APPROVAL']} ${makeBar(stats['OUT FOR APPROVAL'])}`;
+            document.getElementById('stat-rep').innerText = `REL: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
+        }
+                
         function renderSidebar() {
             const nav = document.getElementById('sidebarNav');
             if (!nav) return;
@@ -872,6 +904,7 @@
             });
         
             renderTable(filtered); // Vẽ lại bảng với dữ liệu đã lọc
+            updateColoredStats(filteredData); // Cập nhật Stats theo đúng dữ liệu đã lọc đó
         }
         
         // 3. Hàm lọc nhanh Pending (Khác RELEASE)
