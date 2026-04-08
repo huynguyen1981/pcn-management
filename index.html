@@ -276,7 +276,7 @@
         <div class="flex flex-col xl:flex-row justify-between items-center mb-6 gap-6">
             <!-- <div class="flex items-center gap-4">
                 <div class="w-2 h-10 bg-[#0073ea] rounded-full"></div>
-                <h1 class="text-2xl font-black text-[#333] tracking-tight">PCN MASTER BOARD</h1>
+                <h1 class="text-2xl font-black text-[#333] tracking-tight text-slate-800 dark:text-white font-bold transition-colors">PCN MASTER BOARD</h1>
             </div> -->
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 flex items-center justify-center bg-indigo-50 rounded-xl border border-indigo-100 shadow-sm overflow-hidden">
@@ -946,40 +946,85 @@
                 const normalRemark = (!trackingHtml && row[12]) ? 
                     `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : '';
         
-                return `
-                <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} 
-                    ${isUpdating ? 'bg-blue-50/50 border-l-4 border-blue-500' : ''} 
-                    ${(updatingId !== null && !isUpdating) ? 'opacity-30 pointer-events-none grayscale' : ''}">
+                // return `
+                // <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} 
+                //     ${isUpdating ? 'bg-blue-50/50 border-l-4 border-blue-500' : ''} 
+                //     ${(updatingId !== null && !isUpdating) ? 'opacity-30 pointer-events-none grayscale' : ''}">
                     
-                    <td class="p-4 font-black text-lg">${row[1]}<br>
-                        <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
-                            ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
-                        </span>
-                    </td>
+                //     <td class="p-4 font-black text-lg">${row[1]}<br>
+                //         <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
+                //             ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
+                //         </span>
+                //     </td>
                     
-                    <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
+                //     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
                     
-                    <td class="p-4 min-w-[300px]">
-                        <div class="desc-text font-medium text-slate-700">${row[4]}</div>
-                        ${trackingHtml || normalRemark}
-                    </td>
+                //     <td class="p-4 min-w-[300px]">
+                //         <div class="desc-text font-medium text-slate-700">${row[4]}</div>
+                //         ${trackingHtml || normalRemark}
+                //     </td>
                 
-                    <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
-                    <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
-                    <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
-                    <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-                    <td class="p-4 font-bold text-slate-600 text-center">${row[8] || '-'}</td>
-                    <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+                //     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
+                //     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
+                //     <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
+                //     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
+                //     <td class="p-4 font-bold text-slate-600 text-center">${row[8] || '-'}</td>
+                //     <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
                     
-                    <td class="p-4 text-center">
-                        <button onclick="prepareEdit('${row[0]}')" 
-                            ${updatingId !== null ? 'disabled' : ''} 
-                            class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs 
-                            ${updatingId !== null ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0073ea] hover:text-white'}">
-                            EDIT
-                        </button>
-                    </td>
-                </tr>
+                //     <td class="p-4 text-center">
+                //         <button onclick="prepareEdit('${row[0]}')" 
+                //             ${updatingId !== null ? 'disabled' : ''} 
+                //             class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs 
+                //             ${updatingId !== null ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0073ea] hover:text-white'}">
+                //             EDIT
+                //         </button>
+                //     </td>
+                // </tr>
+                return `
+                    <tr class="transition-colors duration-200 border-b border-slate-100 dark:border-slate-700/50
+                        hover:bg-[#f8fafc] dark:hover:bg-slate-700/30 
+                        ${row[11] ? 'bg-slate-50/50 dark:bg-slate-800/40' : ''} 
+                        ${isUpdating ? 'bg-blue-50/50 dark:bg-blue-900/20 border-l-4 border-blue-500' : ''} 
+                        ${(updatingId !== null && !isUpdating) ? 'opacity-30 pointer-events-none grayscale' : ''}">
+                        
+                        <td class="p-4 font-black text-lg text-slate-800 dark:text-slate-100">
+                            ${row[1]}<br>
+                            <span class="text-[10px] ${isImmediately ? 'type-immediately font-bold text-red-500' : 'text-slate-400 dark:text-slate-500'}">
+                                ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
+                            </span>
+                        </td>
+                        
+                        <td class="p-4 text-center">
+                            <span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span>
+                        </td>
+                        
+                        <td class="p-4 min-w-[300px]">
+                            <div class="desc-text font-medium text-slate-700 dark:text-slate-200">${row[4]}</div>
+                            ${trackingHtml || normalRemark}
+                        </td>
+                    
+                        <td class="p-4 text-center text-slate-400 dark:text-slate-500 font-semibold">${formatDateDisplay(row[5])}</td>
+                        <td class="p-4 text-center text-slate-400 dark:text-slate-500 font-semibold">${formatDateDisplay(row[7])}</td>
+                        <td class="p-4 text-center font-black bg-blue-50/20 dark:bg-blue-900/10 text-slate-700 dark:text-blue-300">
+                            ${formatDateDisplay(row[9])}
+                        </td>
+                    
+                        <td class="p-4 font-bold text-indigo-600 dark:text-indigo-400">${row[6] || '-'}</td>
+                        <td class="p-4 font-bold text-slate-600 dark:text-slate-400 text-center">${row[8] || '-'}</td>
+                        
+                        <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
+                        
+                        <td class="p-4 text-center">
+                            <button onclick="prepareEdit('${row[0]}')" 
+                                ${updatingId !== null ? 'disabled' : ''} 
+                                class="px-4 py-2 rounded-lg font-black text-xs transition-all
+                                ${updatingId !== null 
+                                    ? 'opacity-50 cursor-not-allowed bg-slate-100 text-slate-400' 
+                                    : 'bg-[#0073ea]/10 text-[#0073ea] dark:bg-blue-500/20 dark:text-blue-300 hover:bg-[#0073ea] hover:text-white dark:hover:bg-blue-600'}">
+                                EDIT
+                            </button>
+                        </td>
+                    </tr>
             `}).join('');
         }
         //Hàm FILTER theo searchbox và date, ngoài ra test phần Approve lấy từ tracking
@@ -1088,6 +1133,9 @@
                 const resp = await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
                 
                 if (resp.ok) {
+                    // 2. ĐÓNG MODAL NGAY LẬP TỨC (Cho bồ cảm giác nhanh thần sầu)
+                    closeModal(); 
+                    showToast("Saving database...", "info"); // Hiện thông báo nhỏ nếu muốn
                    // CHIÊU NÀY NÈ: Đóng Modal và làm sáng bảng NGAY LẬP TỨC
                     toggleModal(false); 
                     updatingId = null; 
