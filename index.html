@@ -224,22 +224,34 @@
             animation: fadeInUp 0.3s ease-out forwards;
         }
 
-        /* Khi thẻ html có class dark, thì table bên trong sẽ tự đổi màu */
-        .dark #pcnTable {
-            background-color: #1e293b; /* slate-800 */
-            color: #f1f5f9; /* slate-100 */
+        :root {
+            --table-bg: #ffffff;
+            --table-text: #0f172a;
+            --table-border: #e2e8f0;
+            --table-hover: #f8fafc;
         }
         
-        .dark #pcnTable td, 
-        .dark #pcnTable th {
-            background-color: #1e293b !important; /* Ép màu nền tối */
-            border-color: #334155 !important; /* slate-700 (viền tối) */
-            color: #f1f5f9 !important;
+        .dark {
+            --table-bg: #1e293b;    /* slate-800 */
+            --table-text: #f1f5f9;  /* slate-100 */
+            --table-border: #334155; /* slate-700 */
+            --table-hover: #334155;  /* slate-700 */
         }
         
-        /* Thêm hiệu ứng hover cho dòng ở Dark Mode cho nó "ngựa" */
-        .dark #pcnTable tbody tr:hover {
-            background-color: #334155 !important; /* slate-700 */
+        /* Áp dụng một lần duy nhất cho toàn bộ Table */
+        #pcnTable {
+            background-color: var(--table-bg) !important;
+            color: var(--table-text) !important;
+        }
+        
+        #pcnTable td, #pcnTable th {
+            background-color: var(--table-bg) !important;
+            border-color: var(--table-border) !important;
+            color: var(--table-text) !important;
+        }
+        
+        #pcnTable tbody tr:hover td {
+            background-color: var(--table-hover) !important;
         }
     </style>
 </head>
