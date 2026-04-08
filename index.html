@@ -223,7 +223,24 @@
         #pcnTable tbody tr {
             animation: fadeInUp 0.3s ease-out forwards;
         }
+
+        /* Khi thẻ html có class dark, thì table bên trong sẽ tự đổi màu */
+        .dark #pcnTable {
+            background-color: #1e293b; /* slate-800 */
+            color: #f1f5f9; /* slate-100 */
+        }
         
+        .dark #pcnTable td, 
+        .dark #pcnTable th {
+            background-color: #1e293b !important; /* Ép màu nền tối */
+            border-color: #334155 !important; /* slate-700 (viền tối) */
+            color: #f1f5f9 !important;
+        }
+        
+        /* Thêm hiệu ứng hover cho dòng ở Dark Mode cho nó "ngựa" */
+        .dark #pcnTable tbody tr:hover {
+            background-color: #334155 !important; /* slate-700 */
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -350,8 +367,8 @@
         <div class="bg-white monday-card overflow-hidden">
             <div class="container-fluid"> 
                   <div class="table-responsive-wrapper">
-                    <table class="w-full text-left">
-                        <thead class="table-header">
+                    <table class="w-full text-left bg-slate-100 dark:bg-slate-700">
+                        <thead class="table-header text-slate-700 dark:text-slate-200">
                             <tr>
                                 <th class="p-4 col-pcn sortable" onclick="sortTable(1)">PCN # ↕</th>
                                 <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
