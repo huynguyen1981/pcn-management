@@ -466,54 +466,53 @@
 
     <div id="pcnModal" class="fixed inset-0 z-50 flex items-center justify-center opacity-0 pointer-events-none transition-all duration-300">
         <style>
-            /* --- CHIẾN DỊCH GIẢI CỨU MODAL: TRUY QUÉT TẬN GỐC --- */
+            /* --- DIỆT TẬN GỐC V2: ĐÁNH TRỰC DIỆN VÀO CLASS TAILWIND --- */
 
-            /* 1. Ép nền tổng thể cho cái hộp trắng to đùng (Modal Box) */
-            body.dark #pcnModal .bg-white {
-                background-color: #1e293b !important;
-                color: #f1f5f9 !important;
-            }
-            
-            /* 2. Ép Header (Nóc nhà) - Chỗ có chữ PCN EDITOR */
-            body.dark #pcnModal .bg-slate-50,
-            body.dark #pcnModal .border-b {
-                background-color: #0f172a !important; /* Đen sâu */
+            /* 1. Ép cái Header (PCN EDITOR) - Nó đang dính bg-slate-50 */
+            #pcnModal .bg-slate-50, 
+            #pcnModal .border-b {
+                background-color: #0f172a !important; 
                 border-color: #334155 !important;
-                color: #ffffff !important;
             }
             
-            /* 3. Ép mấy cái ô Input và Select tàng hình */
-            body.dark #pcnModal input, 
-            body.dark #pcnModal select, 
-            body.dark #pcnModal textarea {
-                background-color: #0f172a !important;
-                color: #ffffff !important;
-                border-color: #475569 !important;
-            }
-            
-            /* 4. Fix cái cụm chứa 3 ô DATE (Cái dải xám xịt bg-slate-50) */
-            body.dark #pcnModal .bg-slate-50.p-3 {
-                background-color: #0f172a !important;
+            /* 2. Ép cái hộp to chứa nội dung - Nó đang dính bg-white */
+            #pcnModal .bg-white.w-full {
+                background-color: #1e293b !important;
                 border: 1px solid #334155 !important;
             }
             
-            /* 5. Fix danh sách APPROVE BY (Cái container cuộn cuộn) */
-            body.dark #pcnModal #engrContainer {
+            /* 3. Ép mấy cái ô Input trắng xóa hiện hình */
+            #pcnModal input[type="text"], 
+            #pcnModal select, 
+            #pcnModal textarea,
+            #pcnModal .bg-white:not(.w-full) { 
+                background-color: #0f172a !important;
+                color: #ffffff !important;
+                border: 1px solid #475569 !important;
+            }
+            
+            /* 4. Fix cái dải chứa 3 ô DATE (Nó cũng là bg-slate-50) */
+            #pcnModal .bg-slate-50.p-3 {
+                background-color: #0f172a !important;
+            }
+            
+            /* 5. Fix chữ Header và dấu X */
+            #pcnModal h2#modalTitle, 
+            #pcnModal button[onclick*="handleCancel"] {
+                color: #ffffff !important;
+            }
+            
+            /* 6. Fix nốt cái khung APPROVE BY (engrContainer) */
+            #pcnModal #engrContainer {
                 background-color: #0f172a !important;
                 border-color: #475569 !important;
             }
             
-            /* 6. Fix ô Remark màu đỏ cho bồ (bg-rose-50/30) */
-            body.dark #pcnModal #remarksInput {
-                background-color: #442727 !important; /* Đỏ tối */
-                color: #fca5a5 !important;           /* Chữ hồng nhạt dễ đọc */
+            /* 7. Fix ô Remark đỏ (remarksInput) */
+            #pcnModal #remarksInput {
+                background-color: #2d1a1a !important;
+                color: #fca5a5 !important;
                 border-color: #7f1d1d !important;
-            }
-            
-            /* 7. Chữ tiêu đề PCN EDITOR và dấu X */
-            body.dark #pcnModal h2, 
-            body.dark #pcnModal button {
-                color: #ffffff !important;
             }
         </style>
         <div class="absolute inset-0 bg-[#1e293baa]" onclick="handleCancel()"></div>
