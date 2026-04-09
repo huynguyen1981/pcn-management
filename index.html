@@ -409,11 +409,11 @@
                 ✅ REPORTED
             </button>
             <div id="quick-stats" class="text-[10px] font-mono flex gap-3 items-center">
-                <span class="text-slate-400" id="stat-nsy"></span>
-                <span class="text-blue-400" id="stat-prog"></span>
-                <span class="text-purple-400" id="stat-rev"></span>
-                <span class="text-orange-400" id="stat-appr"></span>
-                <span class="text-emerald-400" id="stat-rep"></span>
+                <span style="color: #94a3b8;" id="stat-nsy"></span>
+                <span style="color: #fdab3d;" id="stat-prog"></span>
+                <span style="color: #579bfc;" id="stat-rev"></span>
+                <span style="color: #a25ddc;" id="stat-appr"></span>
+                <span style="color: #00c875;" id="stat-rep"></span>
             </div>
         </div>
         <!--END ------Sử dụng TAB------ -->
@@ -721,13 +721,13 @@
             });
         
             // Cập nhật lên giao diện
-            const makeBar = (num) => "█".repeat(Math.min(num, 3)) + "░".repeat(Math.max(0, 3 - num));
+            const makeBar = (num) => "█".repeat(Math.min(num, 5)) + "░".repeat(Math.max(0, 5 - num));
         
-            document.getElementById('stat-nsy').innerText = `NSY: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
-            document.getElementById('stat-prog').innerText = `PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
-            document.getElementById('stat-rev').innerText = `REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
+            document.getElementById('stat-nsy').innerText = `NOT-START: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
+            document.getElementById('stat-prog').innerText = `IN-PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
+            document.getElementById('stat-rev').innerText = `ENG-REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
             document.getElementById('stat-appr').innerText = `APPR: ${stats['OUT FOR APPROVAL']} ${makeBar(stats['OUT FOR APPROVAL'])}`;
-            document.getElementById('stat-rep').innerText = `REL: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
+            document.getElementById('stat-rep').innerText = `RELEASED: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
         }
         
         function renderSidebar() {
