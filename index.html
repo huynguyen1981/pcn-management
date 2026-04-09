@@ -1488,19 +1488,22 @@
         
             const total = dataToExport.length;
             
-            const summaryLine = 
-                `NOT-START: ${counts['NOT START YET']} ${generateProgressBar(counts['NOT START YET'], total)}  ` +
-                `IN-PROG: ${counts['PENDING']} ${generateProgressBar(counts['PENDING'], total)}  ` +
-                `ENG-REV: ${counts['ENG REVIEW']} ${generateProgressBar(counts['ENG REVIEW'], total)}  ` +
-                `APPR: ${counts['OUT FOR APPROVAL']} ${generateProgressBar(counts['OUT FOR APPROVAL'], total)}  ` +
-                `RELEASED: ${counts['RELEASED']} ${generateProgressBar(counts['RELEASED'], total)}`;
+            // 4. Tạo dòng tổng hợp "ngựa ngựa" với thanh Progress
+            doc.setFont("courier", "bold");
+            doc.setFontSize(8);
             
-            // Thiết lập font và in ra PDF
-            doc.setFont("courier", "bold"); // Dùng font Courier để các ký tự vuông vức, thẳng hàng
-            doc.setFontSize(9);
-            doc.text(summaryLine, 14, 20); // In tại vị trí x=14, y=20
-
-            // END Thêm phần count từng loại vô báo cáo
+            // Hàm tạo thanh bar (bồ nhớ định nghĩa hàm này nhé)
+            const bar = (val) => generateProgressBar(val, total);
+        
+            const summaryLine = 
+                `NOT-START: ${stats['NOT START YET']} ${bar(stats['NOT START YET'])}  ` +
+                `IN-PROG: ${stats['IN-PROGRESS']} ${bar(stats['IN-PROGRESS'])}  ` +
+                `ENG-REV: ${stats['ENG REVIEW']} ${bar(stats['ENG REVIEW'])}  ` +
+                `APPR: ${stats['OUT FOR APPROVAL']} ${bar(stats['OUT FOR APPROVAL'])}  ` +
+                `RELEASED: ${stats['RELEASED']} ${bar(stats['RELEASED'])}`;
+        
+            // In dòng summary lên PDF
+            doc.text(summaryLine, 14, 15);
 
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
