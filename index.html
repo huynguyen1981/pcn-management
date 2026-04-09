@@ -1462,8 +1462,32 @@
             doc.setTextColor(100, 100, 100);
             doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);       
 
-            // Giả sử bồ đã có object counts từ hàm updateQuickStats
-            const total = toExport.length; // Hoặc filtered.length tùy bồ muốn in gì
+            
+            // 1. Lấy dữ liệu đang hiển thị trên bảng
+            const dataToExport = toExport; // Mảng filtered bồ đang dùng để renderTable
+        
+            // 2. Khởi tạo stats khớp 100% với bồ
+            const stats = {
+                'NOT START YET': 0,
+                'IN-PROGRESS': 0,
+                'ENG REVIEW': 0,
+                'OUT FOR APPROVAL': 0,
+                'RELEASED': 0
+            };
+        
+            // 3. Duyệt và đếm (Giả sử cột Status là row[2])
+            dataToExport.forEach(row => {
+                const s = row[2] ? row[2].toUpperCase() : '';
+                if (stats.hasOwnProperty(s)) {
+                    stats[s]++;
+                } else {
+                    // Nếu có trạng thái lạ hoặc trống, mình gom vào IN-PROGRESS cho an toàn
+                    stats['IN-PROGRESS']++;
+                }
+            });
+        
+            const total = dataToExport.length;
+            
             const summaryLine = 
                 `NOT-START: ${counts['NOT START YET']} ${generateProgressBar(counts['NOT START YET'], total)}  ` +
                 `IN-PROG: ${counts['PENDING']} ${generateProgressBar(counts['PENDING'], total)}  ` +
@@ -1475,7 +1499,9 @@
             doc.setFont("courier", "bold"); // Dùng font Courier để các ký tự vuông vức, thẳng hàng
             doc.setFontSize(9);
             doc.text(summaryLine, 14, 20); // In tại vị trí x=14, y=20
-            
+
+            // END Thêm phần count từng loại vô báo cáo
+
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
                body: toExport.map(t => [
