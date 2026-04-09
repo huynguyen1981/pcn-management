@@ -1419,11 +1419,11 @@
         }
 
         function generateProgressBar(count, total) {
-            const size = 5; // Độ dài thanh bar (5 ô như mẫu của bồ)
-            if (total === 0) return "░░░░░";
+            const size = 5;
+            if (total === 0) return "[-----]";
             const solidCount = Math.round((count / total) * size);
-            const emptyCount = size - solidCount;
-            return "█".repeat(solidCount) + "░".repeat(emptyCount);
+            // Dùng dấu # cho phần đã xong và dấu - cho phần chưa xong
+            return "[" + "#".repeat(solidCount) + "-".repeat(size - solidCount) + "]";
         }
         
         function exportPDF() {
@@ -1503,7 +1503,7 @@
                 `RELEASED: ${stats['RELEASED']} ${bar(stats['RELEASED'])}`;
         
             // In dòng summary lên PDF
-            doc.text(summaryLine, 14, 15);
+            doc.text(summaryLine, 14, 32);
 
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
@@ -1519,7 +1519,7 @@
                     String(t[8] || "-"), 
                     fDate(t[9])
                 ]),
-                startY: 30,
+                startY: 38,
                 theme: 'grid',
                 styles: { fontSize: 10, cellPadding: 3, valign: 'middle' },
                 headStyles: { fillColor: [0, 115, 234] },
