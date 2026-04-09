@@ -1418,6 +1418,13 @@
             return '#fdab3d'; // Mặc định là màu cam cho các trường hợp khác
         }
 
+        function generateProgressBar(count, total) {
+            const size = 5; // Độ dài thanh bar (5 ô như mẫu của bồ)
+            if (total === 0) return "░░░░░";
+            const solidCount = Math.round((count / total) * size);
+            const emptyCount = size - solidCount;
+            return "█".repeat(solidCount) + "░".repeat(emptyCount);
+        }
         
         function exportPDF() {
             const { jsPDF } = window.jspdf;
@@ -1454,6 +1461,20 @@
             doc.setFontSize(10);
             doc.setTextColor(100, 100, 100);
             doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);       
+
+            // Giả sử bồ đã có object counts từ hàm updateQuickStats
+            const total = toExport.length; // Hoặc filtered.length tùy bồ muốn in gì
+            const summaryLine = 
+                `NOT-START: ${counts['NOT START YET']} ${generateProgressBar(counts['NOT START YET'], total)}  ` +
+                `IN-PROG: ${counts['PENDING']} ${generateProgressBar(counts['PENDING'], total)}  ` +
+                `ENG-REV: ${counts['ENG REVIEW']} ${generateProgressBar(counts['ENG REVIEW'], total)}  ` +
+                `APPR: ${counts['OUT FOR APPROVAL']} ${generateProgressBar(counts['OUT FOR APPROVAL'], total)}  ` +
+                `RELEASED: ${counts['RELEASED']} ${generateProgressBar(counts['RELEASED'], total)}`;
+            
+            // Thiết lập font và in ra PDF
+            doc.setFont("courier", "bold"); // Dùng font Courier để các ký tự vuông vức, thẳng hàng
+            doc.setFontSize(9);
+            doc.text(summaryLine, 14, 20); // In tại vị trí x=14, y=20
             
             doc.autoTable({
                 head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
