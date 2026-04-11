@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/simplemde@1.11.2/dist/simplemde.min.css">
     <script src="https://cdn.jsdelivr.net/combine/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script>
         tailwind.config = {
             darkMode: 'class' // Ép Tailwind nghe lời class "dark" mình vừa viết
@@ -327,30 +327,36 @@
         }
         .editor-toolbar i { color: #334155 !important; }
         
-        /* 1. Ép tất cả icon trong toolbar phải hiện màu */
-        .editor-toolbar i, 
-        .editor-toolbar a, 
-        .editor-toolbar button {
-            color: #1e293b !important; /* Màu xám đen đậm cực rõ */
+        /* Trị dứt điểm vụ icon tàng hình */
+        .editor-toolbar {
+            background-color: #f8fafc !important; /* Nền trắng xám cho toolbar */
+            border: 1px solid #475569 !important;
             opacity: 1 !important;
-            -webkit-text-fill-color: #1e293b !important; /* Dành cho một số trình duyệt kén màu */
         }
         
-        /* 2. Nếu bồ đang dùng Dark Mode mà muốn Toolbar cũng tối luôn nhưng icon màu trắng: */
-        /* (Bỏ đoạn trên, dùng đoạn dưới này nếu muốn Toolbar đen icon trắng) */
-        .editor-toolbar { background: #1e293b !important; }
-        .editor-toolbar i { color: #ffffff !important; opacity: 1 !important; }
-       
-        
-        /* 3. Hiệu ứng khi hover vào icon */
-        .editor-toolbar a:hover i {
-            color: #0284c7 !important;
+        /* Ép tất cả icon hiện màu đen */
+        .editor-toolbar a, .editor-toolbar i {
+            color: #0f172a !important; /* Màu đen xanh */
+            opacity: 1 !important;
+            font-family: "FontAwesome" !important; /* Ép nó nhận diện font icon */
+            font-size: 16px !important;
         }
         
-        /* 4. Fix cái khung bao quanh icon cho nó tách bạch */
-        .editor-toolbar a {
-            border: 1px solid transparent !important;
-            margin: 0 2px !important;
+        /* Khi di chuột vào icon */
+        .editor-toolbar a:hover {
+            background-color: #cbd5e1 !important;
+        }
+        
+        /* Fix cái vùng soạn thảo cho chữ nó hiện lên (không bị đen thui) */
+        .CodeMirror {
+            background: #ffffff !important; /* Cho nền soạn thảo màu trắng luôn cho lành bồ ạ */
+            color: #1e293b !important;
+            font-size: 16px !important;
+        }
+        
+        /* Đảm bảo chữ bồ gõ vào không bị tàng hình */
+        .CodeMirror-code {
+            color: #1e293b !important;
         }
     </style>
 </head>
