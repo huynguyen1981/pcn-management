@@ -889,13 +889,28 @@
         
         async function loadTasks() {
             try {
-            
                 const res = await fetch(SCRIPT_URL);
-                allTasks = await res.json();
+                const data = await res.json(); // Bây giờ data là { tasks: [...], notes: [...] }
+        
+                // 1. Gán đúng mảng tasks cho allTasks để hàm applyFilters() không bị lỗi .filter
+                allTasks = data.tasks || []; 
+                
+                // 2. Gán mảng notes vào biến global để tí nữa mình render cái Wall
+                allNotes = data.notes || []; 
+        
                 updatingId = null;
+                
+                // 3. Chạy lọc và hiển thị bảng PCN như cũ
                 applyFilters(); 
-               
+        
+                // 4. TIỆN TAY: Nếu đang ở trang Note thì vẽ luôn cái Wall
+                if (typeof renderNoteWall === "function") {
+                    renderNoteWall(allNotes);
+                }
+                
             } catch (e) { 
+                console.error("Lỗi load data bồ ơi:", e);
+                allTasks = []; // Chống cháy bằng mảng rỗng để không bị crash
                 updatingId = null;
                 applyFilters(); 
             }
