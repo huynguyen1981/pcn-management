@@ -326,6 +326,38 @@
             border-top-right-radius: 12px !important;
         }
         .editor-toolbar i { color: #334155 !important; }
+        /* 1. Làm cho Toolbar nổi khối và dễ nhìn hơn */
+        .editor-toolbar {
+            background-color: #f1f5f9 !important; /* Màu nền xám trắng rất nhẹ */
+            border: 1px solid #cbd5e1 !important;
+            opacity: 1 !important;
+        }
+        
+        /* 2. Làm cho các icon hiện rõ mồn một */
+        .editor-toolbar a {
+            color: #334155 !important; /* Màu xám đậm chuẩn icon */
+            opacity: 0.8;
+        }
+        
+        /* 3. Hiệu ứng khi di chuột vào icon cho nó 'pro' */
+        .editor-toolbar a:hover {
+            background-color: #e2e8f0 !important;
+            color: #0284c7 !important; /* Đổi sang màu xanh khi hover */
+            opacity: 1;
+        }
+        
+        /* 4. Riêng nút 'con mắt' khi đang bật (active) thì cho nó màu khác để biết */
+        .editor-toolbar a.active {
+            background-color: #0284c7 !important;
+            color: white !important;
+        }
+        
+        /* 5. Fix luôn cái viền của cả bộ soạn thảo cho đồng bộ */
+        .CodeMirror {
+            border: 1px solid #cbd5e1 !important;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
