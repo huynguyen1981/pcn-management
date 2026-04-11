@@ -325,38 +325,46 @@
             border-top-left-radius: 12px !important;
             border-top-right-radius: 12px !important;
         }
+        
         .editor-toolbar i { color: #334155 !important; }
         
-        /* Trị dứt điểm vụ icon tàng hình */
+        /* --- TRỊ DỨT ĐIỂM LỖI "CON MẮT" (PREVIEW) --- */
+
+        /* 1. Ép nền của khu vực Preview luôn là màu giấy note vàng nhạt */
+        .editor-preview-active, .editor-preview {
+            background-color: #fff9c4 !important; /* Màu vàng giấy note */
+            color: #1a1a1a !important;            /* Chữ đen đậm */
+            display: block !important;            /* Đảm bảo nó hiện ra */
+            opacity: 1 !important;
+            z-index: 9999 !important;
+        }
+        
+        /* 2. Ép màu chữ cho các thẻ bên trong Preview để không bị hưởng Dark Mode */
+        .editor-preview-active *, .editor-preview * {
+            color: #1a1a1a !important; 
+            line-height: 1.6 !important;
+        }
+        
+        /* 3. Định dạng tiêu đề và danh sách cho đẹp trên nền giấy */
+        .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3 {
+            color: #854d0e !important; /* Màu nâu đất cho tiêu đề */
+            margin-bottom: 10px !important;
+        }
+        
+        .editor-preview-active ul, .editor-preview-active ol {
+            padding-left: 20px !important;
+            list-style: disc !important; /* Hiện dấu chấm đầu dòng */
+            margin: 10px 0 !important;
+        }
+        
+        /* 4. Fix lỗi Toolbar tàng hình (Bản cập nhật) */
         .editor-toolbar {
-            background-color: #f8fafc !important; /* Nền trắng xám cho toolbar */
-            border: 1px solid #475569 !important;
-            opacity: 1 !important;
+            background: #ffffff !important;
+            border-top: 1px solid #ddd !important;
         }
-        
-        /* Ép tất cả icon hiện màu đen */
         .editor-toolbar a, .editor-toolbar i {
-            color: #0f172a !important; /* Màu đen xanh */
+            color: #334155 !important; /* Icon màu xám đậm */
             opacity: 1 !important;
-            font-family: "FontAwesome" !important; /* Ép nó nhận diện font icon */
-            font-size: 16px !important;
-        }
-        
-        /* Khi di chuột vào icon */
-        .editor-toolbar a:hover {
-            background-color: #cbd5e1 !important;
-        }
-        
-        /* Fix cái vùng soạn thảo cho chữ nó hiện lên (không bị đen thui) */
-        .CodeMirror {
-            background: #ffffff !important; /* Cho nền soạn thảo màu trắng luôn cho lành bồ ạ */
-            color: #1e293b !important;
-            font-size: 16px !important;
-        }
-        
-        /* Đảm bảo chữ bồ gõ vào không bị tàng hình */
-        .CodeMirror-code {
-            color: #1e293b !important;
         }
     </style>
 </head>
