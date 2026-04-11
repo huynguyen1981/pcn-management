@@ -326,37 +326,32 @@
             border-top-right-radius: 12px !important;
         }
         .editor-toolbar i { color: #334155 !important; }
-        /* 1. Làm cho Toolbar nổi khối và dễ nhìn hơn */
-        .editor-toolbar {
-            background-color: #f1f5f9 !important; /* Màu nền xám trắng rất nhẹ */
-            border: 1px solid #cbd5e1 !important;
+        
+        /* 1. Ép tất cả icon trong toolbar phải hiện màu */
+        .editor-toolbar i, 
+        .editor-toolbar a, 
+        .editor-toolbar button {
+            color: #1e293b !important; /* Màu xám đen đậm cực rõ */
             opacity: 1 !important;
+            -webkit-text-fill-color: #1e293b !important; /* Dành cho một số trình duyệt kén màu */
         }
         
-        /* 2. Làm cho các icon hiện rõ mồn một */
+        /* 2. Nếu bồ đang dùng Dark Mode mà muốn Toolbar cũng tối luôn nhưng icon màu trắng: */
+        /* (Bỏ đoạn trên, dùng đoạn dưới này nếu muốn Toolbar đen icon trắng) */
+        /*
+        .editor-toolbar { background: #1e293b !important; }
+        .editor-toolbar i { color: #ffffff !important; opacity: 1 !important; }
+        */
+        
+        /* 3. Hiệu ứng khi hover vào icon */
+        .editor-toolbar a:hover i {
+            color: #0284c7 !important;
+        }
+        
+        /* 4. Fix cái khung bao quanh icon cho nó tách bạch */
         .editor-toolbar a {
-            color: #334155 !important; /* Màu xám đậm chuẩn icon */
-            opacity: 0.8;
-        }
-        
-        /* 3. Hiệu ứng khi di chuột vào icon cho nó 'pro' */
-        .editor-toolbar a:hover {
-            background-color: #e2e8f0 !important;
-            color: #0284c7 !important; /* Đổi sang màu xanh khi hover */
-            opacity: 1;
-        }
-        
-        /* 4. Riêng nút 'con mắt' khi đang bật (active) thì cho nó màu khác để biết */
-        .editor-toolbar a.active {
-            background-color: #0284c7 !important;
-            color: white !important;
-        }
-        
-        /* 5. Fix luôn cái viền của cả bộ soạn thảo cho đồng bộ */
-        .CodeMirror {
-            border: 1px solid #cbd5e1 !important;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
+            border: 1px solid transparent !important;
+            margin: 0 2px !important;
         }
     </style>
 </head>
