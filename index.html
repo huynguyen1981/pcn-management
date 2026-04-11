@@ -647,6 +647,12 @@
         // --- BIẾN TOÀN CỤC ---
         let simplemde; 
         let allNotes = []; // Mảng chứa dữ liệu note từ Sheet
+
+        // 1. Dán dòng cấu hình này ở ĐẦU file script (ngoài các hàm)
+        marked.setOptions({
+            breaks: true,  // Gõ Enter là xuống dòng luôn
+            gfm: true      // Dùng chuẩn GitHub Markdown
+        });
         
         // --- 1. LOGIC BẬT/TẮT TRANG (KIỂU CONVERTER) ---
         function toggleNoteWall() {
@@ -678,7 +684,7 @@
             }
         }
         
-        // --- 2. RENDER THE NOTE WALL (HIỆU ỨNG GHIM GIẤY) ---
+        // 2. Hàm render đã được "tân trang"
         function renderNoteWall(notes) {
             allNotes = notes || []; 
             const wall = document.getElementById('note-wall');
@@ -689,23 +695,30 @@
                 // note[0]: ID, note[1]: Title, note[2]: Content, note[4]: ModifiedDate
                 const dateStr = note[4] ? new Date(note[4]).toLocaleDateString('vi-VN') : 'Mới';
                 
-                // Dùng marked.parse để biến Markdown trong Sheet thành HTML màu mè
-                const contentPreview = marked.parse(note[2] ? note[2].substring(0, 120) + "..." : "Trống..."); 
+                // Cắt bớt nội dung nhưng vẫn đảm bảo là text thuần trước khi parse
+                const rawContent = note[2] || "";
+                const shortContent = rawContent.length > 150 ? rawContent.substring(0, 150) + "..." : rawContent;
+                
+                // Biến Markdown thành HTML
+                const contentHtml = marked.parse(shortContent);
         
                 const noteHtml = `
-                    <div class="sticky-note bg-amber-50 dark:bg-[#fff9c4] p-5 rounded-lg shadow-md border-l-4 border-amber-300 dark:border-amber-400 cursor-pointer flex flex-col h-64 gap-2 relative text-slate-900 group" 
+                    <div class="sticky-note bg-amber-50 dark:bg-[#fff9c4] p-5 rounded-lg shadow-md border-l-4 border-amber-300 dark:border-amber-400 cursor-pointer flex flex-col h-72 gap-2 relative text-slate-900 group" 
                          onclick="openNoteEditor('${note[0]}')">
                         
                         <div class="absolute top-2 right-2 w-3 h-3 bg-red-600 rounded-full shadow-inner border border-red-700 group-hover:scale-125 transition-transform"></div>
         
-                        <h3 class="text-lg font-bold text-amber-950 line-clamp-2 leading-tight">${note[1] || 'Ghi chú mới'}</h3>
+                        <h3 class="text-lg font-bold text-amber-950 line-clamp-2 leading-tight mb-1 border-b border-amber-200/50 pb-1">
+                            ${note[1] || 'Ghi chú mới'}
+                        </h3>
                         
-                        <div class="prose prose-sm text-amber-900/80 line-clamp-4 flex-1 overflow-hidden pointer-events-none">
-                            ${contentPreview}
+                        <div class="prose prose-sm text-amber-900/90 flex-1 overflow-hidden pointer-events-none italic leading-relaxed">
+                            ${contentHtml}
                         </div>
                         
-                        <div class="text-[10px] uppercase tracking-wider text-amber-700/60 border-t border-amber-200/50 pt-2 mt-auto font-bold">
-                            Cập nhật: ${dateStr}
+                        <div class="text-[10px] uppercase tracking-wider text-amber-700/60 border-t border-amber-200/50 pt-2 mt-auto font-bold flex justify-between">
+                            <span>📅 ${dateStr}</span>
+                            <span class="opacity-0 group-hover:opacity-100 transition-opacity">Chỉnh sửa ✎</span>
                         </div>
                     </div>
                 `;
