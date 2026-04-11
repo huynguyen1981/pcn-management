@@ -302,69 +302,80 @@
             transform: scale(1.05) rotate(0deg); /* Phóng to và thẳng lại khi hover */
             z-index: 10;
         }
-        /* Trị lỗi trắng xóa khi nhấn Preview SimpleMDE */
-        .editor-preview {
-            background-color: #fff9c4 !important; /* Màu giấy note vàng nhạt */
-            color: #1a1a1a !important;            /* Chữ đen đậm cho dễ đọc */
-        }
+        /* ============================================================
+           SIÊU CSS TRỊ DỨT ĐIỂM SIMPLEMDE (TOOLBAR & PREVIEW)
+           ============================================================ */
         
-        /* Định dạng các thẻ bên trong Preview cho đẹp */
-        .editor-preview h1, .editor-preview h2, .editor-preview h3 {
-            color: #78350f !important; /* Màu tiêu đề nâu gỗ */
-            font-weight: bold !important;
-        }
-        
-        .editor-preview ul, .editor-preview ol {
-            padding-left: 1.5rem !important;
-            list-style: disc !important;
-        }
-        
-        /* Fix luôn cái toolbar nếu nó bị mờ */
+        /* 1. Fix Toolbar: Nền trắng, Icon đen rõ mồn một */
         .editor-toolbar {
-            background: #f8fafc !important;
+            background-color: #ffffff !important;
+            border: 1px solid #cbd5e1 !important;
             border-top-left-radius: 12px !important;
             border-top-right-radius: 12px !important;
-        }
-        
-        .editor-toolbar i { color: #334155 !important; }
-        
-        /* --- TRỊ DỨT ĐIỂM LỖI "CON MẮT" (PREVIEW) --- */
-
-        /* 1. Ép nền của khu vực Preview luôn là màu giấy note vàng nhạt */
-        .editor-preview-active, .editor-preview {
-            background-color: #fff9c4 !important; /* Màu vàng giấy note */
-            color: #1a1a1a !important;            /* Chữ đen đậm */
-            display: block !important;            /* Đảm bảo nó hiện ra */
             opacity: 1 !important;
-            z-index: 9999 !important;
         }
         
-        /* 2. Ép màu chữ cho các thẻ bên trong Preview để không bị hưởng Dark Mode */
-        .editor-preview-active *, .editor-preview * {
-            color: #1a1a1a !important; 
-            line-height: 1.6 !important;
+        .editor-toolbar a, 
+        .editor-toolbar i, 
+        .editor-toolbar button {
+            color: #334155 !important; /* Màu xám đậm */
+            opacity: 1 !important;
+            font-size: 16px !important;
         }
         
-        /* 3. Định dạng tiêu đề và danh sách cho đẹp trên nền giấy */
+        .editor-toolbar a:hover {
+            background-color: #f1f5f9 !important;
+            color: #0284c7 !important;
+        }
+        
+        /* 2. Fix Vùng soạn thảo: Nền tối chữ sáng (theo Dark Mode của bồ) */
+        .CodeMirror {
+            background: #1e293b !important; /* Nền xanh đen */
+            color: #f8fafc !important;      /* Chữ trắng xanh */
+            border: 1px solid #cbd5e1 !important;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
+            font-family: 'Fira Code', monospace;
+        }
+        
+        /* 3. Fix Preview (Nút con mắt): Giấy vàng chữ đen - KHÔNG BỊ ÁM DARK MODE */
+        .editor-preview-active, 
+        .editor-preview {
+            background-color: #fff9c4 !important; /* Vàng giấy note */
+            color: #1a1a1a !important;            /* Đen đậm */
+            padding: 20px !important;
+            z-index: 10 !important;
+        }
+        
+        /* Ép tất cả các thẻ con bên trong Preview phải hiện màu đen */
+        .editor-preview-active *, 
+        .editor-preview * {
+            color: #1a1a1a !important;
+            background-color: transparent !important;
+        }
+        
+        /* Định dạng tiêu đề và danh sách cho đúng chuẩn bồ yêu cầu */
         .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3 {
-            color: #854d0e !important; /* Màu nâu đất cho tiêu đề */
-            margin-bottom: 10px !important;
+            color: #854d0e !important; /* Nâu đất */
+            font-weight: bold !important;
+            margin-top: 10px !important;
         }
         
-        .editor-preview-active ul, .editor-preview-active ol {
-            padding-left: 20px !important;
-            list-style: disc !important; /* Hiện dấu chấm đầu dòng */
-            margin: 10px 0 !important;
+        .editor-preview-active ul {
+            list-style-type: disc !important;
+            padding-left: 25px !important;
         }
         
-        /* 4. Fix lỗi Toolbar tàng hình (Bản cập nhật) */
-        .editor-toolbar {
-            background: #ffffff !important;
-            border-top: 1px solid #ddd !important;
+        .editor-preview-active ol {
+            list-style-type: decimal !important;
+            padding-left: 25px !important;
         }
-        .editor-toolbar a, .editor-toolbar i {
-            color: #334155 !important; /* Icon màu xám đậm */
-            opacity: 1 !important;
+        
+        /* Màu của các đường kẻ chia bảng gạch ngang trong toolbar */
+        .editor-toolbar .separator {
+            border-right: 1px solid #ddd !important;
+            border-left: 0 !important;
+            margin: 0 4px !important;
         }
     </style>
 </head>
