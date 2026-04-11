@@ -715,7 +715,13 @@
         
         // --- 3. MỞ MODAL SOẠN THẢO (SIMPLEMDE) ---
         function openNoteEditor(noteId) {
-            document.getElementById('noteModal').classList.remove('hidden');
+            const modal = document.getElementById('noteModal');
+            if (!modal) {
+                console.error("Bồ ơi, quên dán cái HTML Modal 'noteModal' rồi kìa!");
+                return;
+            }
+            modal.classList.remove('hidden');
+            
             const btnSave = document.getElementById('btnSaveNote');
             const btnDelete = document.getElementById('btnDeleteNote');
         
@@ -2001,5 +2007,31 @@
     </div>
     <!-- ---------END CONVERSION---------- -->
 
+    <!-- -----------------NOTE--------------------- -->
+    <div id="noteModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
+        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
+            <input type="hidden" id="noteId"> 
+            
+            <input type="text" id="noteTitle" placeholder="Tiêu đề ghi chú..." 
+                   class="text-2xl font-bold mb-4 p-2 bg-transparent border-b border-slate-200 dark:border-slate-700 dark:text-white outline-none w-full">
+            
+            <div class="flex-1 overflow-hidden border rounded-xl dark:border-slate-700">
+                <textarea id="noteEditor"></textarea>
+            </div>
+            
+            <div class="flex justify-between items-center mt-6">
+                <button onclick="deleteNoteFromEditor()" id="btnDeleteNote" class="px-4 py-2 text-red-500 font-bold hidden hover:bg-red-50 rounded-lg transition-colors">
+                    🗑️ Xóa Note
+                </button>
+                <div class="flex gap-3 ml-auto">
+                    <button onclick="closeNoteModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Hủy</button>
+                    <button onclick="saveNote()" id="btnSaveNote" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 font-bold">
+                        Ghim lên Wall
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- ---------------------END NOTE--------------------- -->
 </body>
 </html>
