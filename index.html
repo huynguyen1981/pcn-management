@@ -302,6 +302,30 @@
             transform: scale(1.05) rotate(0deg); /* Phóng to và thẳng lại khi hover */
             z-index: 10;
         }
+        /* Trị lỗi trắng xóa khi nhấn Preview SimpleMDE */
+        .editor-preview {
+            background-color: #fff9c4 !important; /* Màu giấy note vàng nhạt */
+            color: #1a1a1a !important;            /* Chữ đen đậm cho dễ đọc */
+        }
+        
+        /* Định dạng các thẻ bên trong Preview cho đẹp */
+        .editor-preview h1, .editor-preview h2, .editor-preview h3 {
+            color: #78350f !important; /* Màu tiêu đề nâu gỗ */
+            font-weight: bold !important;
+        }
+        
+        .editor-preview ul, .editor-preview ol {
+            padding-left: 1.5rem !important;
+            list-style: disc !important;
+        }
+        
+        /* Fix luôn cái toolbar nếu nó bị mờ */
+        .editor-toolbar {
+            background: #f8fafc !important;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+        }
+        .editor-toolbar i { color: #334155 !important; }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -744,7 +768,12 @@
                     element: document.getElementById("noteEditor"),
                     spellChecker: false,
                     autosave: { enabled: true, uniqueId: "pcn_note_editor", delay: 1000 },
-                    status: false
+                    status: false,
+                    // Thêm cái này để lúc gõ nó không bị lẫn lộn màu
+                    renderingConfig: {
+                        singleLineBreaks: true,
+                        codeSyntaxHighlighting: true,
+                    },
                 });
             }
         
@@ -777,32 +806,58 @@
             const btn = document.getElementById('btnSaveNote');
             const noteId = document.getElementById('noteId').value;
             
+            // 1. Kiểm tra dữ liệu trước khi gửi (Tránh gửi rác lên Sheet)
+            const title = document.getElementById('noteTitle').value.trim();
+            const content = simplemde.value().trim();
+            
+            if (!title || !content) {
+                alert("Bồ ơi, nhập tiêu đề với nội dung đã chứ!");
+                return;
+            }
+        
             const payload = {
-                type: 'NOTE', // Để Apps Script phân loại với Task PCN
+                type: 'NOTE',
                 id: noteId,
-                title: document.getElementById('noteTitle').value,
-                content: simplemde.value(),
+                title: title,
+                content: content,
+                // Nếu là update thì lấy lại ngày tạo cũ, không thì để null cho Apps Script tự xử
                 dateCreated: noteId ? allNotes.find(n => n[0] === noteId)[3] : null
             };
         
+            // 2. Trạng thái đang xử lý
             btn.innerText = "Đang ghim...";
             btn.disabled = true;
         
             try {
+                console.log("Đang gửi dữ liệu...");
                 const res = await fetch(SCRIPT_URL, {
                     method: 'POST',
                     body: JSON.stringify(payload)
                 });
-                const result = await res.text();
                 
-                if (result.includes("Success")) {
-                    // Load lại toàn bộ data để cập nhật bảng ghim
-                    await loadTasks(); 
+                const result = await res.text();
+                console.log("Kết quả từ Server:", result);
+        
+                // 3. Nếu Server báo thành công (Có chữ Success hoặc Updated)
+                if (result.toLowerCase().includes("success") || result.toLowerCase().includes("updated")) {
+                    
+                    // TẮT MODAL NGAY LẬP TỨC CHO ĐỠ SỐT RUỘT
                     closeNoteModal();
+                    
+                    // CẬP NHẬT LẠI DỮ LIỆU (Gọi hàm loadTasks hiện hữu của bồ)
+                    // Lưu ý: Phải dùng await để nó lấy xong data mới render
+                    await loadTasks(); 
+                    
+                    console.log("Đã cập nhật bảng ghim mới nhất!");
+                } else {
+                    alert("Server báo lỗi: " + result);
                 }
+        
             } catch (err) {
-                alert("Lỗi lưu note rồi bồ ơi!");
+                console.error("Lỗi fetch:", err);
+                alert("Lỗi kết nối rồi bồ, check mạng hoặc SCRIPT_URL nhé!");
             } finally {
+                // Trả lại trạng thái nút ban đầu
                 btn.disabled = false;
                 btn.innerText = noteId ? 'Cập nhật ghi chú' : 'Ghim lên Wall';
             }
