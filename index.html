@@ -9,6 +9,10 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/combine/npm/simplemde@1.11.2/dist/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/combine/npm/simplemde@1.11.2/dist/simplemde.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
     <script>
         tailwind.config = {
             darkMode: 'class' // Ép Tailwind nghe lời class "dark" mình vừa viết
@@ -281,6 +285,23 @@
             background-color: #334155 !important;
         }
 
+        /* Tùy chỉnh SimpleMDE cho Dark Mode */
+        .dark .editor-toolbar, .dark .CodeMirror, .dark .editor-preview-side {
+            background: #1e293b !important; color: #f1f5f9 !important; border-color: #334155 !important;
+        }
+        .dark .editor-toolbar a { color: #f1f5f9 !important; }
+        .dark .editor-toolbar a.active, .dark .editor-toolbar a:hover { background: #334155 !important; }
+
+        /* Hiệu ứng ghim note - "Quả tim" của bồ đây */
+        .sticky-note {
+            transition: all 0.2s ease-in-out;
+            transform: rotate(-1deg); /* Xoay nhẹ cho tự nhiên */
+        }
+        .sticky-note:nth-child(even) { transform: rotate(1.5deg); }
+        .sticky-note:hover {
+            transform: scale(1.05) rotate(0deg); /* Phóng to và thẳng lại khi hover */
+            z-index: 10;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -296,7 +317,14 @@
              title="Quick Converter">
             <span class="text-xl group-hover:rotate-12 transition-transform">🔄</span>
         </div>
-    
+        
+        <div onclick="toggleNoteWall()" 
+             id="btn-note-wall"
+             class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 group border border-amber-100 dark:border-amber-800" 
+             title="Sticky Notes Wall">
+            <span class="text-xl group-hover:scale-110 transition-transform">📌</span>
+        </div>
+        
         <div class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></div>
         <nav id="sidebarNav" class="flex flex-col gap-6"></nav>
         
@@ -418,7 +446,7 @@
         </div>
         <!--END ------Sử dụng TAB------ -->
         
-        <div class="bg-white monday-card overflow-hidden">
+        <div id="section-pcn" class="bg-white monday-card overflow-hidden">
             <div class="container-fluid"> 
                   <div class="table-responsive-wrapper">
                     <table class="w-full text-left bg-slate-100 dark:bg-slate-700">
@@ -456,6 +484,18 @@
                  </div>
              </div>
         </div>
+        
+        <!-- -----------NOTE---------- -->
+        <div id="section-notes" class="hidden min-h-screen p-6 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+             <div class="flex justify-between items-center mb-6">
+                  <h2 class="text-2xl font-black">STICKY NOTES WALL</h2>
+                  <button onclick="openNoteEditor()" class="bg-blue-600 text-white px-4 py-2 rounded-xl">+ Thêm Note</button>
+             </div>
+             <div id="note-wall" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                  </div>
+        </div>
+        <!-- -----------END NOTE---------- -->
+        
         <footer class="mt-12 pb-8 text-center">
         <div class="flex flex-col items-center gap-2">
             <div class="w-20 h-[1px] bg-slate-200 mb-2"></div>
@@ -602,8 +642,37 @@
    
     
     <script>
-        // DATABASE MINI: Dễ dàng quản lý và mở rộng
-        // DATABASE MINI: Giờ chỉ cần dán link web vào là xong!
+
+        function toggleNoteWall() {
+            const pcnSection = document.getElementById('section-pcn'); // Cái bọc bảng PCN
+            const noteSection = document.getElementById('section-notes'); // Cái bọc Note Wall
+            const btnNote = document.getElementById('btn-note-wall');
+        
+            // Kiểm tra xem trang Note có đang ẩn không
+            const isNotesHidden = noteSection.classList.contains('hidden');
+        
+            if (isNotesHidden) {
+                // MỞ NOTE - ẨN PCN
+                pcnSection.classList.add('hidden');
+                noteSection.classList.remove('hidden');
+                
+                // Đổi màu nút cho "ngựa" một tí để biết đang ở trang Note
+                btnNote.classList.replace('bg-amber-50', 'bg-amber-500');
+                btnNote.classList.replace('text-amber-600', 'text-white');
+                
+                // Nếu bồ đang mở Converter thì tắt luôn cho đỡ rối
+                // if (typeof isConverterOpen !== 'undefined' && isConverterOpen) toggleConverter();
+            } else {
+                // ĐÓNG NOTE - HIỆN PCN
+                pcnSection.classList.remove('hidden');
+                noteSection.classList.add('hidden');
+                
+                // Trả màu nút về trạng thái ban đầu
+                btnNote.classList.replace('bg-amber-500', 'bg-amber-50');
+                btnNote.classList.replace('text-white', 'text-amber-600');
+            }
+        }
+        
         const SIDEBAR_LINKS = [
             { 
                 name: "Monday", 
@@ -777,7 +846,7 @@
                 }
             }
         }                        
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxMCCijp590EbD09MWJXyFv7lpiSup6IJ96OmhGUj8tSZRtYQWSjaGcybWzVLPR41k3iQ/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZBhPMuEDLVRNxg4DNvCh9MhPHc520-N73jQsbk6_Km7GvCy8-KCxSw2ul5hvdhyhfSg/exec";
         let allTasks = [];
         let updatingId = null;
         let sortAsc = true;
