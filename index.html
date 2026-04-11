@@ -643,12 +643,17 @@
     
     <script>
 
+        // ----------------NOTES--------------------
+        // --- BIẾN TOÀN CỤC ---
+        let simplemde; 
+        let allNotes = []; // Mảng chứa dữ liệu note từ Sheet
+        
+        // --- 1. LOGIC BẬT/TẮT TRANG (KIỂU CONVERTER) ---
         function toggleNoteWall() {
-            const pcnSection = document.getElementById('section-pcn'); // Cái bọc bảng PCN
-            const noteSection = document.getElementById('section-notes'); // Cái bọc Note Wall
+            const pcnSection = document.getElementById('section-pcn'); // Bọc bảng PCN
+            const noteSection = document.getElementById('section-notes'); // Bọc Note Wall
             const btnNote = document.getElementById('btn-note-wall');
         
-            // Kiểm tra xem trang Note có đang ẩn không
             const isNotesHidden = noteSection.classList.contains('hidden');
         
             if (isNotesHidden) {
@@ -656,22 +661,134 @@
                 pcnSection.classList.add('hidden');
                 noteSection.classList.remove('hidden');
                 
-                // Đổi màu nút cho "ngựa" một tí để biết đang ở trang Note
-                btnNote.classList.replace('bg-amber-50', 'bg-amber-500');
-                btnNote.classList.replace('text-amber-600', 'text-white');
+                // Đổi màu nút Sidebar cho "ngựa" tí
+                btnNote.classList.add('bg-amber-500', 'text-white');
+                btnNote.classList.remove('bg-amber-50', 'text-amber-600');
                 
-                // Nếu bồ đang mở Converter thì tắt luôn cho đỡ rối
-                // if (typeof isConverterOpen !== 'undefined' && isConverterOpen) toggleConverter();
+                // Render lại wall để đảm bảo dữ liệu mới nhất
+                renderNoteWall(allNotes);
             } else {
                 // ĐÓNG NOTE - HIỆN PCN
                 pcnSection.classList.remove('hidden');
                 noteSection.classList.add('hidden');
                 
-                // Trả màu nút về trạng thái ban đầu
-                btnNote.classList.replace('bg-amber-500', 'bg-amber-50');
-                btnNote.classList.replace('text-white', 'text-amber-600');
+                // Trả màu nút về ban đầu
+                btnNote.classList.remove('bg-amber-500', 'text-white');
+                btnNote.classList.add('bg-amber-50', 'text-amber-600');
             }
         }
+        
+        // --- 2. RENDER THE NOTE WALL (HIỆU ỨNG GHIM GIẤY) ---
+        function renderNoteWall(notes) {
+            allNotes = notes || []; 
+            const wall = document.getElementById('note-wall');
+            if (!wall) return;
+            wall.innerHTML = ''; 
+        
+            allNotes.forEach(note => {
+                // note[0]: ID, note[1]: Title, note[2]: Content, note[4]: ModifiedDate
+                const dateStr = note[4] ? new Date(note[4]).toLocaleDateString('vi-VN') : 'Mới';
+                
+                // Dùng marked.parse để biến Markdown trong Sheet thành HTML màu mè
+                const contentPreview = marked.parse(note[2] ? note[2].substring(0, 120) + "..." : "Trống..."); 
+        
+                const noteHtml = `
+                    <div class="sticky-note bg-amber-50 dark:bg-[#fff9c4] p-5 rounded-lg shadow-md border-l-4 border-amber-300 dark:border-amber-400 cursor-pointer flex flex-col h-64 gap-2 relative text-slate-900 group" 
+                         onclick="openNoteEditor('${note[0]}')">
+                        
+                        <div class="absolute top-2 right-2 w-3 h-3 bg-red-600 rounded-full shadow-inner border border-red-700 group-hover:scale-125 transition-transform"></div>
+        
+                        <h3 class="text-lg font-bold text-amber-950 line-clamp-2 leading-tight">${note[1] || 'Ghi chú mới'}</h3>
+                        
+                        <div class="prose prose-sm text-amber-900/80 line-clamp-4 flex-1 overflow-hidden pointer-events-none">
+                            ${contentPreview}
+                        </div>
+                        
+                        <div class="text-[10px] uppercase tracking-wider text-amber-700/60 border-t border-amber-200/50 pt-2 mt-auto font-bold">
+                            Cập nhật: ${dateStr}
+                        </div>
+                    </div>
+                `;
+                wall.innerHTML += noteHtml;
+            });
+        }
+        
+        // --- 3. MỞ MODAL SOẠN THẢO (SIMPLEMDE) ---
+        function openNoteEditor(noteId) {
+            document.getElementById('noteModal').classList.remove('hidden');
+            const btnSave = document.getElementById('btnSaveNote');
+            const btnDelete = document.getElementById('btnDeleteNote');
+        
+            // Khởi tạo Editor nếu chưa có
+            if (!simplemde) {
+                simplemde = new SimpleMDE({ 
+                    element: document.getElementById("noteEditor"),
+                    spellChecker: false,
+                    autosave: { enabled: true, uniqueId: "pcn_note_editor", delay: 1000 },
+                    status: false
+                });
+            }
+        
+            if (noteId) {
+                // CHẾ ĐỘ EDIT
+                const note = allNotes.find(n => n[0] === noteId);
+                if (note) {
+                    document.getElementById('noteId').value = note[0];
+                    document.getElementById('noteTitle').value = note[1];
+                    simplemde.value(note[2]);
+                    btnSave.innerText = 'Cập nhật ghi chú';
+                    btnDelete.classList.remove('hidden');
+                }
+            } else {
+                // CHẾ ĐỘ TẠO MỚI
+                document.getElementById('noteId').value = '';
+                document.getElementById('noteTitle').value = '';
+                simplemde.value('');
+                btnSave.innerText = 'Ghim lên Wall';
+                btnDelete.classList.add('hidden');
+            }
+        }
+        
+        function closeNoteModal() {
+            document.getElementById('noteModal').classList.add('hidden');
+        }
+        
+        // --- 4. GỬI DỮ LIỆU LÊN APPS SCRIPT ---
+        async function saveNote() {
+            const btn = document.getElementById('btnSaveNote');
+            const noteId = document.getElementById('noteId').value;
+            
+            const payload = {
+                type: 'NOTE', // Để Apps Script phân loại với Task PCN
+                id: noteId,
+                title: document.getElementById('noteTitle').value,
+                content: simplemde.value(),
+                dateCreated: noteId ? allNotes.find(n => n[0] === noteId)[3] : null
+            };
+        
+            btn.innerText = "Đang ghim...";
+            btn.disabled = true;
+        
+            try {
+                const res = await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.text();
+                
+                if (result.includes("Success")) {
+                    // Load lại toàn bộ data để cập nhật bảng ghim
+                    await loadTasks(); 
+                    closeNoteModal();
+                }
+            } catch (err) {
+                alert("Lỗi lưu note rồi bồ ơi!");
+            } finally {
+                btn.disabled = false;
+                btn.innerText = noteId ? 'Cập nhật ghi chú' : 'Ghim lên Wall';
+            }
+        }
+        // ------------------END NOTES----------------
         
         const SIDEBAR_LINKS = [
             { 
