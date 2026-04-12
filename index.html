@@ -750,7 +750,8 @@
             wall.innerHTML = ''; 
         
             allNotes.forEach((note, index) => {
-                // 1. LẤY MÀU: Ưu tiên note[3], nếu trống thì dùng màu mặc định
+                // CHỈ KHAI BÁO 1 LẦN DUY NHẤT Ở ĐÂY
+                // note[3] là cột Color trong Sheet của bồ
                 const savedColor = note[3] || '#fff9c4'; 
                 
                 const dateStr = note[4] ? new Date(note[4]).toLocaleDateString('vi-VN') : 'Mới';
@@ -758,26 +759,25 @@
                 const shortContent = rawContent.length > 150 ? rawContent.substring(0, 150) + "..." : rawContent;
                 const contentHtml = marked.parse(shortContent);
         
-                // Trong vòng lặp forEach của renderNoteWall:
-                const savedColor = note[3] || '#fff9c4';
-                
+                // Lưu ý: Tui dùng !important ở style để trị dứt điểm vụ trong suốt
                 const noteHtml = `
                     <div class="sticky-note p-5 rounded-2xl shadow-lg border-l-8 border-black/10 cursor-pointer flex flex-col h-72 gap-2 relative transition-all hover:scale-[1.02]" 
                          style="background-color: ${savedColor} !important;" 
                          onclick="openNoteEditor('${note[0]}')">
                         
                         <div class="absolute top-3 right-3 w-3 h-3 bg-red-600 rounded-full shadow-inner border border-white/20"></div>
-                
-                        <h3 class="text-lg font-black line-clamp-2 leading-tight mb-1 border-b border-black/5 pb-1">
+        
+                        <h3 class="text-lg font-black text-slate-900 line-clamp-2 leading-tight mb-1 border-b border-black/5 pb-1">
                             ${note[1] || 'Ghi chú mới'}
                         </h3>
                         
-                        <div class="prose prose-sm flex-1 overflow-hidden pointer-events-none leading-relaxed">
+                        <div class="prose prose-sm text-slate-800 flex-1 overflow-hidden pointer-events-none leading-relaxed">
                             ${contentHtml}
                         </div>
                         
-                        <div class="text-[10px] uppercase tracking-wider opacity-60 border-t border-black/5 pt-2 mt-auto font-bold">
-                            📅 ${dateStr}
+                        <div class="text-[10px] uppercase tracking-wider text-slate-500 border-t border-black/5 pt-2 mt-auto font-bold flex justify-between">
+                            <span>📅 ${dateStr}</span>
+                            <span class="opacity-30">#${note[0].substring(0,4)}</span>
                         </div>
                     </div>
                 `;
