@@ -306,50 +306,55 @@
            SIÊU CSS TRỊ DỨT ĐIỂM SIMPLEMDE (TOOLBAR & PREVIEW)
            ============================================================ */
         
-       /* TRỊ DỨT ĐIỂM LỖI TÀNG HÌNH TRONG PREVIEW */
-
-        /* 1. Ép khung Preview phải hiện ra và có nền vàng */
-        .editor-preview-active, 
-        .editor-preview,
-        .editor-preview-side {
-            background-color: #fff9c4 !important; /* Màu giấy note */
-            color: #0f172a !important;            /* Chữ đen đậm */
-            opacity: 1 !important;
-            display: block !important;
-            visibility: visible !important;
+       /* 1. Ép Preview phải nằm đè lên đúng vị trí của textarea, không được bay ra ngoài */
+        .editor-preview-active, .editor-preview {
+            position: absolute !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            z-index: 50 !important;
+            background-color: #fff9c4 !important; /* Màu giấy */
+            color: #1a1a1a !important;            /* Chữ đen */
         }
         
-        /* 2. CỰC QUAN TRỌNG: Ép toàn bộ nội dung Markdown (p, li, h1, h2...) phải màu đen */
-        .editor-preview-active p, .editor-preview p,
-        .editor-preview-active li, .editor-preview li,
-        .editor-preview-active span, .editor-preview span,
-        .editor-preview-active div, .editor-preview div,
-        .editor-preview-active strong, .editor-preview strong,
-        .editor-preview-active em, .editor-preview em {
-            color: #0f172a !important; 
+        /* 2. Ép toàn bộ nội dung bên trong Preview hiện hình */
+        .editor-preview-active *, .editor-preview * {
+            color: #1a1a1a !important;
+        }
+        
+        /* 3. Trị dứt điểm vụ Wall trong suốt */
+        .sticky-note {
+            background-image: none !important;
+        }
+        .sticky-note h3, .sticky-note .prose *, .sticky-note span {
+            color: #0f172a !important; /* Chữ trên Wall cũng phải đen */
+        }
+        /* --- CSS HÒA GIẢI GIỮA STICKER PASTEL VÀ DARK MODE --- */
+
+        /* Ép toàn bộ con cái bên trong prose-clean (trừ h3) phải hiện màu tối */
+        .prose-clean p, .prose-clean ul, .prose-clean ol, .prose-clean li, 
+        .prose-clean strong, .prose-clean em, .prose-clean span {
+            color: #1e293b !important; /* Màu xám đen cực đậm */
             background: transparent !important;
         }
         
-        /* 3. Tiêu đề và danh sách */
-        .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3,
-        .editor-preview h1, .editor-preview h2, .editor-preview h3 {
-            color: #854d0e !important; /* Nâu đất */
-            font-weight: 800 !important;
-        }
-        
-        .editor-preview-active ul, .editor-preview ol {
+        /* Định dạng danh sách cho đẹp */
+        .prose-clean ul {
             list-style: disc !important;
-            padding-left: 2rem !important;
-            color: #0f172a !important;
+            padding-left: 1.25rem !important;
+            margin-bottom: 0.5rem !important;
         }
         
-        /* 4. Fix luôn cái Toolbar trắng rực để bồ dễ thấy nút */
-        .editor-toolbar {
-            background: #ffffff !important;
+        .prose-clean ol {
+            list-style: decimal !important;
+            padding-left: 1.25rem !important;
+            margin-bottom: 0.5rem !important;
         }
-        .editor-toolbar i, .editor-toolbar a {
-            color: #334155 !important;
-            opacity: 1 !important;
+        
+        /* Đảm bảo khi hover, sticker không bị dính filter tối của Tailwind */
+        .sticky-note:hover {
+            filter: none !important;
         }
     </style>
 </head>
@@ -752,23 +757,29 @@
         
                 // Lưu ý: Tui dùng !important ở style để trị dứt điểm vụ trong suốt
                 const noteHtml = `
-                    <div class="sticky-note p-5 rounded-2xl shadow-lg border-l-8 border-black/10 cursor-pointer flex flex-col h-72 gap-2 relative transition-all hover:scale-[1.02]" 
-                         style="background-color: ${savedColor} !important;" 
+                    <div class="sticky-note p-6 rounded-3xl cursor-pointer flex flex-col h-80 gap-3 relative transition-all hover:scale-[1.02] hover:-rotate-1" 
+                         style="background-color: ${savedColor} !important; 
+                                color: #0f172a !important; 
+                                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -5px rgba(0, 0, 0, 0.2);
+                                border: 1px solid rgba(0, 0, 0, 0.1);" 
                          onclick="openNoteEditor('${note[0]}')">
                         
-                        <div class="absolute top-3 right-3 w-3 h-3 bg-red-600 rounded-full shadow-inner border border-white/20"></div>
-        
-                        <h3 class="text-lg font-black text-slate-900 line-clamp-2 leading-tight mb-1 border-b border-black/5 pb-1">
+                        <div class="absolute top-4 right-4 w-4 h-4 bg-red-600 rounded-full border-2 border-white/50 shadow-inner"></div>
+                
+                        <h3 class="text-xl font-black line-clamp-2 leading-tight mb-2 pb-2"
+                            style="color: #0f172a !important; border-bottom: 1px solid rgba(0, 0, 0, 0.05) !important;">
                             ${note[1] || 'Ghi chú mới'}
                         </h3>
                         
-                        <div class="prose prose-sm text-slate-800 flex-1 overflow-hidden pointer-events-none leading-relaxed">
+                        <div class="prose-clean text-slate-800 flex-1 overflow-hidden pointer-events-none leading-relaxed font-medium"
+                             style="color: #1e293b !important;">
                             ${contentHtml}
                         </div>
                         
-                        <div class="text-[10px] uppercase tracking-wider text-slate-500 border-t border-black/5 pt-2 mt-auto font-bold flex justify-between">
+                        <div class="text-[11px] uppercase tracking-wider font-bold mt-auto pt-3 flex justify-between items-center"
+                             style="border-top: 1px solid rgba(0, 0, 0, 0.05) !important; color: #1e293b !important; opacity: 0.7;">
                             <span>📅 ${dateStr}</span>
-                            <span class="opacity-30">#${note[0].substring(0,4)}</span>
+                            <span class="bg-black/10 px-2 py-0.5 rounded-full font-mono">#NOTE</span>
                         </div>
                     </div>
                 `;
@@ -801,12 +812,16 @@
                     },
                 });
         
-                // TUYỆT CHIÊU 1: Ép màu khi bồ nhấn nút Preview (Con mắt)
-                simplemde.codemirror.on("update", function(){
+                // Cưỡng chế màu sắc mỗi khi có thay đổi
+                simplemde.codemirror.on("update", function() {
                     const preview = document.querySelector('.editor-preview-active');
                     if (preview) {
-                        preview.style.backgroundColor = "#fff9c4"; // Nền vàng
-                        preview.style.color = "#0f172a";           // Chữ đen đậm
+                        preview.style.backgroundColor = "#fff9c4";
+                        preview.style.color = "#1a1a1a";
+                        // Nếu nó vẫn bay ra ngoài, JS sẽ kéo nó về
+                        preview.style.position = "absolute";
+                        preview.style.top = "0";
+                        preview.style.left = "0";
                     }
                 });
             }
@@ -2163,7 +2178,7 @@
 
     <!-- -----------------NOTE--------------------- -->
     <div id="noteModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-        <div class="bg-white p-6 md:p-8 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
+        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
             <input type="hidden" id="noteId"> 
             <input type="hidden" id="selectedColor" value="#fff9c4">
             
@@ -2173,26 +2188,26 @@
             <div class="flex items-center gap-4 mb-4 p-3 bg-slate-50 dark:bg-slate-700/30 rounded-2xl border border-slate-100 dark:border-slate-700">
                 <span class="text-xs font-black uppercase tracking-widest text-slate-400 ml-2">Màu giấy:</span>
                 <div class="flex gap-3" id="colorPickerContainer">
-                    <button onclick="selectNoteColor('#fff9c4', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125 ring-2 ring-amber-400" style="background-color: #fff9c4;"></button>
-                    <button onclick="selectNoteColor('#fee2e2', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125" style="background-color: #fee2e2;"></button>
-                    <button onclick="selectNoteColor('#dcfce7', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125" style="background-color: #dcfce7;"></button>
-                    <button onclick="selectNoteColor('#e0e7ff', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125" style="background-color: #e0e7ff;"></button>
-                    <button onclick="selectNoteColor('#faf5ff', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125" style="background-color: #faf5ff;"></button>
-                    <button onclick="selectNoteColor('#f1f5f9', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm transition-transform hover:scale-125" style="background-color: #f1f5f9;"></button>
+                    <button onclick="selectNoteColor('#fff9c4', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #fff9c4;"></button>
+                    <button onclick="selectNoteColor('#fee2e2', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #fee2e2;"></button>
+                    <button onclick="selectNoteColor('#dcfce7', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #dcfce7;"></button>
+                    <button onclick="selectNoteColor('#e0e7ff', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #e0e7ff;"></button>
+                    <button onclick="selectNoteColor('#faf5ff', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #faf5ff;"></button>
+                    <button onclick="selectNoteColor('#f1f5f9', this)" class="w-6 h-6 rounded-full border-2 border-white shadow-sm" style="background-color: #f1f5f9;"></button>
                 </div>
             </div>
             
-            <div class="flex-1 overflow-hidden border rounded-xl dark:border-slate-700">
+            <div id="editorWrapper" class="relative flex-1 overflow-hidden border rounded-xl dark:border-slate-700">
                 <textarea id="noteEditor"></textarea>
             </div>
             
             <div class="flex justify-between items-center mt-6">
-                <button onclick="deleteNoteFromEditor()" id="btnDeleteNote" class="px-4 py-2 text-red-500 font-bold hidden hover:bg-red-50 rounded-lg transition-colors text-sm">
+                <button onclick="deleteNoteFromEditor()" id="btnDeleteNote" class="px-4 py-2 text-red-500 font-bold hidden hover:bg-red-50 rounded-lg">
                     🗑️ Xóa ghi chú
                 </button>
                 <div class="flex gap-3 ml-auto">
-                    <button onclick="closeNoteModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg text-sm font-medium">Hủy</button>
-                    <button onclick="saveNote()" id="btnSaveNote" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 font-bold transition-all active:scale-95">
+                    <button onclick="closeNoteModal()" class="px-4 py-2 text-slate-500 hover:bg-slate-100 rounded-lg">Hủy</button>
+                    <button onclick="saveNote()" id="btnSaveNote" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl shadow-lg hover:bg-blue-700 font-bold">
                         Ghim lên Wall
                     </button>
                 </div>
