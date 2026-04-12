@@ -306,124 +306,59 @@
            SIÊU CSS TRỊ DỨT ĐIỂM SIMPLEMDE (TOOLBAR & PREVIEW)
            ============================================================ */
         
-        /* 1. Fix Toolbar: Nền trắng, Icon đen rõ mồn một */
-        .editor-toolbar {
-            background-color: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            border-top-left-radius: 12px !important;
-            border-top-right-radius: 12px !important;
-            opacity: 1 !important;
-        }
-        
-        .editor-toolbar a, 
-        .editor-toolbar i, 
-        .editor-toolbar button {
-            color: #334155 !important; /* Màu xám đậm */
-            opacity: 1 !important;
-            font-size: 16px !important;
-        }
-        
-        .editor-toolbar a:hover {
-            background-color: #f1f5f9 !important;
-            color: #0284c7 !important;
-        }
-        
-        /* 2. Fix Vùng soạn thảo: Nền tối chữ sáng (theo Dark Mode của bồ) */
+       /* --- 1. FIX TRẠNG THÁI SOẠN THẢO (EDITOR) --- */
         .CodeMirror {
-            background: #1e293b !important; /* Nền xanh đen */
-            color: #f8fafc !important;      /* Chữ trắng xanh */
-            border: 1px solid #cbd5e1 !important;
+            background: #1e293b !important; /* Nền tối cho bồ đỡ mỏi mắt */
+            color: #f8fafc !important;
+            border: 1px solid #475569 !important;
             border-bottom-left-radius: 12px;
             border-bottom-right-radius: 12px;
             font-family: 'Fira Code', monospace;
         }
         
-        /* 3. Fix Preview (Nút con mắt): Giấy vàng chữ đen - KHÔNG BỊ ÁM DARK MODE */
-        .editor-preview-active, 
-        .editor-preview {
-            background-color: #fff9c4 !important; /* Vàng giấy note */
-            color: #1a1a1a !important;            /* Đen đậm */
-            padding: 20px !important;
-            z-index: 10 !important;
-        }
-        
-        /* Ép tất cả các thẻ con bên trong Preview phải hiện màu đen */
-        .editor-preview-active *, 
-        .editor-preview * {
-            color: #1a1a1a !important;
-            background-color: transparent !important;
-        }
-        
-        /* Định dạng tiêu đề và danh sách cho đúng chuẩn bồ yêu cầu */
-        .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3 {
-            color: #854d0e !important; /* Nâu đất */
-            font-weight: bold !important;
-            margin-top: 10px !important;
-        }
-        
-        .editor-preview-active ul {
-            list-style-type: disc !important;
-            padding-left: 25px !important;
-        }
-        
-        .editor-preview-active ol {
-            list-style-type: decimal !important;
-            padding-left: 25px !important;
-        }
-        
-        /* Màu của các đường kẻ chia bảng gạch ngang trong toolbar */
-        .editor-toolbar .separator {
-            border-right: 1px solid #ddd !important;
-            border-left: 0 !important;
-            margin: 0 4px !important;
-        }
+        /* --- 2. FIX TOOLBAR (THANH CÔNG CỤ) --- */
         .editor-toolbar {
-            background-color: #cbd5e1 !important; /* Màu xám xanh vừa phải */
+            background: #f1f5f9 !important; /* Màu xám sáng nhẹ cho dễ nhìn icon */
             border: 1px solid #475569 !important;
+            border-top-left-radius: 12px !important;
+            border-top-right-radius: 12px !important;
+            opacity: 1 !important;
         }
         .editor-toolbar a, .editor-toolbar i {
-            color: #1e293b !important; /* Màu icon đen đậm cho rõ */
-        }
-        /* --- TRỊ DỨT ĐIỂM LỖI "CON MẮT" (BẢN UPDATE MỚI NHẤT) --- */
-        /* 1. Ép nền của khu vực Preview luôn là màu vàng giấy note */
-        .editor-preview-active, .editor-preview {
-            background-color: #fff9c4 !important; /* Màu giấy note vàng nhạt */
-            padding: 20px !important;
-            border-radius: 12px !important;
+            color: #334155 !important; /* Icon đen đậm rõ ràng */
             opacity: 1 !important;
-            display: block !important;
-            
-            /* DÒNG NÀY LÀ DÒNG CHỮA BỆNH CHÍNH */
-            color: #1e293b !important; /* Ép chữ gõ vào phải hiện màu xám đen đậm cực rõ */
+        }
+        .editor-toolbar a.active, .editor-toolbar a:hover {
+            background: #cbd5e1 !important;
         }
         
-        /* 2. Đảm bảo tất cả các thẻ con (như p, span, li...) cũng phải màu đen */
+        /* --- 3. FIX "CON MẮT" (PREVIEW) - TRỊ BỆNH TÀNG HÌNH --- */
+        .editor-preview-active, .editor-preview {
+            background-color: #fff9c4 !important; /* Luôn là màu giấy vàng */
+            padding: 20px !important;
+            color: #1a1a1a !important;            /* Luôn là chữ đen */
+        }
+        /* Ép toàn bộ con cái bên trong preview phải hiện hình */
         .editor-preview-active *, .editor-preview * {
-            color: #1e293b !important;
-            background-color: transparent !important;
+            color: #1a1a1a !important;
             line-height: 1.6 !important;
         }
-        
-        /* 3. Định dạng tiêu đề cho đẹp trên nền giấy */
-        .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3 {
-            color: #854d0e !important; /* Nâu đất cho tiêu đề */
+        .editor-preview-active h1, .editor-preview-active h2 {
+            color: #854d0e !important;
             font-weight: bold !important;
-            margin-bottom: 10px !important;
         }
         
-        .editor-preview-active ul, .editor-preview-active ol {
-            padding-left: 20px !important;
-            list-style: disc !important; /* Hiện dấu chấm đầu dòng */
+        /* --- 4. FIX WALL (BẢNG GHIM) - TRỊ BỆNH TRONG SUỐT --- */
+        .sticky-note {
+            /* Ép Tailwind không được ghi đè màu nền */
+            background-image: none !important; 
         }
-        
-        /* Fix luôn cái toolbar cho nó chói lòa như ảnh bồ gửi để dễ bấm icon */
-        .editor-toolbar {
-            background: #ffffff !important;
-            border: 1px solid #cbd5e1 !important;
-            opacity: 1 !important;
+        /* Đảm bảo chữ trên Wall luôn dễ đọc bất kể Dark Mode */
+        .sticky-note h3, .sticky-note div, .sticky-note span {
+            color: #0f172a !important; 
         }
-        .editor-toolbar a, .editor-toolbar i {
-            color: #334155 !important;
+        .sticky-note .prose * {
+            color: #1e293b !important;
         }
     </style>
 </head>
@@ -823,25 +758,26 @@
                 const shortContent = rawContent.length > 150 ? rawContent.substring(0, 150) + "..." : rawContent;
                 const contentHtml = marked.parse(shortContent);
         
-                // Chú ý: Tui đã xóa sạch các class bg-white, dark:bg-... ở dưới này
+                // Trong vòng lặp forEach của renderNoteWall:
+                const savedColor = note[3] || '#fff9c4';
+                
                 const noteHtml = `
-                    <div class="sticky-note p-5 rounded-3xl shadow-xl border-l-8 border-black/10 cursor-pointer flex flex-col h-80 gap-2 relative transition-all hover:scale-[1.02] hover:shadow-2xl" 
-                         style="background-color: ${savedColor}; color: #1e293b;" 
+                    <div class="sticky-note p-5 rounded-2xl shadow-lg border-l-8 border-black/10 cursor-pointer flex flex-col h-72 gap-2 relative transition-all hover:scale-[1.02]" 
+                         style="background-color: ${savedColor} !important;" 
                          onclick="openNoteEditor('${note[0]}')">
                         
-                        <div class="absolute top-4 right-4 w-4 h-4 bg-red-600 rounded-full shadow-inner border-2 border-white/30"></div>
-        
-                        <h3 class="text-xl font-black text-slate-900 line-clamp-2 leading-tight mb-2 border-b border-black/5 pb-2">
+                        <div class="absolute top-3 right-3 w-3 h-3 bg-red-600 rounded-full shadow-inner border border-white/20"></div>
+                
+                        <h3 class="text-lg font-black line-clamp-2 leading-tight mb-1 border-b border-black/5 pb-1">
                             ${note[1] || 'Ghi chú mới'}
                         </h3>
                         
-                        <div class="prose prose-sm text-slate-800 flex-1 overflow-hidden pointer-events-none leading-relaxed font-medium">
+                        <div class="prose prose-sm flex-1 overflow-hidden pointer-events-none leading-relaxed">
                             ${contentHtml}
                         </div>
                         
-                        <div class="text-[11px] uppercase tracking-tighter text-slate-500 border-t border-black/5 pt-3 mt-auto font-bold flex justify-between items-center">
-                            <span>📅 ${dateStr}</span>
-                            <span class="bg-black/5 px-2 py-1 rounded-full opacity-50">#${note[0].substring(0,4)}</span>
+                        <div class="text-[10px] uppercase tracking-wider opacity-60 border-t border-black/5 pt-2 mt-auto font-bold">
+                            📅 ${dateStr}
                         </div>
                     </div>
                 `;
