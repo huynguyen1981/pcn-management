@@ -748,7 +748,7 @@
             allNotes.forEach((note, index) => {
                 // CHỈ KHAI BÁO 1 LẦN DUY NHẤT Ở ĐÂY
                 // note[3] là cột Color trong Sheet của bồ
-                const savedColor = note[3] || '#fff9c4'; 
+                const savedColor = note[5] || '#fff9c4'; 
                 
                 const dateStr = note[4] ? new Date(note[4]).toLocaleDateString('vi-VN') : 'Mới';
                 const rawContent = note[2] || "";
@@ -833,7 +833,7 @@
                     document.getElementById('noteId').value = note[0];
                     document.getElementById('noteTitle').value = note[1];
                     simplemde.value(note[2]);
-                    const color = note[3] || '#fff9c4';
+                    const color = note[5] || '#fff9c4';
                     document.getElementById('selectedColor').value = color;
                     btnSave.innerText = 'Cập nhật ghi chú';
                     btnDelete.classList.remove('hidden');
