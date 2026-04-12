@@ -987,16 +987,18 @@
         }
 
         function deleteNote(noteId) {
-            return new Promise((resolve, reject) => {
-                // Tên hàm 'deleteNoteFromSheet' ở đây phải giống hệt bên Code.gs
-                google.script.run
-                    .withSuccessHandler((res) => {
-                        if(res) resolve(true);
-                        else reject("Không tìm thấy note để xóa");
-                    })
-                    .withFailureHandler((err) => reject(err))
-                    .deleteNoteFromSheet(noteId); 
-            });
+            // Dán cái link Web App bồ vừa copy ở bước trên vào đây
+            const scriptUrl = SCRIPT_URL; 
+            
+            try {
+                // Gửi yêu cầu xóa qua tham số URL
+                const response = await fetch(`${scriptUrl}?action=delete&id=${noteId}`);
+                const data = await response.json();
+                return data.success;
+            } catch (error) {
+                console.error("Lỗi kết nối API:", error);
+                return false;
+            }
         }
         
         // Hàm này bồ gọi khi nhấn nút 🗑️
