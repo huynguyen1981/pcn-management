@@ -986,29 +986,34 @@
             element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
         }
 
-        // Hàm xử lý xóa note từ trong Editor
+        function deleteNote(noteId) {
+            return new Promise((resolve, reject) => {
+                // Tên hàm 'deleteNoteFromSheet' ở đây phải giống hệt bên Code.gs
+                google.script.run
+                    .withSuccessHandler((res) => {
+                        if(res) resolve(true);
+                        else reject("Không tìm thấy note để xóa");
+                    })
+                    .withFailureHandler((err) => reject(err))
+                    .deleteNoteFromSheet(noteId); 
+            });
+        }
+        
+        // Hàm này bồ gọi khi nhấn nút 🗑️
         async function deleteNoteFromEditor() {
             const noteId = document.getElementById('noteId').value;
             if (!noteId) return;
         
-            // Hỏi lại cho chắc, tránh bấm nhầm "bay màu" công sức gõ
-            if (!confirm("Bồ có chắc muốn gỡ ghi chú này khỏi Wall không?")) {
-                return;
-            }
+            if (!confirm("Bồ chắc chắn muốn gỡ note này chứ?")) return;
         
             try {
-                // Gọi hàm xóa (Giả sử bồ đã có hàm deleteNote xử lý API với Sheet)
-                // Nếu bồ dùng tên hàm khác để xóa thì đổi lại chỗ này nhé
-                const success = await deleteNote(noteId); 
-                
-                if (success) {
-                    closeNoteModal(); // Xóa xong thì đóng Modal
-                    // Load lại wall để cập nhật ngay lập tức
-                    if (typeof fetchNotes === "function") fetchNotes(); 
-                }
+                await deleteNote(noteId);
+                closeNoteModal();
+                // Cập nhật lại Wall ngay lập tức
+                if (typeof fetchNotes === "function") fetchNotes();
+                else location.reload(); 
             } catch (error) {
-                console.error("Lỗi khi xóa nè:", error);
-                alert("Có biến rồi, không xóa được bồ ơi!");
+                alert("Xóa không được rồi: " + error);
             }
         }
         // ------------------END NOTES----------------
@@ -1186,7 +1191,7 @@
                 }
             }
         }                        
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxZBhPMuEDLVRNxg4DNvCh9MhPHc520-N73jQsbk6_Km7GvCy8-KCxSw2ul5hvdhyhfSg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyvoBhO44_oTZlCmdPpNXhujggGJqUDRJ8jlDUcmG4ZXxnZ2fICKajJ-U2Q04JEo2dNXA/exec";
         let allTasks = [];
         let updatingId = null;
         let sortAsc = true;
