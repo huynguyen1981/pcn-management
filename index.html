@@ -356,6 +356,29 @@
         .sticky-note:hover {
             filter: none !important;
         }
+        
+        /* TRỊ DỨT ĐIỂM CON MẮT (PREVIEW) TÀNG HÌNH */
+
+        /* 1. Ép nền màu vàng nhạt (hoặc màu giấy bồ muốn) cho khung Preview */
+        .editor-preview-active, 
+        .editor-preview {
+            background-color: #fff9c4 !important; /* Màu giấy bồ thích */
+            color: #1a1a1a !important;            /* Ép chữ phải màu đen xanh */
+        }
+        
+        /* 2. Ép toàn bộ các thẻ bên trong (p, h1, li, span...) cũng phải màu đen */
+        .editor-preview-active *, 
+        .editor-preview * {
+            color: #1a1a1a !important;
+        }
+        
+        /* 3. Tùy chỉnh thêm cho tiêu đề trong Preview cho đẹp */
+        .editor-preview-active h1, 
+        .editor-preview-active h2, 
+        .editor-preview-active h3 {
+            color: #854d0e !important; /* Màu nâu đất cho tiêu đề */
+            border-bottom: 1px solid rgba(0,0,0,0.1) !important;
+        }
     </style>
 </head>
 <!-- <body class="bg-[#f5f6f8] min-h-screen py-4"> -->
@@ -962,7 +985,32 @@
             // Thêm hiệu ứng 'đang chọn' cho nút vừa bấm
             element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
         }
+
+        // Hàm xử lý xóa note từ trong Editor
+        async function deleteNoteFromEditor() {
+            const noteId = document.getElementById('noteId').value;
+            if (!noteId) return;
+        
+            // Hỏi lại cho chắc, tránh bấm nhầm "bay màu" công sức gõ
+            if (!confirm("Bồ có chắc muốn gỡ ghi chú này khỏi Wall không?")) {
+                return;
+            }
+        
+            try {
+                // Gọi hàm xóa (Giả sử bồ đã có hàm deleteNote xử lý API với Sheet)
+                // Nếu bồ dùng tên hàm khác để xóa thì đổi lại chỗ này nhé
+                const success = await deleteNote(noteId); 
                 
+                if (success) {
+                    closeNoteModal(); // Xóa xong thì đóng Modal
+                    // Load lại wall để cập nhật ngay lập tức
+                    if (typeof fetchNotes === "function") fetchNotes(); 
+                }
+            } catch (error) {
+                console.error("Lỗi khi xóa nè:", error);
+                alert("Có biến rồi, không xóa được bồ ơi!");
+            }
+        }
         // ------------------END NOTES----------------
         
         const SIDEBAR_LINKS = [
