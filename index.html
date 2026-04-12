@@ -306,59 +306,50 @@
            SIÊU CSS TRỊ DỨT ĐIỂM SIMPLEMDE (TOOLBAR & PREVIEW)
            ============================================================ */
         
-       /* --- 1. FIX TRẠNG THÁI SOẠN THẢO (EDITOR) --- */
-        .CodeMirror {
-            background: #1e293b !important; /* Nền tối cho bồ đỡ mỏi mắt */
-            color: #f8fafc !important;
-            border: 1px solid #475569 !important;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            font-family: 'Fira Code', monospace;
-        }
-        
-        /* --- 2. FIX TOOLBAR (THANH CÔNG CỤ) --- */
-        .editor-toolbar {
-            background: #f1f5f9 !important; /* Màu xám sáng nhẹ cho dễ nhìn icon */
-            border: 1px solid #475569 !important;
-            border-top-left-radius: 12px !important;
-            border-top-right-radius: 12px !important;
+       /* TRỊ DỨT ĐIỂM LỖI TÀNG HÌNH TRONG PREVIEW */
+
+        /* 1. Ép khung Preview phải hiện ra và có nền vàng */
+        .editor-preview-active, 
+        .editor-preview,
+        .editor-preview-side {
+            background-color: #fff9c4 !important; /* Màu giấy note */
+            color: #0f172a !important;            /* Chữ đen đậm */
             opacity: 1 !important;
-        }
-        .editor-toolbar a, .editor-toolbar i {
-            color: #334155 !important; /* Icon đen đậm rõ ràng */
-            opacity: 1 !important;
-        }
-        .editor-toolbar a.active, .editor-toolbar a:hover {
-            background: #cbd5e1 !important;
+            display: block !important;
+            visibility: visible !important;
         }
         
-        /* --- 3. FIX "CON MẮT" (PREVIEW) - TRỊ BỆNH TÀNG HÌNH --- */
-        .editor-preview-active, .editor-preview {
-            background-color: #fff9c4 !important; /* Luôn là màu giấy vàng */
-            padding: 20px !important;
-            color: #1a1a1a !important;            /* Luôn là chữ đen */
-        }
-        /* Ép toàn bộ con cái bên trong preview phải hiện hình */
-        .editor-preview-active *, .editor-preview * {
-            color: #1a1a1a !important;
-            line-height: 1.6 !important;
-        }
-        .editor-preview-active h1, .editor-preview-active h2 {
-            color: #854d0e !important;
-            font-weight: bold !important;
-        }
-        
-        /* --- 4. FIX WALL (BẢNG GHIM) - TRỊ BỆNH TRONG SUỐT --- */
-        .sticky-note {
-            /* Ép Tailwind không được ghi đè màu nền */
-            background-image: none !important; 
-        }
-        /* Đảm bảo chữ trên Wall luôn dễ đọc bất kể Dark Mode */
-        .sticky-note h3, .sticky-note div, .sticky-note span {
+        /* 2. CỰC QUAN TRỌNG: Ép toàn bộ nội dung Markdown (p, li, h1, h2...) phải màu đen */
+        .editor-preview-active p, .editor-preview p,
+        .editor-preview-active li, .editor-preview li,
+        .editor-preview-active span, .editor-preview span,
+        .editor-preview-active div, .editor-preview div,
+        .editor-preview-active strong, .editor-preview strong,
+        .editor-preview-active em, .editor-preview em {
             color: #0f172a !important; 
+            background: transparent !important;
         }
-        .sticky-note .prose * {
-            color: #1e293b !important;
+        
+        /* 3. Tiêu đề và danh sách */
+        .editor-preview-active h1, .editor-preview-active h2, .editor-preview-active h3,
+        .editor-preview h1, .editor-preview h2, .editor-preview h3 {
+            color: #854d0e !important; /* Nâu đất */
+            font-weight: 800 !important;
+        }
+        
+        .editor-preview-active ul, .editor-preview ol {
+            list-style: disc !important;
+            padding-left: 2rem !important;
+            color: #0f172a !important;
+        }
+        
+        /* 4. Fix luôn cái Toolbar trắng rực để bồ dễ thấy nút */
+        .editor-toolbar {
+            background: #ffffff !important;
+        }
+        .editor-toolbar i, .editor-toolbar a {
+            color: #334155 !important;
+            opacity: 1 !important;
         }
     </style>
 </head>
@@ -786,7 +777,7 @@
         }
         
         // --- 3. MỞ MODAL SOẠN THẢO (SIMPLEMDE) ---
-        function openNoteEditor(noteId) {
+       function openNoteEditor(noteId) {
             const modal = document.getElementById('noteModal');
             if (!modal) {
                 console.error("Bồ ơi, quên dán cái HTML Modal 'noteModal' rồi kìa!");
@@ -804,11 +795,19 @@
                     spellChecker: false,
                     autosave: { enabled: true, uniqueId: "pcn_note_editor", delay: 1000 },
                     status: false,
-                    // Thêm cái này để lúc gõ nó không bị lẫn lộn màu
                     renderingConfig: {
                         singleLineBreaks: true,
                         codeSyntaxHighlighting: true,
                     },
+                });
+        
+                // TUYỆT CHIÊU 1: Ép màu khi bồ nhấn nút Preview (Con mắt)
+                simplemde.codemirror.on("update", function(){
+                    const preview = document.querySelector('.editor-preview-active');
+                    if (preview) {
+                        preview.style.backgroundColor = "#fff9c4"; // Nền vàng
+                        preview.style.color = "#0f172a";           // Chữ đen đậm
+                    }
                 });
             }
         
@@ -823,16 +822,50 @@
                     document.getElementById('selectedColor').value = color;
                     btnSave.innerText = 'Cập nhật ghi chú';
                     btnDelete.classList.remove('hidden');
+                    
+                    // Highlight cái nút màu tương ứng (nếu muốn cầu kỳ)
+                    updateColorPickerUI(color);
                 }
             } else {
                 // CHẾ ĐỘ TẠO MỚI
                 document.getElementById('noteId').value = '';
                 document.getElementById('noteTitle').value = '';
-                document.getElementById('selectedColor').value = '#fff9c4';
+                const defaultColor = '#fff9c4';
+                document.getElementById('selectedColor').value = defaultColor;
                 simplemde.value('');
                 btnSave.innerText = 'Ghim lên Wall';
                 btnDelete.classList.add('hidden');
+                updateColorPickerUI(defaultColor);
             }
+        
+            // TUYỆT CHIÊU 2: Đảm bảo khi vừa mở Modal, nếu đang ở chế độ Preview thì nó phải đen ngay
+            setTimeout(() => {
+                const preview = document.querySelector('.editor-preview-active');
+                if (preview) {
+                    preview.style.backgroundColor = "#fff9c4";
+                    preview.style.color = "#0f172a";
+                }
+            }, 100);
+        }
+        
+        // Hàm bổ trợ để bồ nhìn thấy cái nút màu nào đang được chọn
+        function updateColorPickerUI(selectedColor) {
+            const buttons = document.querySelectorAll('#colorPickerContainer button');
+            buttons.forEach(btn => {
+                // Nếu mã màu của nút trùng với màu đang chọn thì thêm viền xanh highlight
+                if (btn.style.backgroundColor.toLowerCase() === hexToRgb(selectedColor).toLowerCase() || 
+                    btn.style.backgroundColor.toLowerCase() === selectedColor.toLowerCase()) {
+                    btn.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
+                } else {
+                    btn.classList.remove('ring-2', 'ring-blue-500', 'ring-offset-2');
+                }
+            });
+        }
+        
+        // Hàm phụ để so sánh màu RGB và HEX
+        function hexToRgb(hex) {
+            var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+            return result ? `rgb(${parseInt(result[1], 16)}, ${parseInt(result[2], 16)}, ${parseInt(result[3], 16)})` : hex;
         }
         
         function closeNoteModal() {
@@ -2130,7 +2163,7 @@
 
     <!-- -----------------NOTE--------------------- -->
     <div id="noteModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-[100] p-4">
-        <div class="bg-white dark:bg-slate-800 p-6 md:p-8 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
+        <div class="bg-white p-6 md:p-8 rounded-3xl w-full max-w-5xl h-[85vh] flex flex-col shadow-2xl">
             <input type="hidden" id="noteId"> 
             <input type="hidden" id="selectedColor" value="#fff9c4">
             
