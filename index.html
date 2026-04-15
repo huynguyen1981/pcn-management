@@ -1078,13 +1078,23 @@
             }
         }
         function searchNotes() {
-            const keyword = document.getElementById('search-notes').value.toLowerCase();
-            // Lọc mảng allNotes dựa trên từ khóa
-            const filteredNotes = allNotes.filter(note => 
-                (note[1] && note[1].toLowerCase().includes(keyword)) || 
-                (note[2] && note[2].toLowerCase().includes(keyword))
-            );
-            // Vẽ lại Wall với danh sách đã lọc
+            // 1. Luôn lấy keyword mới nhất
+            const keyword = (document.getElementById('search-notes').value || "").toLowerCase();
+            
+            // 2. CHỐT CHẶN: Nếu keyword rỗng, hiện lại toàn bộ bản gốc ngay và thoát
+            if (!keyword) {
+                renderNoteWall(allNotes); 
+                return;
+            }
+        
+            // 3. Lọc trên allNotes và trả ra một "bản sao tạm thời" (filteredNotes)
+            const filteredNotes = allNotes.filter(note => {
+                const title = (note[1] || "").toString().toLowerCase();
+                const content = (note[2] || "").toString().toLowerCase();
+                return title.includes(keyword) || content.includes(keyword);
+            });
+        
+            // 4. CHỈ VẼ bản sao này lên màn hình, KHÔNG lưu nó vào allNotes
             renderNoteWall(filteredNotes);
         }
         // ------------------END NOTES----------------
