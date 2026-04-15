@@ -1078,27 +1078,24 @@
             }
         }
         function searchNotes() {
-            const rawKeyword = document.getElementById('search-notes').value;
-            const keyword = (rawKeyword || "").toLowerCase();
+            const keyword = (document.getElementById('search-notes').value || "").toLowerCase();
             
-            // DEBUG: Bồ nhấn F12 xem số này có bị giảm đi sau mỗi lần gõ không
-            console.log("Tổng số Note gốc hiện có:", allNotes.length);
+            // DÒNG NÀY ĐỂ BỒ KIỂM TRA: Nó phải luôn giữ nguyên số gốc (ví dụ: 7)
+            console.log("Tổng số Note gốc (CỐ ĐỊNH):", allNotes.length);
         
-            if (!keyword || keyword.trim() === "") {
-                renderNoteWall(allNotes);
+            if (!keyword.trim()) {
+                renderNoteWall(allNotes); // Trả lại nguyên vẹn nếu không search
                 return;
             }
         
-            // Tạo một mảng hoàn toàn mới bằng Spread Operator [...] để không đụng chạm bản gốc
-            const tempNotes = [...allNotes]; 
-            
-            const results = tempNotes.filter(n => {
-                const t = (n[1] || "").toString().toLowerCase();
-                const c = (n[2] || "").toString().toLowerCase();
-                return t.includes(keyword) || c.includes(keyword);
+            // TẠO BIẾN TẠM (filtered) - TUYỆT ĐỐI KHÔNG GÁN NGƯỢC VÀO allNotes
+            const filtered = allNotes.filter(note => {
+                const title = (note[1] || "").toString().toLowerCase();
+                const content = (note[2] || "").toString().toLowerCase();
+                return title.includes(keyword) || content.includes(keyword);
             });
         
-            renderNoteWall(results);
+            renderNoteWall(filtered);
         }
         // ------------------END NOTES----------------
 
