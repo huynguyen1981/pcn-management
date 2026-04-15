@@ -1164,7 +1164,7 @@
                 renderNoteWall(data.notes);
                 
                 // Vẽ Alarm List
-                renderAlarmList(data.alarms);
+                renderAlarmWall(data.alarms);
                 
                 // Vẽ Task (nếu bồ có dùng)
                 // renderTasks(data.tasks);
@@ -1990,7 +1990,7 @@
                     }
                 }
             });
-            doc.save("PCN Report of HUY NGUYEN.pdf");
+            doc.save("PCN Report of HUY NGUYEN " + new Date().toLocaleString()".pdf");
         }
         // ----Khúc này END xử lý export---- 
         // TẦNG 3: ĐIỂM KÍCH HOẠT (Nằm ở cuối cùng)
