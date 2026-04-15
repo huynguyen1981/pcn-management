@@ -395,11 +395,17 @@
             <span class="text-xl group-hover:rotate-12 transition-transform">🔄</span>
         </div>
         
-        <div onclick="toggleNoteWall()" 
+        <div onclick="switchSection('NOTE')" 
              id="btn-note-wall"
              class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 hover:bg-amber-100 dark:hover:bg-amber-900/50 group border border-amber-100 dark:border-amber-800" 
              title="Sticky Notes Wall">
             <span class="text-xl group-hover:scale-110 transition-transform">📌</span>
+        </div>
+        
+        <div onclick="switchSection('ALARM')" 
+             class="w-10 h-10 rounded-xl flex items-center justify-center cursor-pointer transition-all bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/50 group border border-blue-100 dark:border-blue-800" 
+             title="Quản lý nhắc hẹn (Alarm)">
+            <span class="text-xl group-hover:scale-110 transition-transform">⏰</span>
         </div>
         
         <div class="w-8 h-[1px] bg-slate-100 dark:bg-slate-800"></div>
@@ -443,25 +449,6 @@
                              fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>
                     </div>
                 </button>
-            
-                <!-- <input type="text" id="searchInput" onkeyup="renderTable(allTasks)" placeholder="Search anything..." 
-                    class="w-48 border-2 border-[#c3c6d4] p-2 rounded-xl text-sm outline-none focus:border-[#0073ea] text-black">
-            
-                <div class="flex items-center gap-2 bg-gray-100 p-1 px-3 rounded-xl border-2 border-transparent" id="filterContainer">
-                    <div class="flex items-center gap-2">
-                        <label class="text-[12px] font-bold text-gray-600 label-date">From:</label>
-                        <input type="date" id="dateFrom" onchange="renderTable(allTasks)" 
-                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
-                    </div>
-                    
-                    <div class="flex items-center gap-2 border-l border-gray-300 pl-2">
-                        <label class="text-[12px] font-bold text-gray-600 label-date">To:</label>
-                        <input type="date" id="dateTo" onchange="renderTable(allTasks)" 
-                            class="border border-gray-300 p-1.5 rounded-lg text-xs text-black w-[130px] outline-none">
-                    </div>
-                
-                    <button onclick="resetFilters()" class="text-blue-600 text-[12px] font-bold hover:underline ml-1 shrink-0">Reset</button>
-                </div> -->
 
                 <!-- Search bổ sung phần My Task, Pending -->
                 <input type="text" id="searchInput" onkeyup="applyFilters()" placeholder="Search anything..." 
@@ -540,22 +527,6 @@
                                 <th class="p-4 w-[90px] text-center">Action</th>
                             </tr>
                         </thead>
-                        
-                        <!-- <thead class="table-header">
-                            <tr>
-                                <th class="p-4 w-[120px] sortable" onclick="sortTable(1)">PCN # ↕</th>
-                                <th class="p-4 w-[130px] text-center sortable" onclick="sortTable(3)">Status ↕</th>
-                                <th class="p-4">Description & Remarks</th>
-                                <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(5)">Start ↕</th>
-                                <th class="p-4 w-[110px] text-center sortable" onclick="sortTable(7)">Appr ↕</th>
-                                <th class="p-4 w-[110px] text-center sortable font-black text-[#0073ea]" onclick="sortTable(9)">Release ↕</th>
-                                <th class="p-4 w-[130px] sortable" onclick="sortTable(6)">Tech ↕</th>
-                                <th class="p-4 w-[130px] sortable" onclick="sortTable(8)">Appr Engr ↕</th>
-                                <th class="p-4 w-[80px] text-center sortable" onclick="sortTable(11)">Rep ↕</th>
-                                <th class="p-4 w-[90px] text-center">Action</th>
-                            </tr>
-                        </thead> -->
-                        
                         <tbody id="taskTableBody" class="table-text bg-white"></tbody>
                     </table>
                  </div>
@@ -572,6 +543,23 @@
                   </div>
         </div>
         <!-- -----------END NOTE---------- -->
+
+        <!-- ----------------ALARM---------------- -->
+        <div id="section-alarms" class="hidden min-h-screen p-6 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <div class="flex items-center gap-3">
+                    <h2 class="text-2xl font-black text-slate-800 dark:text-white uppercase tracking-tighter">Scheduled Alarms</h2>
+                    <span id="alarm-count" class="bg-blue-600 text-white text-xs px-2 py-1 rounded-full">0</span>
+                </div>
+                <button onclick="openAlarmModal()" class="bg-blue-600 hover:bg-blue-500 text-white px-5 py-2.5 rounded-xl font-bold transition-all shadow-lg shadow-blue-500/20 active:scale-95">
+                    + Thêm Alarm
+                </button>
+            </div>
+        
+            <div id="alarm-wall" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                </div>
+        </div>
+        <!-- ----------------END ALARM------------ -->
         
         <footer class="mt-12 pb-8 text-center">
         <div class="flex flex-col items-center gap-2">
@@ -720,7 +708,7 @@
     
     <script>
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzH8rTen2Vt4PuK1RNihL9yLqQvKsjReCz2tQMJBff1351754BUpHiDPSxo2Rwo9J6s8Q/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwySpFvzMt0T5Xzilz-Ji7mMe4Dn1CwRhsEWgkKoMz3gW8KEH9oA_F7XOoyXJqvXhrrzw/exec";
 
         // ----------------NOTES--------------------
         // --- BIẾN TOÀN CỤC ---
@@ -733,36 +721,85 @@
             gfm: true      // Dùng chuẩn GitHub Markdown
         });
         
-        // --- 1. LOGIC BẬT/TẮT TRANG (KIỂU CONVERTER) ---
-        function toggleNoteWall() {
-            const pcnSection = document.getElementById('section-pcn'); // Bọc bảng PCN
-            const noteSection = document.getElementById('section-notes'); // Bọc Note Wall
+        // // --- 1. LOGIC BẬT/TẮT TRANG (KIỂU CONVERTER) ---
+        // function toggleNoteWall() {
+        //     const pcnSection = document.getElementById('section-pcn'); // Bọc bảng PCN
+        //     const noteSection = document.getElementById('section-notes'); // Bọc Note Wall
+        //     const btnNote = document.getElementById('btn-note-wall');
+        
+        //     const isNotesHidden = noteSection.classList.contains('hidden');
+        
+        //     if (isNotesHidden) {
+        //         // MỞ NOTE - ẨN PCN
+        //         pcnSection.classList.add('hidden');
+        //         noteSection.classList.remove('hidden');
+                
+        //         // Đổi màu nút Sidebar cho "ngựa" tí
+        //         btnNote.classList.add('bg-amber-500', 'text-white');
+        //         btnNote.classList.remove('bg-amber-50', 'text-amber-600');
+                
+        //         // Render lại wall để đảm bảo dữ liệu mới nhất
+        //         renderNoteWall(allNotes);
+        //     } else {
+        //         // ĐÓNG NOTE - HIỆN PCN
+        //         pcnSection.classList.remove('hidden');
+        //         noteSection.classList.add('hidden');
+                
+        //         // Trả màu nút về ban đầu
+        //         btnNote.classList.remove('bg-amber-500', 'text-white');
+        //         btnNote.classList.add('bg-amber-50', 'text-amber-600');
+        //     }
+        // }
+        // --- HÀM ĐIỀU HƯỚNG TỔNG (SWITCH TABS) ---
+        function switchSection(targetSectionId) {
+           const pcnSection = document.getElementById('section-pcn');
+            const noteSection = document.getElementById('section-notes');
+            const alarmSection = document.getElementById('section-alarms');
+            
             const btnNote = document.getElementById('btn-note-wall');
+            const btnAlarm = document.getElementById('btn-alarm-wall');
         
-            const isNotesHidden = noteSection.classList.contains('hidden');
+            // Kiểm tra trạng thái hiện tại
+            const isNotesOpen = !noteSection.classList.contains('hidden');
+            const isAlarmsOpen = !alarmSection.classList.contains('hidden');
         
-            if (isNotesHidden) {
-                // MỞ NOTE - ẨN PCN
-                pcnSection.classList.add('hidden');
-                noteSection.classList.remove('hidden');
-                
-                // Đổi màu nút Sidebar cho "ngựa" tí
-                btnNote.classList.add('bg-amber-500', 'text-white');
-                btnNote.classList.remove('bg-amber-50', 'text-amber-600');
-                
-                // Render lại wall để đảm bảo dữ liệu mới nhất
-                renderNoteWall(allNotes);
-            } else {
-                // ĐÓNG NOTE - HIỆN PCN
-                pcnSection.classList.remove('hidden');
-                noteSection.classList.add('hidden');
-                
-                // Trả màu nút về ban đầu
-                btnNote.classList.remove('bg-amber-500', 'text-white');
-                btnNote.classList.add('bg-amber-50', 'text-amber-600');
+            // 1. Reset tất cả về trạng thái ẩn và trả màu nút
+            noteSection.classList.add('hidden');
+            alarmSection.classList.add('hidden');
+            pcnSection.classList.add('hidden');
+            
+            btnNote.classList.remove('bg-amber-500', 'text-white');
+            btnNote.classList.add('bg-amber-50', 'dark:bg-amber-900/30', 'text-amber-600');
+            
+            btnAlarm.classList.remove('bg-blue-600', 'text-white');
+            btnAlarm.classList.add('bg-blue-50', 'dark:bg-blue-900/30', 'text-blue-600');
+        
+            // 2. Logic bật/tắt (Toggle)
+            if (target === 'NOTE') {
+                if (isNotesOpen) {
+                    // Nếu đang mở Note mà bấm tiếp vào Note -> Quay về PCN
+                    pcnSection.classList.remove('hidden');
+                } else {
+                    // Mở Note
+                    noteSection.classList.remove('hidden');
+                    btnNote.classList.add('bg-amber-500', 'text-white');
+                    btnNote.classList.remove('bg-amber-50', 'text-amber-600');
+                    renderNoteWall(allNotes);
+                }
+            } 
+            else if (target === 'ALARM') {
+                if (isAlarmsOpen) {
+                    // Nếu đang mở Alarm mà bấm tiếp vào Alarm -> Quay về PCN
+                    pcnSection.classList.remove('hidden');
+                } else {
+                    // Mở Alarm
+                    alarmSection.classList.remove('hidden');
+                    btnAlarm.classList.add('bg-blue-600', 'text-white');
+                    btnAlarm.classList.remove('bg-blue-50', 'text-blue-600');
+                    renderAlarmWall(allAlarms);
+                }
             }
         }
-        
         // 2. Hàm render đã được "tân trang"
         function renderNoteWall(notes) {
             allNotes = notes || []; 
@@ -988,21 +1025,36 @@
             element.classList.add('ring-2', 'ring-blue-500', 'ring-offset-2');
         }
 
-        async function deleteNote(noteId) {
-            // Dán cái link Web App bồ vừa copy ở bước trên vào đây
-            const scriptUrl = SCRIPT_URL; 
-            
+        // --- HÀM XÓA CHUNG ---
+        // Hàm này sẽ gọi đến "tổng đài" xóa của Apps Script
+        async function sendDeleteRequest(target, id) {
             try {
-                // Gửi yêu cầu xóa qua tham số URL
-                const response = await fetch(`${scriptUrl}?action=delete&id=${noteId}`);
-                const data = await response.json();
-                return data.success;
+                // scriptUrl là link Web App (.../exec) của bồ
+                const response = await fetch(`${scriptUrl}?action=delete&target=${target}&id=${id}`);
+                const result = await response.json();
+                return result.success;
             } catch (error) {
-                console.error("Lỗi kết nối API:", error);
+                console.error(`Lỗi khi xóa ${target}:`, error);
                 return false;
             }
         }
         
+        // --- HÀM XÓA NOTE (Gọi khi bấm nút xóa trên Note Card) ---
+        async function deleteNote(noteId) {
+            if (!confirm("Bồ chắc chắn muốn dẹp cái Note này chứ?")) return;
+        
+            const success = await sendDeleteRequest('NOTE', noteId);
+            
+            if (success) {
+                console.log("Đã xóa Note thành công");
+                // Gọi hàm load lại danh sách Note để cập nhật giao diện
+                if (typeof fetchNotes === "function") fetchNotes(); 
+            } else {
+                alert("Xóa Note thất bại rồi bồ ơi!");
+            }
+        }
+        
+       
         // Hàm này bồ gọi khi nhấn nút 🗑️
         async function deleteNoteFromEditor() {
             const noteId = document.getElementById('noteId').value;
@@ -1021,6 +1073,188 @@
             }
         }
         // ------------------END NOTES----------------
+
+
+        // -------------------ALARM-------------------
+        function renderAlarmWall(alarms) {
+            const wall = document.getElementById('alarm-wall');
+            const countLabel = document.getElementById('alarm-count');
+            if (!wall) return;
+            
+            wall.innerHTML = '';
+            const alarmData = alarms || [];
+            if (countLabel) countLabel.innerText = alarmData.length;
+        
+            alarmData.forEach((alarm) => {
+                // ID(0), Title(1), Content(2), Time(3), Recipients(4), Type(5), Freq(6), Status(7)
+                const isSent = alarm[7] === "SENT";
+                const alarmTime = new Date(alarm[3]);
+                const timeStr = alarmTime.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+                const dateStr = alarmTime.toLocaleDateString('vi-VN');
+                
+                const freqLabel = { 'ONCE': '1 lần', 'DAILY': 'Hàng ngày', 'WEEKLY': 'Hàng tuần', 'MONTHLY': 'Hàng tháng' }[alarm[6]] || alarm[6];
+        
+                const alarmHtml = `
+                    <div class="group relative bg-[#1e2227] border border-slate-700 rounded-3xl p-5 flex flex-col gap-4 transition-all hover:border-blue-500/50 hover:shadow-2xl hover:shadow-blue-500/10 ${isSent ? 'opacity-60 grayscale-[0.5]' : ''}">
+                        
+                        <div class="flex justify-between items-start">
+                            <div class="w-12 h-12 bg-blue-500/10 rounded-2xl flex items-center justify-center text-2xl group-hover:animate-bounce">
+                                ${isSent ? '✅' : '🔔'}
+                            </div>
+                            <div class="flex flex-col items-end gap-1">
+                                <span class="text-[10px] font-black px-2 py-1 rounded-lg bg-slate-800 text-blue-400 border border-slate-700 uppercase tracking-widest">${freqLabel}</span>
+                                <span class="text-[9px] text-slate-500 font-bold uppercase">${alarm[5]}</span>
+                            </div>
+                        </div>
+        
+                        <div class="cursor-pointer" onclick="openAlarmModalById('${alarm[0]}')">
+                            <h3 class="text-lg font-bold text-white line-clamp-1 group-hover:text-blue-400 transition-colors">${alarm[1] || 'Không tiêu đề'}</h3>
+                            <p class="text-sm text-slate-400 line-clamp-2 mt-1 leading-relaxed">${alarm[2] || '...'}</p>
+                        </div>
+        
+                        <div class="mt-auto pt-4 border-t border-slate-800 flex justify-between items-center">
+                            <div class="flex flex-col">
+                                <span class="text-xl font-black text-white">${timeStr}</span>
+                                <span class="text-[10px] text-slate-500 font-bold">${dateStr}</span>
+                            </div>
+                            <button onclick="deleteAlarm('${alarm[0]}')" 
+                                    class="w-10 h-10 rounded-xl bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all">
+                                🗑️
+                            </button>
+                        </div>
+        
+                        <div class="absolute bottom-0 left-1/2 -translate-x-1/2 w-1/2 h-1 bg-gradient-to-r from-transparent via-blue-500/20 to-transparent rounded-full"></div>
+                    </div>
+                `;
+                wall.innerHTML += alarmHtml;
+            });
+        }
+
+        // Biến lưu trữ toàn bộ alarm đổ về từ server
+        let allAlarms = []; 
+        
+        function openAlarmModalById(alarmId) {
+            const alarm = allAlarms.find(a => a[0] === alarmId);
+            if (alarm) {
+                // Tận dụng hàm openAlarmModal mình đã viết ở trên
+                // Nhưng lưu ý map đúng vị trí cột
+                const alarmObj = {
+                    id: alarm[0],
+                    title: alarm[1],
+                    content: alarm[2],
+                    time: new Date(alarm[3]).toISOString().slice(0, 16),
+                    recipients: alarm[4],
+                    notifyType: alarm[5],
+                    freq: alarm[6]
+                };
+                openAlarmModal(alarmObj);
+            }
+        }
+
+        async function fetchData() {
+            try {
+                const response = await fetch(scriptUrl);
+                const data = await response.json();
+                
+                // Lưu data vào biến global để dùng khi sửa
+                allAlarms = data.alarms || [];
+                
+                // Vẽ Note Wall
+                renderNoteWall(data.notes);
+                
+                // Vẽ Alarm List
+                renderAlarmList(data.alarms);
+                
+                // Vẽ Task (nếu bồ có dùng)
+                // renderTasks(data.tasks);
+                
+            } catch (error) {
+                console.error("Lỗi load dữ liệu:", error);
+            }
+        }
+        
+        // --- HÀM XÓA ALARM (Gọi khi bấm nút xóa trong danh mục Alarm) ---
+        async function deleteAlarm(alarmId) {
+            if (!confirm("Xóa cái nhắc hẹn này luôn hả bồ?")) return;
+        
+            const success = await sendDeleteRequest('ALARM', alarmId);
+            
+            if (success) {
+                console.log("Đã xóa Alarm thành công");
+                // Gọi hàm load lại toàn bộ data hoặc danh sách Alarm
+                if (typeof fetchAllData === "function") fetchAllData(); 
+            } else {
+                alert("Xóa Alarm không được, bồ check lại Sheet thử xem!");
+            }
+        }
+        
+        // Đóng Modal Alarm
+        function closeAlarmModal() {
+            const modal = document.getElementById('alarmModal');
+            modal.classList.add('hidden');
+            // Reset form sau khi đóng
+            document.getElementById('alarmId').value = "";
+            document.getElementById('alarmTitle').value = "";
+            document.getElementById('alarmContent').value = "";
+            document.getElementById('alarmTime').value = "";
+        }
+        
+        // Mở Modal Alarm (Dùng chung cho cả Tạo mới và Sửa)
+        function openAlarmModal(alarm = null) {
+            const modal = document.getElementById('alarmModal');
+            modal.classList.remove('hidden');
+        
+            if (alarm) {
+                document.getElementById('alarmId').value = alarm.id;
+                document.getElementById('alarmTitle').value = alarm.title;
+                document.getElementById('alarmContent').value = alarm.content;
+                document.getElementById('alarmTime').value = alarm.time; // Định dạng YYYY-MM-DDTHH:mm
+                document.getElementById('alarmFreq').value = alarm.freq;
+                document.getElementById('alarmRecipients').value = alarm.recipients;
+                document.getElementById('alarmType').value = alarm.notifyType;
+            }
+        }
+        
+        function setQuickTime(val) {
+            let now = new Date();
+            if (val === 'tomorrow') {
+                now.setDate(now.getDate() + 1);
+                now.setHours(9, 0, 0, 0);
+            } else {
+                now.setMinutes(now.getMinutes() + val);
+            }
+            
+            // Định dạng lại để nhét vào input datetime-local (YYYY-MM-DDTHH:mm)
+            let localTime = new Date(now.getTime() - now.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
+            document.getElementById('alarmTime').value = localTime;
+        }
+        
+        async function saveAlarm() {
+            const data = {
+                type: 'ALARM',
+                id: document.getElementById('alarmId').value,
+                title: document.getElementById('alarmTitle').value,
+                content: document.getElementById('alarmContent').value,
+                time: document.getElementById('alarmTime').value,
+                freq: document.getElementById('alarmFreq').value,
+                recipients: document.getElementById('alarmRecipients').value,
+                notifyType: document.getElementById('alarmType').value
+            };
+        
+            if(!data.title || !data.time) {
+                alert("Bồ nhập thiếu Tiêu đề hoặc Thời gian rồi!");
+                return;
+            }
+        
+            // Gửi sang Apps Script (dùng link Web App của bồ)
+            const response = await fetch(scriptUrl, { method: 'POST', body: JSON.stringify(data) });
+            if(response.ok) {
+                closeAlarmModal();
+                // loadAlarms(); // Hàm load lại danh sách Alarm để hiển thị
+            }
+        }
+        // ---------------------END ALARM--------------------
+
         
         const SIDEBAR_LINKS = [
             { 
@@ -1101,31 +1335,6 @@
             // Chạy bộ lọc tổng hợp để vẽ lại bảng
             applyFilters();
         }
-
-        // function updateColoredStats(data) {
-        //     const stats = {
-        //         'NOT START YET': 0,
-        //         'IN-PROGRESS': 0,
-        //         'ENG REVIEW': 0,
-        //         'OUT FOR APPROVAL': 0,
-        //         'RELEASED': 0
-        //     };
-        
-        //     // 1. Đếm số lượng từ dữ liệu thực tế
-        //     data.forEach(item => {
-        //         if (stats[item.status] !== undefined) stats[item.status]++;
-        //     });
-        
-        //     // 2. Hàm vẽ thanh bar mini
-        //     const makeBar = (num) => "█".repeat(Math.min(num, 3)) + "░".repeat(Math.max(0, 3 - num));
-        
-        //     // 3. Đổ dữ liệu vào từng ID với màu đã định sẵn
-        //     document.getElementById('stat-nsy').innerText = `NSY: ${stats['NOT START YET']} ${makeBar(stats['NOT START YET'])}`;
-        //     document.getElementById('stat-prog').innerText = `PROG: ${stats['IN-PROGRESS']} ${makeBar(stats['IN-PROGRESS'])}`;
-        //     document.getElementById('stat-rev').innerText = `REV: ${stats['ENG REVIEW']} ${makeBar(stats['ENG REVIEW'])}`;
-        //     document.getElementById('stat-appr').innerText = `APPR: ${stats['OUT FOR APPROVAL']} ${makeBar(stats['OUT FOR APPROVAL'])}`;
-        //     document.getElementById('stat-rep').innerText = `REL: ${stats['RELEASED']} ${makeBar(stats['RELEASED'])}`;
-        // }
 
         function updateColoredStats(data) {
             const stats = {
@@ -1263,19 +1472,6 @@
                 applyFilters(); 
             }
         }
-        
-        // //----Dark Mode-----
-        // function toggleDarkMode() {
-        //     const currentTheme = document.documentElement.getAttribute('data-theme');
-        //     const targetTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        //     document.documentElement.setAttribute('data-theme', targetTheme);
-        //     // Lưu lại lựa chọn để F5 không bị mất
-        //     localStorage.setItem('theme', targetTheme);
-            
-        // }
-        // // Tự động load theme cũ khi mở web
-        // if(localStorage.getItem('theme') === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
-        // //----Dark Mode END-----
 
         // ---- Dark Mode Nâng Cấp (Chạy theo Class của Tailwind) ----
         function toggleDarkMode() {
@@ -1412,102 +1608,6 @@
             engrChecks.forEach(ck => ck.checked = false);
         }
 
-        //Hàm này FILTER theo searchbox >>> OK 
-        // function renderTable(data) {
-        //     const query = document.getElementById('searchInput').value.toLowerCase();
-        //     const body = document.getElementById('taskTableBody');
-        //     const filtered = data.filter(t => t[1].toLowerCase().includes(query) || t[4].toLowerCase().includes(query));
-
-        //     body.innerHTML = filtered.map((row) => {
-        //         const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
-        //         const isImmediately = row[2] === "IMMEDIATELY";
-        //         return `
-        //         <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
-        //             <td class="p-4 font-black text-lg">${row[1]}<br>
-        //                 <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
-        //                     ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
-        //                 </span>
-        //             </td>
-        //             <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
-        //             <td class="p-4">
-        //                 <div class="desc-text">${row[4]}</div>
-        //                 ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
-        //             </td>
-        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
-        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
-        //             <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
-        //             <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-        //             <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
-        //             <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
-        //             <td class="p-4 text-center">
-        //                 <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
-        //             </td>
-        //         </tr>
-        //     `}).join('');
-        // }
-        //END - Hàm này FILTER theo searchbox >>> OK 
-        
-        // //Hàm này FILTER theo searchbox và date >>> OK
-        // function renderTable(data) {
-        //     const query = document.getElementById('searchInput').value.toLowerCase();
-        //     const dateFrom = document.getElementById('dateFrom')?.value; // Thêm dấu ? để tránh lỗi nếu chưa có ô input
-        //     const dateTo = document.getElementById('dateTo')?.value;
-        //     const body = document.getElementById('taskTableBody');
-        
-        //     // --- LOGIC LỌC SIÊU CẤP: Search + Khoảng ngày ---
-        //     const filtered = data.filter(t => {
-        //         // 1. Lọc theo từ khóa (PCN hoặc Description)
-        //         const matchSearch = String(t[1]).toLowerCase().includes(query) || 
-        //                            String(t[4]).toLowerCase().includes(query);
-        
-        //         // 2. Lọc theo khoảng ngày (Cột Release Date - Index 9 cho chuẩn bài nhé bồ)
-        //         const taskDate = t[9] ? t[9].split('T')[0] : ""; 
-        //         let matchDate = true;
-        //         if (dateFrom && taskDate < dateFrom) matchDate = false;
-        //         if (dateTo && taskDate > dateTo) matchDate = false;
-        
-        //         return matchSearch && matchDate;
-        //     });
-        
-        //     // --- PHẦN VẼ BẢNG (Giữ nguyên logic của bồ) ---
-        //     body.innerHTML = filtered.map((row) => {
-        //         const isUpdating = (updatingId !== null && String(row[0]) === String(updatingId));
-        //         const isImmediately = row[2] === "IMMEDIATELY";
-                
-        //         return `
-        //         <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} ${isUpdating ? 'updating' : ''}">
-        //             <td class="p-4 font-black text-lg">${row[1]}<br>
-        //                 <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
-        //                     ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
-        //                 </span>
-        //             </td>
-        //             <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
-        //             <td class="p-4">
-        //                 <div class="desc-text">${row[4]}</div>
-        //                 ${row[12] ? `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : ''}
-        //             </td>
-        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
-        //             <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
-        //             <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
-        //             <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-        //             <td class="p-4 font-bold text-slate-600">${row[8] || '-'}</td>
-        //             <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
-        //             <td class="p-4 text-center">
-        //                 <button onclick="prepareEdit('${row[0]}')" class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs hover:bg-[#0073ea] hover:text-white">EDIT</button>
-        //             </td>
-        //         </tr>
-        //     `}).join('');
-        // }
-        
-        // // Hàm reset để quay về trạng thái ban đầu
-        // function resetFilters() {
-        //     document.getElementById('dateFrom').value = "";
-        //     document.getElementById('dateTo').value = "";
-        //     document.getElementById('searchInput').value = "";
-        //     renderTable(allTasks);
-        // }
-        // //END - Hàm này FILTER theo searchbox và date >>> OK
-
         //Hàm FILTER theo searchbox và date, ngoài ra test phần Approve lấy từ tracking
         function renderTable(data) {
             const query = document.getElementById('searchInput').value.toLowerCase();
@@ -1567,41 +1667,6 @@
                 // Nếu không phải tracking thì hiện Remark như bình thường
                 const normalRemark = (!trackingHtml && row[12]) ? 
                     `<div class="text-[12px] text-rose-600 font-bold mt-2 bg-rose-50 p-2 rounded-lg border border-rose-100 italic">REMARK: ${row[12]}</div>` : '';
-        
-                // return `
-                // <tr class="hover:bg-[#f8fafc] ${row[11] ? 'bg-slate-50/50' : ''} 
-                //     ${isUpdating ? 'bg-blue-50/50 border-l-4 border-blue-500' : ''} 
-                //     ${(updatingId !== null && !isUpdating) ? 'opacity-30 pointer-events-none grayscale' : ''}">
-                    
-                //     <td class="p-4 font-black text-lg">${row[1]}<br>
-                //         <span class="text-[10px] ${isImmediately ? 'type-immediately' : 'text-slate-400'}">
-                //             ${isImmediately ? '🚨 IMMEDIATELY' : row[2]}
-                //         </span>
-                //     </td>
-                    
-                //     <td class="p-4 text-center"><span class="status-pill ${getStatusClass(row[3])}">${row[3]}</span></td>
-                    
-                //     <td class="p-4 min-w-[300px]">
-                //         <div class="desc-text font-medium text-slate-700">${row[4]}</div>
-                //         ${trackingHtml || normalRemark}
-                //     </td>
-                
-                //     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[5])}</td>
-                //     <td class="p-4 text-center text-slate-400 font-semibold">${formatDateDisplay(row[7])}</td>
-                //     <td class="p-4 text-center font-black bg-blue-50/20">${formatDateDisplay(row[9])}</td>
-                //     <td class="p-4 font-bold text-indigo-600">${row[6] || '-'}</td>
-                //     <td class="p-4 font-bold text-slate-600 text-center">${row[8] || '-'}</td>
-                //     <td class="p-4 text-center text-xl">${row[11] ? '✅' : '⏳'}</td>
-                    
-                //     <td class="p-4 text-center">
-                //         <button onclick="prepareEdit('${row[0]}')" 
-                //             ${updatingId !== null ? 'disabled' : ''} 
-                //             class="bg-[#0073ea]/10 text-[#0073ea] px-4 py-2 rounded-lg font-black text-xs 
-                //             ${updatingId !== null ? 'opacity-50 cursor-not-allowed' : 'hover:bg-[#0073ea] hover:text-white'}">
-                //             EDIT
-                //         </button>
-                //     </td>
-                // </tr>
                 return `
                     <tr class="transition-colors duration-200 border-b border-slate-100 dark:border-slate-700/50
                         hover:bg-[#f8fafc] dark:hover:bg-slate-700/30 
@@ -1676,47 +1741,6 @@
 
         function formatDateDisplay(d) { return (!d || d === "" || d === "-") ? "-" : d.split('T')[0]; }
         function formatDateInput(d) { return (!d || d === "" || d === "-") ? "" : d.split('T')[0]; }
-
-        // async function saveTask() {
-        //     const id = document.getElementById('editId').value;
-        //     // Trong hàm saveTask, thay dòng lấy giá trị apprEngr bằng đoạn này:
-        //     const selectedEngrs = Array.from(document.querySelectorAll('input[name="engrCheck"]:checked'))
-        //                                .map(el => el.value)
-        //                                .join('; ');
-        //     const data = {
-        //         id: id || null,
-        //         pcn: document.getElementById('pcnInput').value,
-        //         pcnType: document.getElementById('pcnTypeInput').value,
-        //         status: document.getElementById('statusInput').value,
-        //         desc: document.getElementById('descInput').value,
-        //         start: document.getElementById('startInput').value,
-        //         engrTech: document.getElementById('engrTechInput').value,
-        //         apprDate: document.getElementById('apprDateInput').value,
-        //         apprEngr: selectedEngrs,
-        //         releaseDate: document.getElementById('releaseDateInput').value,
-        //         isReported: document.getElementById('reportedInput').checked,
-        //         remarks: document.getElementById('remarksInput').value
-        //     };
-        //     if (!data.pcn) return alert("You forget to add PCN #!");
-        //     updatingId = id || "new"; 
-        //     toggleModal(false);
-        //     renderTable(allTasks);
-        //     try {
-        //         // 4. Gửi data đi (vẫn đang mờ...)
-        //         await fetch(SCRIPT_URL, { method: "POST", body: JSON.stringify(data) });
-                
-        //         // 5. Load lại data mới nhất từ Google Sheets
-        //         // Trong hàm loadTasks của bồ đã có sẵn lệnh updatingId = null
-        //         // nên khi nó chạy xong, bảng sẽ tự động SÁNG lại và cập nhật data mới.
-        //         await loadTasks(); 
-                
-        //     } catch (e) {
-        //         console.error("Error:", e);
-        //         updatingId = null; // Lỡ lỗi thì cũng cho sáng lại để còn bấm tiếp
-        //         renderTable(allTasks);
-        //     }
-        // }
-
         async function saveTask() {
             try {
                 const id = document.getElementById('editId').value;
@@ -1811,35 +1835,7 @@
             applyFilters();
             toggleModal(true);
         }
-
-        // HÀM EXPORT PDF ĐÃ TRỞ LẠI VÀ LỢI HẠI HƠN << OK NHƯNG KO CÓ MÀU
-        // function exportPDFOK() {
-        //     const { jsPDF } = window.jspdf;
-        //     const doc = new jsPDF('l', 'mm', 'a3');
-        //     const toExport = allTasks.filter(t => !t[11]); // Chỉ xuất cái chưa Reported
-        //     const tableData = toExport.map(t => [
-        //         t[1], t[2], t[3], 
-        //         t[4] + (t[12] ? "\n---\nREMARK: " + t[12] : ""), 
-        //         formatDateDisplay(t[5]), t[6], formatDateDisplay(t[7]), t[8], formatDateDisplay(t[9])
-        //     ]);
-        //     doc.setFontSize(22);
-        //     doc.setTextColor(0, 115, 234);
-        //     doc.text("PCN REPORT", 14, 20);
-            
-        //     doc.setFontSize(10);
-        //     doc.setTextColor(100, 100, 100);
-        //     doc.text("Export Date: " + new Date().toLocaleString(), 14, 28);        
-            
-        //     doc.autoTable({
-        //         head: [['PCN', 'TYPE', 'STATUS', 'CONTENT & REMARKS', 'START', 'TECH', 'APPR DATE', 'APPR', 'REL DATE']],
-        //         body: tableData,
-        //         startY: 30,
-        //         styles: { fontSize: 10, cellPadding: 4 },
-        //         headStyles: { fillColor: [0, 115, 234] }
-        //     });
-        //     doc.save("PCN-Report.pdf");
-        // }
-        // ----Khúc này END xử lý export---- 
+       
         
         // ----Khúc này xử lý export OK VÀ CÓ MÀU---- 
         // Hàm "thần thánh" giúp định nghĩa màu sắc đồng nhất cho Web và PDF
@@ -1964,118 +1960,6 @@
                 headStyles: { fillColor: [0, 115, 234] },
                 
 
-                // 1. CHUẨN BỊ MÀU SẮC CHO CẢ Ô (STATUS, TYPE)
-                // didParseCell: (data) => {
-                //     if (data.section === 'body') {
-                //         // Cột Status (Index 2): Đổ màu nền
-                //         if (data.column.index === 2) {
-                //             const color = getStatusColor(data.cell.raw);
-                //             const r = parseInt(color.slice(1,3), 16), 
-                //                   g = parseInt(color.slice(3,5), 16), 
-                //                   b = parseInt(color.slice(5,7), 16);
-                //             data.cell.styles.fillColor = [r, g, b];
-                //             data.cell.styles.textColor = [255, 255, 255];
-                //             data.cell.styles.fontStyle = 'bold';
-                //         }
-                //         // Cột Type (Index 1): Chữ đỏ nếu Immediately
-                //         if (data.column.index === 1 && String(data.cell.raw).includes("IMMEDIATELY")) {
-                //             data.cell.styles.textColor = [239, 68, 68];
-                //             data.cell.styles.fontStyle = 'bold';
-                //         }
-                //     }
-                // },
-            
-                // // 2. XỬ LÝ TÔ MÀU TỪNG DÒNG TRONG CỘT CONTENT (DIỆT BÓNG MA)
-                // willDrawCell: (data) => {
-                //     if (data.section === 'body' && data.column.index === 3) {
-                //         // Xóa sạch nội dung text mà AutoTable định vẽ để mình tự vẽ
-                //         // Đây là cách duy nhất để không bị chồng chữ (bóng ma)
-                //         data.cell.text = data.cell.text.map(line => ""); 
-                //     }
-                // },
-            
-                // didDrawCell: (data) => {
-                //     // Chỉ can thiệp vào cột Content & Remarks (Index 3)
-                //     if (data.section === 'body' && data.column.index === 3) {
-                //         const doc = data.doc;
-                //         const cell = data.cell;
-                //         const paddingLeft = cell.x + cell.padding('left');
-                        
-                //         // 1. LẤY NỘI DUNG DÒNG (AutoTable đã tự cắt dòng cho bồ rồi)
-                //         const lines = cell.text; 
-                //         if (!lines || lines.length === 0) return;
-                
-                //         // 2. TÍNH TOÁN VỊ TRÍ Y (Quan trọng để không lệch chữ)
-                //         let cursorY = cell.y + cell.padding('top') + (doc.getFontSize() / 2);
-                
-                //         // 3. DUYỆT TỪNG DÒNG ĐỂ TÔ MÀU
-                //         lines.forEach((line) => {
-                //             const cleanLine = line.trim();
-                
-                //             // Kiểm tra nội dung để quyết định màu sắc
-                //             if (cleanLine.includes('[X]')) {
-                //                 doc.setTextColor(225, 29, 72); // Đỏ cho người chưa duyệt
-                //                 doc.setFont("helvetica", "bold");
-                //             } 
-                //             else if (cleanLine.includes('[V]')) {
-                //                 doc.setTextColor(16, 185, 129); // Xanh cho người đã duyệt
-                //                 doc.setFont("helvetica", "normal");
-                //             }
-                //             else if (cleanLine.includes('REMARK:')) {
-                //                 doc.setTextColor(225, 29, 72); // Đỏ cho Remark
-                //                 doc.setFont("helvetica", "bolditalic");
-                //             }
-                //             else {
-                //                 // Nội dung Description bình thường thì để màu xám đen mặc định
-                //                 doc.setTextColor(51, 65, 85); 
-                //                 doc.setFont("helvetica", "normal");
-                //             }
-                
-                //             // VẼ CHỮ ĐÈ LÊN (Không xóa text gốc, chỉ vẽ đè đúng vị trí)
-                //             doc.text(line, paddingLeft, cursorY);
-                            
-                //             // Nhảy xuống dòng tiếp theo dựa trên line height của thư viện
-                //             cursorY += (cell.styles.lineHeight || 1.15) * doc.getFontSize() * 0.3527; 
-                //             // 0.3527 là hệ số chuyển đổi từ pt sang mm
-                //         });
-                //     }
-                // }
-                // didDrawCell: (data) => {
-                //     if (data.section === 'body' && data.column.index === 3) {
-                //         const doc = data.doc;
-                //         const cell = data.cell;
-                //         const padding = cell.padding('left');
-                        
-                //         // Lấy danh sách các dòng ĐÃ ĐƯỢC AutoTable cắt sẵn
-                //         const lines = cell.text; 
-                        
-                //         // MẸO DIỆT BÓNG MA: Xóa text trong cell để AutoTable không tự vẽ nữa
-                //         cell.text = []; 
-                
-                //         let cursorY = cell.y + cell.padding('top') + (doc.getFontSize() / 2);
-                
-                //         lines.forEach((line) => {
-                //             // Kiểm tra nội dung để đổi màu
-                //             if (line.includes('[X]')) {
-                //                 doc.setTextColor(225, 29, 72); // Đỏ Rose
-                //                 doc.setFont("helvetica", "bold");
-                //             } else if (line.includes('[V]')) {
-                //                 doc.setTextColor(16, 185, 129); // Xanh Emerald
-                //                 doc.setFont("helvetica", "normal");
-                //             } else if (line.includes('REMARK:')) {
-                //                 doc.setTextColor(225, 29, 72); // Đỏ cho Remark
-                //                 doc.setFont("helvetica", "bolditalic");
-                //             } else {
-                //                 doc.setTextColor(51, 65, 85); // Mặc định
-                //                 doc.setFont("helvetica", "normal");
-                //             }
-                
-                //             // Vẽ dòng chữ
-                //             doc.text(line, cell.x + padding, cursorY);
-                //             cursorY += doc.getLineHeight();
-                //         });
-                //     }
-                // },
                 
                 // TUYỆT CHIÊU CUỐI: CHỈ ĐỔI MÀU CHỮ (KHÔNG VẼ ĐÈ - KHÔNG LỖI)
                 didParseCell: (data) => {
@@ -2197,6 +2081,8 @@
                 document.onmousemove = null;
             }
         }
+        
+        
     </script>
     <!-- ---------CONVERSION---------- -->
     <div id="converter-widget" class="hidden fixed bg-white dark:bg-slate-800 shadow-2xl rounded-2xl border border-slate-200 dark:border-slate-700 z-[9999] overflow-hidden" style="width: 250px; bottom: 20px; right: 20px;">
@@ -2271,5 +2157,71 @@
         </div>
     </div>
     <!-- ---------------------END NOTE--------------------- -->
+
+    <!-- --------------------ALARM----------------------- -->
+    <div id="alarmModal" class="hidden fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+        <div class="bg-[#1e2227] w-full max-w-md rounded-xl border border-gray-700 shadow-2xl overflow-hidden text-gray-200">
+            <div class="flex justify-between items-center p-4 border-b border-gray-700">
+                <h3 class="font-bold text-lg">Tạo nhắc hẹn</h3>
+                <button onclick="closeAlarmModal()" class="text-gray-400 hover:text-white">✕</button>
+            </div>
+    
+            <div class="p-4 space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nhập tiêu đề</label>
+                    <input type="text" id="alarmTitle" placeholder="Tiêu đề nhắc hẹn..." 
+                           class="w-full bg-[#282c34] border border-gray-600 rounded-lg p-3 outline-none focus:border-blue-500">
+                </div>
+    
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nhập nội dung</label>
+                    <textarea id="alarmContent" rows="3" placeholder="Nhập nội dung mới hoặc dán link" 
+                              class="w-full bg-[#282c34] border border-gray-600 rounded-lg p-3 outline-none focus:border-blue-500"></textarea>
+                </div>
+    
+                <div>
+                    <label class="block text-sm font-medium mb-2">Chọn thời gian nhanh</label>
+                    <div class="flex flex-wrap gap-2">
+                        <button onclick="setQuickTime(15)" class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-full text-sm">15 phút nữa</button>
+                        <button onclick="setQuickTime(30)" class="bg-blue-900 text-blue-200 px-3 py-1.5 rounded-full text-sm border border-blue-700">30 phút nữa</button>
+                        <button onclick="setQuickTime('tomorrow')" class="bg-gray-700 hover:bg-gray-600 px-3 py-1.5 rounded-full text-sm">9:00 ngày mai</button>
+                    </div>
+                </div>
+    
+                <div>
+                    <label class="block text-sm font-medium mb-1">Chọn ngày nhắc hẹn</label>
+                    <div class="relative">
+                        <input type="datetime-local" id="alarmTime" 
+                               class="w-full bg-[#282c34] border border-gray-600 rounded-lg p-3 outline-none focus:border-blue-500">
+                    </div>
+                </div>
+    
+                <div>
+                    <label class="block text-sm font-medium mb-1">Chọn kiểu lặp lại</label>
+                    <select id="alarmFreq" class="w-full bg-[#282c34] border border-gray-600 rounded-lg p-3 outline-none">
+                        <option value="ONCE">Không lặp lại</option>
+                        <option value="DAILY">Hàng ngày</option>
+                        <option value="WEEKLY">Hàng tuần</option>
+                        <option value="MONTHLY">Hàng tháng</option>
+                    </select>
+                </div>
+                
+                <div class="grid grid-cols-2 gap-3">
+                    <input type="text" id="alarmRecipients" placeholder="Người nhận (email/sđt)" class="bg-[#282c34] border border-gray-600 rounded-lg p-3 text-sm">
+                    <select id="alarmType" class="bg-[#282c34] border border-gray-600 rounded-lg p-3 text-sm">
+                        <option value="MAIL">Email</option>
+                        <option value="SMS">SMS</option>
+                        <option value="BOTH">Cả hai</option>
+                    </select>
+                </div>
+            </div>
+    
+            <div class="p-4 bg-[#181a1f] flex justify-end gap-3">
+                <button onclick="closeAlarmModal()" class="text-gray-400 px-4 py-2">Hủy</button>
+                <button onclick="saveAlarm()" class="bg-blue-600 hover:bg-blue-500 text-white px-6 py-2 rounded-lg font-medium">Lưu Alarm</button>
+            </div>
+        </div>
+    </div>
+    <!-- -------------------------END ALARM---------------------- -->
 </body>
 </html>
