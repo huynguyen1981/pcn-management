@@ -1078,24 +1078,27 @@
             }
         }
         function searchNotes() {
-            // 1. Luôn lấy keyword mới nhất
-            const keyword = (document.getElementById('search-notes').value || "").toLowerCase();
+            const rawKeyword = document.getElementById('search-notes').value;
+            const keyword = (rawKeyword || "").toLowerCase();
             
-            // 2. CHỐT CHẶN: Nếu keyword rỗng, hiện lại toàn bộ bản gốc ngay và thoát
-            if (!keyword) {
-                renderNoteWall(allNotes); 
+            // DEBUG: Bồ nhấn F12 xem số này có bị giảm đi sau mỗi lần gõ không
+            console.log("Tổng số Note gốc hiện có:", allNotes.length);
+        
+            if (!keyword || keyword.trim() === "") {
+                renderNoteWall(allNotes);
                 return;
             }
         
-            // 3. Lọc trên allNotes và trả ra một "bản sao tạm thời" (filteredNotes)
-            const filteredNotes = allNotes.filter(note => {
-                const title = (note[1] || "").toString().toLowerCase();
-                const content = (note[2] || "").toString().toLowerCase();
-                return title.includes(keyword) || content.includes(keyword);
+            // Tạo một mảng hoàn toàn mới bằng Spread Operator [...] để không đụng chạm bản gốc
+            const tempNotes = [...allNotes]; 
+            
+            const results = tempNotes.filter(n => {
+                const t = (n[1] || "").toString().toLowerCase();
+                const c = (n[2] || "").toString().toLowerCase();
+                return t.includes(keyword) || c.includes(keyword);
             });
         
-            // 4. CHỈ VẼ bản sao này lên màn hình, KHÔNG lưu nó vào allNotes
-            renderNoteWall(filteredNotes);
+            renderNoteWall(results);
         }
         // ------------------END NOTES----------------
 
