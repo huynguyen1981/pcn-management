@@ -1448,29 +1448,38 @@
         async function loadTasks() {
             try {
                 const res = await fetch(SCRIPT_URL);
-                const data = await res.json(); // Bây giờ data là { tasks: [...], notes: [...] }
-        
-                // 1. Gán đúng mảng tasks cho allTasks để hàm applyFilters() không bị lỗi .filter
-                allTasks = data.tasks || []; 
+                const data = await res.json(); 
                 
-                // 2. Gán mảng notes vào biến global để tí nữa mình render cái Wall
-                allNotes = data.notes || []; 
+                // 1. Gán mảng tasks (PCN Data)
+                allTasks = data.tasks || [];
+                
+                // 2. Gán mảng notes
+                allNotes = data.notes || [];
+        
+                // 3. Gán mảng alarms (QUAN TRỌNG: Cần dòng này để hiện dữ liệu)
+                allAlarms = data.alarms || []; 
         
                 updatingId = null;
                 
-                // 3. Chạy lọc và hiển thị bảng PCN như cũ
-                applyFilters(); 
+                // 4. Chạy lọc và hiển thị bảng PCN
+                applyFilters();
         
-                // 4. TIỆN TAY: Nếu đang ở trang Note thì vẽ luôn cái Wall
+                // 5. Vẽ Note Wall
                 if (typeof renderNoteWall === "function") {
                     renderNoteWall(allNotes);
+                }
+        
+                // 6. Vẽ Alarm Wall (Bồ vừa thêm cái này nè)
+                if (typeof renderAlarmWall === "function") {
+                    renderAlarmWall(allAlarms);
                 }
                 
             } catch (e) { 
                 console.error("Lỗi load data bồ ơi:", e);
-                allTasks = []; // Chống cháy bằng mảng rỗng để không bị crash
+                allTasks = [];
+                allAlarms = []; 
                 updatingId = null;
-                applyFilters(); 
+                applyFilters();
             }
         }
 
