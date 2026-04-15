@@ -1031,7 +1031,7 @@
         async function sendDeleteRequest(target, id) {
             try {
                 // scriptUrl là link Web App (.../exec) của bồ
-                const response = await fetch(`${scriptUrl}?action=delete&target=${target}&id=${id}`);
+                const response = await fetch(`${SCRIPT_URL}?action=delete&target=${target}&id=${id}`);
                 const result = await response.json();
                 return result.success;
             } catch (error) {
@@ -1154,7 +1154,7 @@
 
         async function fetchData() {
             try {
-                const response = await fetch(scriptUrl);
+                const response = await fetch(SCRIPT_URL);
                 const data = await response.json();
                 
                 // Lưu data vào biến global để dùng khi sửa
@@ -1248,7 +1248,7 @@
             }
         
             // Gửi sang Apps Script (dùng link Web App của bồ)
-            const response = await fetch(scriptUrl, { method: 'POST', body: JSON.stringify(data) });
+            const response = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
             if(response.ok) {
                 closeAlarmModal();
                 // loadAlarms(); // Hàm load lại danh sách Alarm để hiển thị
