@@ -1990,7 +1990,7 @@
                     }
                 }
             });
-            / Lấy ngày hiện tại theo chuẩn US (MM-DD-YYYY)
+            // Lấy ngày hiện tại theo chuẩn US (MM-DD-YYYY)
             const formattedDate = new Date().toLocaleDateString('en-US').replace(/\//g, '-');
             doc.save("PCN Report of HUY NGUYEN _ ${formattedDate}.pdf");
         }
