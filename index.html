@@ -807,12 +807,12 @@
         }
         // 2. Hàm render đã được "tân trang"
         function renderNoteWall(notes) {
-            allNotes = notes || []; 
+            const data = notes || []; 
             const wall = document.getElementById('note-wall');
             if (!wall) return;
             wall.innerHTML = ''; 
         
-            allNotes.forEach((note, index) => {
+            data.forEach((note, index) => {
                 // CHỈ KHAI BÁO 1 LẦN DUY NHẤT Ở ĐÂY
                 // note[3] là cột Color trong Sheet của bồ
                 const savedColor = note[5] || '#fff9c4'; 
