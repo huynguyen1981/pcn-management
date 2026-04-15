@@ -709,7 +709,7 @@
     
     <script>
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwySpFvzMt0T5Xzilz-Ji7mMe4Dn1CwRhsEWgkKoMz3gW8KEH9oA_F7XOoyXJqvXhrrzw/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaeUBIsiV19yAu1yE9km0JdXkmjvhDTdFszwwAGJWuckGmyTuGM5d71DOVTKpoH0UsBg/exec";
 
         // ----------------NOTES--------------------
         // --- BIẾN TOÀN CỤC ---
@@ -1139,11 +1139,20 @@
             if (alarm) {
                 // Tận dụng hàm openAlarmModal mình đã viết ở trên
                 // Nhưng lưu ý map đúng vị trí cột
+                // Chuyển đổi date từ database sang định dạng HTML datetime-local (YYYY-MM-DDTHH:mm)
+                const dateObj = new Date(alarm[3]);
+                const year = dateObj.getFullYear();
+                const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+                const day = String(dateObj.getDate()).padStart(2, '0');
+                const hours = String(dateObj.getHours()).padStart(2, '0');
+                const minutes = String(dateObj.getMinutes()).padStart(2, '0');
+                
+                const formattedTime = `${year}-${month}-${day}T${hours}:${minutes}`;
                 const alarmObj = {
                     id: alarm[0],
                     title: alarm[1],
                     content: alarm[2],
-                    time: new Date(alarm[3]).toISOString().slice(0, 16),
+                    time: formattedTime,
                     recipients: alarm[4],
                     notifyType: alarm[5],
                     freq: alarm[6]
