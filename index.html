@@ -538,7 +538,11 @@
         <div id="section-notes" class="hidden min-h-screen p-6 bg-slate-50 dark:bg-slate-900 overflow-y-auto">
              <div class="flex justify-between items-center mb-6">
                   <h2 class="text-2xl font-black">STICKY NOTES WALL</h2>
-                  <button onclick="openNoteEditor()" class="bg-blue-600 text-white px-4 py-2 rounded-xl">+ Thêm Note</button>
+                 <div class="flex items-center gap-4">
+                    <input type="text" id="search-notes" oninput="searchNotes()" placeholder="Tìm ghi chú..." 
+                           class="px-4 py-2 rounded-xl border border-gray-300 dark:bg-slate-800 dark:border-slate-700 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <button onclick="openNoteEditor()" class="bg-blue-600 text-white px-4 py-2 rounded-xl">+ Thêm Note</button>
+                 </div>
              </div>
              <div id="note-wall" class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6">
                   </div>
@@ -709,7 +713,7 @@
     
     <script>
 
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyaeUBIsiV19yAu1yE9km0JdXkmjvhDTdFszwwAGJWuckGmyTuGM5d71DOVTKpoH0UsBg/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkqvcssyCvhq4hJbQhWhix0vaG1O2yXQxiBUCaGyOze-MfvbpgQawO3lOvMuK3FK1vdQ/exec";
 
         // ----------------NOTES--------------------
         // --- BIẾN TOÀN CỤC ---
@@ -1072,6 +1076,16 @@
             } catch (error) {
                 alert("Xóa không được rồi: " + error);
             }
+        }
+        function searchNotes() {
+            const keyword = document.getElementById('search-notes').value.toLowerCase();
+            // Lọc mảng allNotes dựa trên từ khóa
+            const filteredNotes = allNotes.filter(note => 
+                (note[1] && note[1].toLowerCase().includes(keyword)) || 
+                (note[2] && note[2].toLowerCase().includes(keyword))
+            );
+            // Vẽ lại Wall với danh sách đã lọc
+            renderNoteWall(filteredNotes);
         }
         // ------------------END NOTES----------------
 
